@@ -168,8 +168,8 @@ const PRODUCTS = [
     handle: 'mango-wave', folio: 23, name: 'Mango Wave', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Mangue juteuse, framboise éclatante et ambre gourmand, dans un sillage solaire, fruité et irrésistible.',
     keyNotes: 'Mangue · Framboise · Ambre', families: ['Fruité', 'Ambré'],
-    pack: 'mango-wave-pack', card: 'mango-wave-1', pack30: 'mango-wave-pack30', scene: 'mango-wave-1',
-    gallery: ['mango-wave-pack', 'mango-wave-pack30', 'mango-wave-1', 'mango-wave-2', 'hero-summer'],
+    pack: 'mango-wave-pack', card: 'mango-wave-pack', pack30: 'mango-wave-pack30', scene: 'hero-summer',
+    gallery: ['mango-wave-pack', 'mango-wave-pack30', 'hero-summer', 'cover-pile'],
     description: [
       "Mango Wave est une vague d’énergie fruitée et de douceur gourmande. En tête, la mangue juteuse et l’orange acidulée éclatent comme un souffle lumineux, vibrant sur la peau.",
       "Le cœur, fruité et floral, mêle grenade, framboise et jasmin, esquissant la douceur d’un soir d’été suspendu entre chaleur et éclat. En fond, l’ambre, la mousse de chêne et la cassonade caramélisée composent un sillage captivant, riche et enveloppant.",
@@ -329,7 +329,6 @@ const SHELF = [
   { img: 'prune-livres', t: 'La prune', h: 'vanilla-plum' },
   { img: 'poire-livres', t: 'La poire', h: 'magnetic-flowers' },
   { img: 'tonka-capot', t: 'La fève tonka', h: 'tonka-love' },
-  { img: 'mango-wave-2', t: 'La mangue', h: 'mango-wave' },
   { img: 'baies-colonne', t: 'Les baies', h: 'palmeira' },
   { img: 'sun-ice-2', t: 'Le cassis', h: 'sun-ice' },
   { img: 'ambert-sunset-2', t: 'L’abricot', h: 'ambert-sunset' },
