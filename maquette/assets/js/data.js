@@ -1,15 +1,16 @@
 /* ==========================================================================
-   LIBRERY — données de la maquette
+   LIBRERY — données du site (v2, d'après le catalogue A4 v4)
    Ces objets correspondent 1:1 à ce qui sera créé dans Shopify :
-   produits (+ métachamps notes / parfumeur / matières), collections,
-   métaobjets « parfumeur » et « point de vente ».
-   Les prix marqués PRIX_A_CONFIRMER sont des valeurs provisoires.
+   produits (+ métachamps : accroche, notes, parfumeur, matières),
+   collections, métaobjets « parfumeur » et « point de vente ».
+   Les prix marqués PRIX_A_CONFIRMER sont provisoires.
    ========================================================================== */
 
-const IMG = '/assets/img/';
+const IMG = '/assets/img/v2/';
+const CATALOGUE_URL = 'https://librery-catalogue-3d.vercel.app/';
+const CATALOGUE_PDF = 'https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf';
 
-/* Formats et prix — maquette Canva : 100 ml à 170 €, « dès 6 € » (2 ml).
-   Le 30 ml est un prix provisoire à confirmer par le client. */
+/* Formats — catalogue : « Extrait de Parfum 25 % · 100 ml & 30 ml » ; échantillon 2 ml (« dès 6 € », maquette Canva). */
 const FORMATS = [
   { id: '100', label: '100 ml', price: 170 },
   { id: '30', label: '30 ml', price: 75 },   // PRIX_A_CONFIRMER
@@ -18,241 +19,211 @@ const FORMATS = [
 
 const PERFUMERS = {
   'chris-maurice': {
-    name: 'Chris Maurice',
+    name: 'Chris Maurice', role: 'Maître parfumeur', image: 'chris-maurice',
+    works: 'Hot Sand · Mango Wave · Palmeira · Ambert Sunset',
     bio: [
       "Chris Maurice, maître parfumeur et directeur de Carbonnel S.A., est issu d’une prestigieuse lignée de parfumeurs espagnols. Plongé dès l’enfance dans l’univers des fragrances de niche, il a affiné son expertise dans la création d’essences raffinées, incarnant sa vision de la Haute Parfumerie.",
-      "Grâce à une vaste expérience auprès de marques renommées comme Xerjoff, Nishane, Fragrance Du Bois et Masque Milano, Chris s’est imposé comme une figure clé du secteur. Il est également le fondateur de CDe La Niche, une entreprise dédiée à la création de parfums uniques et intemporels.",
-      "Ses compositions, telles que Lira, Alexandria II ou More Than Words, sont plébiscitées par les amateurs du monde entier. Collaborant avec des maisons prestigieuses, son talent, sa passion et sa créativité font de lui l’un des parfumeurs les plus respectés de l’industrie."
+      "Grâce à une vaste expérience auprès de maisons renommées comme Xerjoff, Nishane, Fragrance Du Bois et Masque Milano, il s’est imposé comme une figure clé du secteur. Il est également le fondateur de CDe La Niche, une entreprise dédiée à la création de parfums uniques et intemporels.",
+      "Ses compositions, telles que Lira, Alexandria II ou More Than Words, sont plébiscitées par les amateurs du monde entier. Son talent, sa passion et sa créativité font de lui l’un des parfumeurs les plus respectés de l’industrie."
     ]
   },
   'nathalie-feisthauer': {
-    name: 'Nathalie Feisthauer',
+    name: 'Nathalie Feisthauer', role: 'Parfumeure', image: 'nathalie-feisthauer',
+    works: 'Sun Ice',
     bio: [
-      "Nathalie Feisthauer a toujours été fascinée par les parfums, une passion révélée par Opium d’Yves Saint Laurent. En 1983, elle intègre l’école de parfumerie Roure à Grasse, devenant la première stagiaire sans héritage familial dans un milieu encore très fermé. Sa carrière prend son essor à New York chez Estée Lauder, où elle découvre l’énergie et l’audace du marché américain, enrichissant ainsi sa créativité.",
-      "Pendant plus de 30 ans, elle façonne des parfums pour des maisons prestigieuses comme Hermès, Cartier ou État Libre d’Orange, évoluant au sein de Givaudan puis Symrise. Aujourd’hui indépendante, elle fonde LABscent à Montmartre, installant son laboratoire dans une ancienne galerie d’art. Forte de son expérience et de sa renommée, elle compose des créations olfactives pour des marques de niche aux quatre coins du monde.",
-      "Son talent lui a valu de multiples récompenses, dont le prix FIFI du parfumeur de l’année en 2019 et plusieurs distinctions pour ses compositions emblématiques."
+      "Nathalie Feisthauer a toujours été fascinée par les parfums, une passion révélée par Opium d’Yves Saint Laurent. En 1983, elle intègre l’école de parfumerie Roure à Grasse, devenant la première stagiaire sans héritage familial dans un milieu encore très fermé. Sa carrière prend son essor à New York chez Estée Lauder.",
+      "Pendant plus de trente ans, elle façonne des parfums pour Hermès, Cartier ou État Libre d’Orange, au sein de Givaudan puis de Symrise. Aujourd’hui indépendante, elle a fondé LABscent à Montmartre, installant son laboratoire dans une ancienne galerie d’art.",
+      "Son talent lui a valu de nombreuses distinctions, dont le prix FIFI du parfumeur de l’année en 2019."
     ]
   },
   'coralie-spicher': {
-    name: 'Coralie Spicher',
+    name: 'Coralie Spicher', role: 'Parfumeure · dsm-firmenich', image: 'coralie-spicher',
+    works: 'Vanilla Plum · Magnetic Flowers · Tonka Love',
+    quote: "J’aime l’idée que chaque parfum puisse être une vie que je n’ai pas vécue. C’est peut-être pour cela que je fais ce métier : pour en vivre mille.",
     bio: [
-      "Née à Genève, Coralie Spicher découvre sa passion pour la parfumerie à l’âge de douze ans, lorsqu’elle reçoit son premier parfum. Une première rencontre olfactive qui l’emmène dans un univers magique et émotionnel, et qui deviendra son terrain d’expression.",
-      "Après des études de biochimie à l’Université de Genève, elle rejoint l’École Supérieure du Parfum à Paris pour y effectuer son Master. Son parcours débute chez dsm-firmenich à Genève, dans le domaine de la chromatographie, avant qu’elle n’intègre en 2018 l’école de parfumerie dsm-firmenich Fine Fragrance.",
-      "Curieuse et profondément inspirée par le monde qui l’entoure, Coralie puise ses idées dans les lieux, les rencontres, l’architecture, l’art, la gastronomie et les voyages. Elle aime observer les cultures, les gestes, les habitudes et les odeurs du quotidien, autant de sources d’inspiration qui nourrissent sa vision de la parfumerie.",
-      "Animée par une volonté constante d’apprendre et d’explorer, elle associe patience, persévérance et sensibilité pour donner naissance à des créations qui transmettent des émotions authentiques. Entre force et sensibilité, Coralie Spicher explore de nouveaux territoires olfactifs sans jamais perdre de vue ce qui l’a poussée, à l’origine, à aimer le parfum."
+      "Depuis l’enfance, Coralie Spicher entretient une relation intime avec les odeurs. Son premier souvenir olfactif — l’herbe fraîchement coupée du jardin familial, à Genève — est resté fondateur et nourrit encore son lien profond à la nature et aux matières premières.",
+      "Très tôt, elle comprend que les parfums sont plus que des odeurs : des passages vers d’autres mondes. À l’adolescence, cette fascination devient une vocation. Après plusieurs années de persévérance dans l’industrie, elle intègre en 2018 l’école de parfumerie de dsm-firmenich, où elle se forme pendant trois ans auprès de Nathalie Lorson et Fabrice Pellegrin.",
+      "Aujourd’hui parfumeure, Coralie puise son inspiration dans le quotidien, les voyages, la musique et les matières naturelles. Sa sensibilité se nourrit autant d’une lumière, d’une texture ou d’un instant fugace que de ses rencontres avec les producteurs et les terres où naissent les ingrédients.",
+      "Son approche de la création est profondément musicale. Comme une pianiste, elle cherche une mélodie — une note centrale, intuitive, qui résonne — puis construit autour d’elle les nuances et la profondeur qui donnent au parfum toute sa dimension."
     ]
   }
 };
 
 const PRODUCTS = [
-  /* ---------------- Skin Obsession (nouvelle collection) ---------------- */
+  /* ============ Skin Obsession — Collection II (nouveauté) ============ */
   {
-    handle: 'tonka-love', name: 'Tonka Love', collection: 'skin-obsession', isNew: true,
-    perfumer: 'coralie-spicher', tone: '#b8a48c',
-    keyNotes: 'Fève de tonka · Caramel salé · Cèdre',
-    short: "Une gourmandise charnelle, enveloppante et affirmée, qui s’impose sur la peau avec une présence immédiatement envoûtante.",
+    handle: 'vanilla-plum', name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    tagline: 'L’obsession d’une douceur que l’on veut retenir.',
+    keyNotes: 'Prune · Accord lait · Vanille',
+    card: 'vanilla-plum-1', hover: 'vanilla-plum-mod', hoverLabel: 'La campagne',
+    gallery: ['vanilla-plum-1', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres'],
     description: [
-      "Tonka Love explore une gourmandise plus charnelle, presque instinctive, où la douceur devient tension et où le confort glisse vers l’addiction. Une fragrance pensée comme une attraction lente, profonde, difficile à interrompre.",
-      "L’ouverture installe immédiatement un contraste vivant : entre la chaleur légèrement grillée de l’amande, l’éclat hespéridé et la vibration épicée des notes de tête. Une entrée dense, texturée, qui accroche les sens sans jamais les brusquer.",
-      "Peu à peu, la composition se resserre autour d’un cœur plus enveloppant. Le caramel salé apporte une gourmandise trouble, jamais lisse, tandis que la tonka et la vanille construisent une chaleur crémeuse, presque tactile, qui semble fusionner avec la peau.",
-      "Le fond prolonge cette sensation d’attachement. Les bois secs et ambrés dessinent une structure douce mais persistante, tandis que les muscs et les matières modernes prolongent la sensation de peau chauffée, habitée, presque familière.",
-      "Tonka Love ne cherche pas la séduction immédiate. Il installe une présence, puis une habitude, puis une nécessité. Une fragrance qui s’ancre lentement, mais dont on ne se détache plus vraiment."
+      "Il y a les parfums que l’on découvre. Et il y a ceux vers lesquels on se surprend à revenir.",
+      "Vanilla Plum est né du désir de retrouver une sensation : celle d’un fruit mûr enveloppé dans une étreinte chaude, crémeuse et réconfortante.",
+      "Dès les premières notes, la prune révèle une facette riche et concentrée, comme un fruit délicatement confit. La cannelle apporte une touche chaude et épicée, tandis que l’amande adoucit la composition de sa rondeur crémeuse.",
+      "À mesure que le parfum se déploie, il se rapproche de la peau. Un accord lait velouté rencontre un cuir chaud, créant une tension inattendue entre douceur et caractère. La vanille émerge peu à peu, jusqu’à devenir le cœur de cette obsession.",
+      "Dans le sillage, deux vanilles révèlent leurs facettes contrastées : la vanille de Tahiti, douce, poudrée et amandée, puis la vanille Planifolia de Madagascar, plus riche et plus profonde. Le benjoin Siam, la tonka et les bois ambrés prolongent cette chaleur."
     ],
-    notes: {
-      tete: 'Amande grillée, Bergamote d’Italie, Poivre, Cardamome du Guatemala',
-      coeur: 'Caramel salé, Tonka, Vanille',
-      fond: 'Dreamwood, Cèdre de Virginie, Cashmeran'
-    },
+    coda: ['Une sensation à découvrir.', 'Une empreinte à retenir.', 'Une irrésistible envie d’y revenir.'],
+    notes: { tete: 'Prune, Cannelle', coeur: 'Accord lait, Cuir de Grasse, Myrrhe, Vanille de Tahiti', fond: 'Vanille Planifolia de Madagascar, Ambre, Benjoin Siam' },
     materials: {
-      list: {
-        tete: 'Amande grillée STT, Bergamote Italie Ess, Poivre Ess, Cardamome Guatemala Ess',
-        coeur: 'Caramel Salé NP, Tonka Abs, Vanille',
-        fond: 'Dreamwood, Cèdre Virginie USA Ess, Cashmeran'
-      },
+      title: 'Entre douceur et profondeur',
+      list: { tete: 'Cannelle SFE, Prune séchée STT, Amande', coeur: 'Accord lait, Cuir de Grasse, Vanille Tahitensis (infusion)', fond: 'Vanille Planifolia Madagascar SFE, Benjoin Siam, Accord tonka' },
       text: [
-        "Tonka Love repose sur une construction de matières où chaque ingrédient est travaillé pour exprimer une chaleur précise, entre tension épicée et douceur enveloppante.",
-        "L’ouverture associe une amande grillée révélée en Smell-The-Taste™, qui restitue sa dimension gourmande et toastée, à une bergamote d’Italie en essence pour l’éclat, tandis que le poivre et la cardamome du Guatemala en essences apportent une vibration épicée nette et structurante.",
-        "Le cœur s’articule autour de matières gourmandes traitées pour leur intensité et leur texture : un caramel salé en NaturePrint™, plus vrai que nature dans son effet addictif, une fève tonka en absolue aux facettes rondes et sensuelles, et une vanille qui vient adoucir et lier l’ensemble dans une continuité crémeuse.",
-        "Le fond s’appuie sur des bois et molécules de structure sélectionnés pour leur tenue et leur confort olfactif : Dreamwood pour sa modernité boisée douce, un cèdre de Virginie en essence pour la verticalité, et le Cashmeran pour sa signature musquée-boisée, chaleureuse et enveloppante."
+        "Au cœur de Vanilla Plum, deux vanilles d’exception révèlent deux facettes complémentaires de la précieuse gousse. La vanille de Tahiti apporte une expression délicate, poudrée, amandée et subtilement florale ; douce et raffinée, elle prolonge naturellement la note d’amande.",
+        "À l’inverse, la vanille Planifolia de Madagascar, extraite par SFE — extraction au CO₂ supercritique —, révèle une expression plus riche et plus profonde. Ce procédé capte avec une précision remarquable les facettes naturelles de la gousse et lui donne chaleur, profondeur et densité.",
+        "En ouverture, la prune séchée STT — Smell the Taste — restitue par l’odorat la richesse d’un fruit sec : une prune mûre, concentrée, presque confite. L’approche Smell the Taste de dsm-firmenich traduit l’expérience d’un ingrédient à la fois par le goût et par l’odeur.",
+        "Au cœur, un accord lait apporte une texture veloutée et enveloppante ; en contraste, le cuir de Grasse introduit une facette plus chaude, plus sombre et texturée. En fond, le benjoin Siam, balsamique, vanillé et amandé, prolonge la chaleur de la composition."
       ]
     }
   },
   {
-    handle: 'magnetic-flowers', name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true,
-    perfumer: 'coralie-spicher', tone: '#d8cbbb',
-    keyNotes: 'Poire · Tubéreuse · Fleur d’oranger · Santal',
-    short: "Une présence douce et magnétique qui s’installe sur la peau comme une évidence, entre éclat et sensualité.",
+    handle: 'magnetic-flowers', name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    tagline: 'L’obsession d’une attraction florale.',
+    keyNotes: 'Poire · Tubéreuse · Santal',
+    card: 'magnetic-flowers-1', hover: 'magnetic-flowers-30', hoverLabel: 'Existe en 30 ml',
+    gallery: ['magnetic-flowers-1', 'magnetic-flowers-30', 'magnetic-flowers-mod', 'poire-livres'],
     description: [
-      "Magnetic Flowers s’inscrit dans une esthétique de l’attraction immédiate, celle des matières lumineuses qui captent avant même de se dévoiler pleinement. Une fragrance construite comme un champ de tension douce, entre éclat floral et sensualité enveloppante.",
-      "L’ouverture surprend par un accord de poire juteuse, à la fois frais et pulpeux, relevé par la sauge sclarée dont l’aspect aromatique apporte une verticalité légèrement herbacée. Le sésame, plus inattendu, introduit une nuance toastée, subtilement texturée, qui donne déjà au parfum une dimension tactile et addictive.",
-      "Le cœur s’ouvre ensuite sur un bouquet floral dense et vibrant. Le néroli apporte une lumière presque solaire, tandis que la tubéreuse déploie sa richesse crémeuse et charnelle. Le jasmin Sambac intensifie cette profondeur florale, soutenu par la sensualité enveloppante de l’ylang et la douceur lumineuse de la fleur d’oranger.",
-      "En fond, le santal d’Australie structure la composition avec une chaleur boisée soyeuse. L’accord ambré prolonge cette sensation de peau réchauffée, tandis que les muscs blancs ancrent le parfum dans une douceur propre, presque seconde peau.",
-      "Magnetic Flowers se déploie ainsi comme une caresse : une fleur en mouvement, qui ne cesse de capter, d’envelopper et de retenir."
+      "Certaines fleurs sont admirées pour leur beauté. D’autres possèdent un pouvoir d’attraction presque instinctif.",
+      "Magnetic Flowers est né de cette fascination : un bouquet de fleurs blanches, lumineux et opulent, dont les facettes se dévoilent lentement sur la peau.",
+      "En ouverture, la poire juteuse apporte fraîcheur et lumière, tandis que la sauge sclarée introduit une note verte et aromatique. Le sésame ajoute une chaleur toastée inattendue.",
+      "Puis le bouquet s’épanouit. Le néroli et la fleur d’oranger apportent éclat et fraîcheur, tandis que la tubéreuse crémeuse et le jasmin Sambac composent un cœur floral riche et enveloppant. L’ylang-ylang adoucit la composition de son caractère crémeux et exotique.",
+      "En s’installant, le santal enveloppe les fleurs d’une chaleur douce et crémeuse. L’ambre approfondit le sillage, tandis que les muscs blancs laissent une impression propre et enveloppante."
     ],
-    notes: {
-      tete: 'Accord poire, Sauge sclarée, Sésame',
-      coeur: 'Accord néroli, Tubéreuse, Jasmin Sambac, Ylang, Fleur d’oranger',
-      fond: 'Santal d’Australie, Ambre, Muscs blancs'
-    },
+    coda: ['Un bouquet qui attire.', 'Une présence qui demeure.', 'Une sensation que l’on veut revivre.'],
+    notes: { tete: 'Accord poire, Sauge sclarée, Sésame', coeur: 'Accord néroli, Tubéreuse, Jasmin Sambac, Ylang-ylang, Fleur d’oranger', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
     materials: {
-      list: {
-        tete: 'Accord poire, Sauge sclarée Firabs, Sésame SFE',
-        coeur: 'Accord néroli, Tubéreuse fleur Firabs, Jasmin Sambac Inde Abs, Ylang Ess, Fleur d’oranger Abs',
-        fond: 'Santal Album Australie Firabs, Accord Ambre, Muscs blancs'
-      },
+      title: 'L’attraction des fleurs blanches',
+      list: { tete: 'Accord poire, Sauge sclarée FirAbs, Sésame SFE', coeur: 'Accord néroli, Tubéreuse FirAbs, Jasmin Sambac Inde Abs, Ylang Ess, Fleur d’oranger Abs', fond: 'Santal d’Australie FirAbs, Accord ambre, Muscs blancs' },
       text: [
-        "Magnetic Flowers s’appuie sur une sélection de matières travaillées pour préserver leur éclat naturel tout en révélant des textures précises et contemporaines.",
-        "L’ouverture associe une poire construite en accord pour en restituer toute la jutosité lumineuse, une sauge sclarée Firabs qui apporte une facette aromatique plus nette et aérienne, et un sésame extrait en SFE, révélant des nuances douces, légèrement grillées et texturées.",
-        "Le cœur met en scène des matières florales traitées pour exprimer toute leur densité : un néroli lumineux et structuré, une tubéreuse Firabs travaillée dans sa richesse crémeuse, un jasmin Sambac d’Inde en absolue pour sa profondeur charnelle, complété par l’ylang en essence et la fleur d’oranger en absolue, apportant volume, éclat et sensualité.",
-        "Le fond s’ancre dans des matières boisées et musquées sélectionnées pour leur tenue et leur douceur : un santal Album d’Australie Firabs aux facettes lactées et boisées précises, un accord ambré moderne structurant la composition, et des muscs blancs qui prolongent la sensation de peau propre et enveloppante."
+        "Magnetic Flowers se construit sur la tension entre la fraîcheur, les facettes vertes et l’opulence crémeuse des fleurs blanches.",
+        "En ouverture, la poire apporte une fraîcheur juteuse et lumineuse. Elle rencontre la sauge sclarée FirAbs, qui introduit une dimension verte et aromatique, tandis que le sésame SFE révèle des facettes toastées, céréalières et gourmandes.",
+        "Au cœur, les fleurs blanches prennent le devant de la scène. La tubéreuse FirAbs apporte un caractère crémeux, solaire et opulent ; l’absolue de jasmin Sambac d’Inde ajoute de la profondeur ; l’huile essentielle d’ylang-ylang assure une transition soyeuse vers les fleurs plus riches.",
+        "En fond, le santal d’Australie FirAbs apporte une texture boisée crémeuse, lactée et chaude. L’ambre renforce la profondeur, les muscs blancs adoucissent la structure. Fraîche et chaude, verte et crémeuse, lumineuse et enveloppante : une architecture olfactive construite sur le contraste."
       ]
     }
   },
   {
-    handle: 'vanilla-plum', name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true,
-    perfumer: 'coralie-spicher', tone: '#8e6f73',
-    keyNotes: 'Prune · Vanille · Accord lait · Cannelle',
-    short: "Plus qu’un parfum, une présence qui s’installe sur la peau comme une caresse profonde, où l’éclat fruité de la prune et la chaleur solaire de la vanille fusionnent dans une étreinte charnelle et addictive.",
+    handle: 'tonka-love', name: 'Tonka Love', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    tagline: 'L’irrésistible chaleur de la tonka.',
+    keyNotes: 'Amande grillée · Caramel salé · Tonka',
+    card: 'tonka-love-1', hover: 'tonka-love-mod', hoverLabel: 'La campagne',
+    gallery: ['tonka-love-1', 'tonka-love-2', 'tonka-love-mod', 'tonka-capot'],
     description: [
-      "Vanilla Plum explore une gourmandise dense et texturée, où la douceur se charge progressivement de profondeur et de sensualité. Une fragrance construite autour de l’attraction : celle des matières chaudes, enveloppantes, presque tactiles, qui donnent immédiatement envie d’y revenir.",
-      "L’ouverture mêle la richesse veloutée de la prune à l’éclat épicé de la cannelle. Dès les premières secondes, la composition oscille entre intensité fruitée et chaleur diffuse, créant une sensation à la fois familière et troublante.",
-      "Au cœur, l’accord lait apporte une texture crémeuse et addictive, tandis que le cuir de Grasse révèle une facette plus sensuelle, presque charnelle. La myrrhe vient troubler l’ensemble d’une profondeur résineuse subtile, avant que la vanille de Tahiti ne déploie sa chaleur solaire et enveloppante au contact de la peau.",
-      "Le fond prolonge cette sensation de confort obsessionnel. La vanille Planifolia de Madagascar s’y exprime avec richesse et relief, soutenue par la rondeur ambrée et les accents balsamiques du benjoin Siam. Peu à peu, le parfum devient plus qu’une odeur : une présence chaude, addictive, qui semble naturellement appartenir à la peau.",
-      "Vanilla Plum laisse ainsi une impression persistante, intime et profondément sensorielle."
+      "Certains ingrédients ont une présence qui s’attarde dans la mémoire. La tonka est de ceux-là. Chaude, veloutée, naturellement addictive, elle est au cœur de Tonka Love.",
+      "Le parfum s’ouvre sur l’amande grillée, à la facette chaude et toastée, éclairée par la bergamote d’Italie. Le poivre et la cardamome du Guatemala ajoutent une étincelle vive et aromatique.",
+      "Puis la tonka se révèle. L’absolue de fève tonka prend le premier rôle, avec son caractère chaud, amandé et poudré. Elle fond dans un accord caramel salé riche et gourmand, tandis que la vanille renforce discrètement sa chaleur crémeuse.",
+      "À mesure que la composition se déploie, le cœur gourmand rencontre une structure boisée plus profonde : Dreamwood pour la modernité, cèdre de Virginie pour la verticalité, Cashmeran pour la texture."
     ],
-    notes: {
-      tete: 'Prune, Cannelle',
-      coeur: 'Accord lait, Cuir de Grasse, Myrrhe, Vanille de Tahiti',
-      fond: 'Vanille Planifolia Madagascar, Ambre, Benjoin Siam'
-    },
+    coda: ['Une première impression grillée.', 'Un cœur chaud et addictif.', 'Un sillage qui reste.'],
+    notes: { tete: 'Amande grillée, Bergamote d’Italie, Poivre, Cardamome du Guatemala', coeur: 'Caramel salé, Fève tonka, Vanille', fond: 'Dreamwood, Cèdre de Virginie, Cashmeran' },
     materials: {
-      list: {
-        tete: 'Cannelle SFE, Prune séchée STT, Amande',
-        coeur: 'Accord lait, Cuir de Grasse Firbest, Vanille Tahitensis Infusion',
-        fond: 'Vanille Planifolia Madagascar SFE, Amberever Neo, Benjoin Siam Res, Accord Tonka'
-      },
+      title: 'La signature de la tonka',
+      list: { tete: 'Amande grillée STT, Bergamote Italie Ess, Poivre Ess, Cardamome Guatemala Ess', coeur: 'Caramel salé NP, Tonka Abs, Vanille', fond: 'Dreamwood®, Cèdre Virginie Ess, Cashmeran' },
       text: [
-        "Vanilla Plum repose sur un travail d’extraction précis, où chaque matière est révélée dans sa vérité la plus juste, entre naturalité et maîtrise technique.",
-        "L’ouverture associe une cannelle obtenue par SFE, qui en préserve la chaleur sèche tout en en affinant les aspérités, à une prune travaillée en Smell-The-Taste™, restituant une impression gustative dense et réaliste.",
-        "Le cœur met en avant des matières travaillées pour leur texture : un accord lait aux facettes crémeuses proches de la sensation peau, un cuir de Grasse affiné dans sa souplesse olfactive, et une vanille Tahitensis obtenue par infusion, développant une rondeur chaude et nuancée.",
-        "Le fond révèle la profondeur des matières dans leur expression la plus stable : une vanille Planifolia de Madagascar extraite en SFE, plus pure et structurée, un Amberever Neo aux accents ambrés modernes, un benjoin Siam résineux et enveloppant qui prolonge la sensation de douceur."
+        "Tonka Love explore les multiples facettes de la tonka, de sa douceur chaude et amandée à sa profondeur poudrée et son affinité avec les bois.",
+        "En ouverture, l’amande grillée STT — Smell the Taste — traduit par l’odorat l’impression d’une amande torréfiée. L’huile essentielle de bergamote d’Italie apporte l’éclat ; le poivre et la cardamome du Guatemala, distillée à partir des graines et des gousses, une vibration épicée.",
+        "Au cœur, l’absolue de fève tonka, obtenue par extraction puis purification, capte le caractère riche de la fève, aux facettes de caramel, d’amande et de vanille. Sa coumarine naturelle lui donne sa chaleur poudrée caractéristique. Le caramel salé NP en amplifie la gourmandise, sa facette salée gardant la douceur en équilibre.",
+        "En fond, Dreamwood® — né de la biotechnologie blanche et inspiré de la chaleur du santal — apporte une dimension boisée crémeuse et moderne ; l’essence de cèdre de Virginie donne la structure, le Cashmeran la texture."
       ]
     }
   },
 
-  /* ---------------- Summer Vibes ---------------- */
+  /* ============ Summer Vibes — Collection I ============ */
   {
-    handle: 'hot-sand', name: 'Hot Sand', collection: 'summer-vibes',
-    perfumer: 'chris-maurice',
-    images: ['produits/hot-sand-1.webp', 'site/Hot_sand_visu_copy.webp', 'produits/hot-sand-3.webp'],
+    handle: 'hot-sand', name: 'Hot Sand', collection: 'summer-vibes', perfumer: 'chris-maurice',
+    tagline: 'Jasmin lumineux, chocolat blanc fondant et santal crémeux, dans une gourmandise solaire et addictive.',
     keyNotes: 'Jasmin · Chocolat blanc · Santal',
-    short: "Hot Sand mêle jasmin lumineux, chocolat blanc fondant et santal crémeux dans une gourmandise solaire et addictive.",
+    card: 'hot-sand-1', hover: 'hot-sand-30', hoverLabel: 'Existe en 30 ml',
+    gallery: ['hot-sand-1', 'hot-sand-30', 'hot-sand-mod'],
     description: [
       "Hot Sand capture la douceur aérienne d’une gourmandise d’été, où le sable encore tiède caresse la peau dorée par le soleil.",
-      "En tête, l’eau de jasmin et l’orchidée flottent comme un souffle léger et lumineux, tandis que la ganache de chocolat blanc, la crème chantilly et le lait d’amande fondent en un cœur délicieusement sucré et fondant. En fond, le cèdre, le santal crémeux et le musc blanc enveloppent la peau d’une chaleur douce et réconfortante, comme un souvenir tendre d’une journée au soleil.",
-      "Hot Sand invite à prolonger l’instant suspendu d’un été radiant, entre douceur et légèreté, comme un chapitre délicatement écrit sur la peau."
+      "En tête, l’eau de jasmin et l’orchidée flottent comme un souffle léger et lumineux, tandis que la ganache de chocolat blanc, la crème chantilly et le lait d’amande fondent en un cœur délicieusement crémeux. En fond, le cèdre, le santal crémeux et le musc blanc enveloppent la peau d’une chaleur douce et réconfortante, comme le souvenir tendre d’une journée au soleil.",
+      "Hot Sand invite à prolonger l’instant suspendu d’un été radieux, entre douceur et légèreté, comme un chapitre délicatement écrit sur la peau."
     ],
-    notes: {
-      tete: 'Eau de Jasmin et Orchidée',
-      coeur: 'Ganache de chocolat blanc, Crème chantilly et Lait d’amande',
-      fond: 'Cèdre, Bois de Santal et Musc Blanc'
-    }
+    notes: { tete: 'Eau de jasmin, Orchidée', coeur: 'Ganache de chocolat blanc, Crème chantilly, Lait d’amande', fond: 'Cèdre, Bois de santal, Musc blanc' }
   },
   {
-    handle: 'mango-wave', name: 'Mango Wave', collection: 'summer-vibes',
-    perfumer: 'chris-maurice',
-    images: ['produits/mango-wave-1.webp', 'site/Mango_visu.webp', 'produits/mango-wave-3.webp'],
+    handle: 'mango-wave', name: 'Mango Wave', collection: 'summer-vibes', perfumer: 'chris-maurice',
+    tagline: 'Mangue juteuse, framboise éclatante et ambre gourmand, dans un sillage solaire, fruité et irrésistible.',
     keyNotes: 'Mangue · Framboise · Ambre',
-    short: "Mango Wave mêle mangue juteuse, framboise éclatante et ambre gourmand dans un sillage solaire, fruité et addictif.",
+    card: 'mango-wave-1', hover: 'mango-wave-30', hoverLabel: 'Existe en 30 ml',
+    gallery: ['mango-wave-1', 'mango-wave-30', 'mango-wave-2'],
     description: [
       "Mango Wave est une vague d’énergie fruitée et de douceur gourmande. En tête, la mangue juteuse et l’orange acidulée éclatent comme un souffle lumineux, vibrant sur la peau.",
-      "Le cœur, fruité et floral, mêle grenade, framboise et jasmin, esquissant la douceur d’un soir d’été, suspendu entre chaleur et éclat. En fond, l’ambre, la mousse de chêne et la cassonade caramélisée composent un sillage captivant, riche et enveloppant.",
+      "Le cœur, fruité et floral, mêle grenade, framboise et jasmin, esquissant la douceur d’un soir d’été suspendu entre chaleur et éclat. En fond, l’ambre, la mousse de chêne et la cassonade caramélisée composent un sillage captivant, riche et enveloppant.",
       "Mango Wave invite à vibrer, ralentir et savourer chaque instant, comme un chapitre solaire que l’on relit avec délice."
     ],
-    notes: {
-      tete: 'Mangue, Orange, Pêche et Safran',
-      coeur: 'Grenade, Framboise et Jasmin',
-      fond: 'Ambre, Mousse de Chêne et Cassonade'
-    }
+    notes: { tete: 'Mangue, Orange, Pêche, Safran', coeur: 'Grenade, Framboise, Jasmin', fond: 'Ambre, Mousse de chêne, Cassonade' }
   },
   {
-    handle: 'sun-ice', name: 'Sun Ice', collection: 'summer-vibes',
-    perfumer: 'nathalie-feisthauer',
-    images: ['produits/sun-ice-1.webp', 'site/SunIcevisu.webp', 'produits/sun-ice-3.webp'],
-    keyNotes: 'Cassis · Pistache grillée · Vanille de Tahiti',
-    short: "Sun Ice mêle pistache grillée, vanille de Tahiti et bois de santal dans une gourmandise solaire, crémeuse et enveloppante.",
+    handle: 'sun-ice', name: 'Sun Ice', collection: 'summer-vibes', perfumer: 'nathalie-feisthauer',
+    tagline: 'Pistache grillée, vanille de Tahiti et bois de santal, dans une gourmandise solaire, crémeuse et enveloppante.',
+    keyNotes: 'Cassis · Pistache grillée · Vanille',
+    card: 'sun-ice-1', hover: 'sun-ice-30', hoverLabel: 'Existe en 30 ml',
+    gallery: ['sun-ice-1', 'sun-ice-30', 'sun-ice-2'],
     description: [
-      "Sun Ice est une composition solaire, florale et gourmande, née de l’évocation d’une glace à la pistache artisanale, ce plaisir glacé qui fond lentement sous le soleil d’été, entre douceur sucrée et fraîcheur réconfortante.",
-      "La fragrance s’ouvre sur une envolée pétillante de cassis et de bergamote d’Italie, telle une brise légère caressant la peau. En cœur, la pomme croquante, la pistache grillée, le toffee caramélisé et l’héliotrope velouté composent une partition savoureuse et addictive, rappelant les notes dorées d’une gelateria au bord de mer.",
-      "Enfin, le fond dévoile une base boisée et sensuelle, où cèdre de Virginie, vanille de Tahiti, musc, fève tonka, bois de santal et ambre s’entrelacent. Une signature chaleureuse, enveloppante et élégante, qui prolonge sur la peau l’empreinte d’un été infini, entre crème glacée fondante et étreinte d’un soir d’août."
+      "Sun Ice est une composition solaire, florale et gourmande, inspirée du plaisir d’une glace artisanale à la pistache, ce délice glacé qui fond lentement sous le soleil d’été, entre douceur sucrée et fraîcheur réconfortante.",
+      "La fragrance s’ouvre sur une envolée pétillante de cassis et de bergamote d’Italie. Au cœur, la pomme croquante, la pistache grillée, le toffee caramélisé et l’héliotrope velouté composent une partition savoureuse, rappelant les notes dorées d’une gelateria au bord de mer.",
+      "Le fond dévoile une base boisée et sensuelle, où cèdre de Virginie, vanille de Tahiti, musc, fève tonka, santal et ambre s’entrelacent — une signature qui prolonge l’empreinte d’un été infini, entre glace fondante et étreinte d’un soir d’août."
     ],
-    notes: {
-      tete: 'Cassis et Bergamote d’Italie',
-      coeur: 'Pomme, Pistache grillée, Toffee et Héliotrope',
-      fond: 'Cèdre de Virginie, Vanille de Tahiti, Musc, Fève de tonka, Santal et Ambre'
-    }
+    notes: { tete: 'Cassis, Bergamote d’Italie', coeur: 'Pomme, Pistache grillée, Toffee, Héliotrope', fond: 'Cèdre de Virginie, Vanille de Tahiti, Musc, Fève tonka, Santal, Ambre' }
   },
   {
-    handle: 'palmeira', name: 'Palmeira', collection: 'summer-vibes',
-    perfumer: 'chris-maurice',
-    images: ['produits/palmeira-1.webp', 'site/Palmeiravisu.webp', 'produits/palmeira-3.webp'],
+    handle: 'palmeira', name: 'Palmeira', collection: 'summer-vibes', perfumer: 'chris-maurice',
+    tagline: 'Fruits rouges juteux, violette et rose élégante, puis praline et santal, dans un sillage fruité, floral et chaleureux.',
     keyNotes: 'Framboise · Violette · Praline',
-    short: "Palmeira mêle fruits rouges juteux, violette et rose élégante, puis praline et santal dans un sillage fruité, floral et chaleureux.",
+    card: 'palmeira-1', hover: 'baies-colonne', hoverLabel: 'Framboise, fraise, cassis',
+    gallery: ['palmeira-1', 'baies-colonne', 'palmeira-2'],
     description: [
-      "Palmeira s’ouvre comme une promenade sous les frondaisons d’un jardin estival, où la lumière joue avec les feuilles et les fruits.",
-      "En tête, framboise, fraise, cassis et myrtille forment une envolée lumineuse et juteuse, comme un panier de fruits fraîchement cueillis, éclatant de douceur et de vitalité. Au cœur, un bouquet élégant de violette, rose, prune et Ambroxan apporte profondeur et sophistication, équilibrant délicatesse florale et intensité fruitée, telle une lumière qui traverse les pages d’un récit d’été.",
-      "En fond, la praline gourmande, le bois de santal velouté et le musc blanc soyeux créent un sillage chaleureux et enveloppant, réconfortant et captivant, comme le souvenir d’un après-midi suspendu entre rêve et réalité."
+      "Palmeira s’ouvre comme une promenade sous les frondaisons d’un jardin d’été, où la lumière danse entre les feuilles et s’attarde sur les fruits.",
+      "En tête, framboise, fraise, cassis et myrtille éclatent en un accord lumineux et juteux, comme un panier de baies fraîchement cueillies. Au cœur, un bouquet élégant de violette, rose, prune et Ambroxan apporte profondeur et sophistication, telle une lumière qui traverse les pages d’un récit d’été.",
+      "En fond, la praline gourmande, le santal velouté et le musc blanc soyeux créent un sillage chaleureux et enveloppant, comme le souvenir d’un après-midi suspendu entre rêve et réalité."
     ],
-    notes: {
-      tete: 'Framboise, Fraise, Cassis et Myrtille',
-      coeur: 'Violette, Rose, Prune et Ambroxan',
-      fond: 'Praline, Bois de Santal et Musc Blanc'
-    }
+    notes: { tete: 'Framboise, Fraise, Cassis, Myrtille', coeur: 'Violette, Rose, Prune, Ambroxan', fond: 'Praline, Bois de santal, Musc blanc' }
   },
   {
-    handle: 'ambert-sunset', name: 'Ambert Sunset', collection: 'summer-vibes',
-    perfumer: 'chris-maurice',
-    images: ['produits/ambert-sunset-1.webp', 'site/Ambervisu.webp', 'produits/ambert-sunset-3.webp'],
+    handle: 'ambert-sunset', name: 'Ambert Sunset', collection: 'summer-vibes', perfumer: 'chris-maurice',
+    tagline: 'Abricot doré, safran et osmanthus, puis rose, iris et jasmin, sur un fond d’ambre, de cuir et de santal.',
     keyNotes: 'Abricot · Iris · Cuir · Ambre',
-    short: "Ambert Sunset mêle abricot doré, safran et osmanthus, puis rose, iris et jasmin, sur un fond d’ambre, cuir et santal dans un sillage chaud, floral et sensuel.",
+    card: 'ambert-sunset-1', hover: 'ambert-sunset-mod', hoverLabel: 'La campagne',
+    gallery: ['ambert-sunset-1', 'ambert-sunset-mod', 'ambert-sunset-2'],
     description: [
       "Ambert Sunset s’ouvre comme le dernier souffle d’un jour d’été, lorsque le ciel se pare de teintes dorées et que l’air devient plus doux, presque tangible.",
-      "Dès l’ouverture, l’abricot velouté, le safran épicé et l’osmanthus lumineux esquissent les premiers rayons d’un coucher de soleil doré, fruité, floral et ambré, comme un chapitre s’ouvrant sur la lumière d’un soir d’été. Au cœur, la rose, l’iris pallida aux reflets poudrés et le jasmin composent une partition florale noble et vibrante, presque crépusculaire, où chaque note semble suspendre le temps. En fond, le cuir, l’ambre et le bois de santal s’entrelacent pour créer un sillage riche, sophistiqué et infiniment sensuel.",
-      "Ambert Sunset est une ode au crépuscule, ce moment suspendu où le ciel se pare d’or liquide et où la lumière devient caresse, un hommage à la beauté d’un jour qui s’éteint, tout en volupté."
+      "Dès l’ouverture, l’abricot velouté, le safran épicé et l’osmanthus lumineux esquissent les premiers rayons d’un coucher de soleil. Au cœur, la rose, l’iris pallida poudré et le jasmin composent une partition florale noble et vibrante, presque crépusculaire. En fond, le cuir, l’ambre et le santal s’entrelacent en un sillage riche, sophistiqué et profondément sensuel.",
+      "Ambert Sunset est une ode au crépuscule, ce moment suspendu où le ciel se pare d’or liquide et où la lumière déclinante devient caresse."
     ],
-    notes: {
-      tete: 'Abricot, Safran et Osmanthus',
-      coeur: 'Rose, Iris pallida et Jasmin',
-      fond: 'Cuir, Ambre et Bois de Santal'
-    }
+    notes: { tete: 'Abricot, Safran, Osmanthus', coeur: 'Rose, Iris pallida, Jasmin', fond: 'Cuir, Ambre, Bois de santal' }
   },
 
-  /* ---------------- Coffrets (exclusivité site) ---------------- */
+  /* ============ Coffrets — exclusivité site ============ */
   {
-    handle: 'coffret-decouverte-2ml', name: 'Coffret Découverte', subtitle: 'Discovery set · 2 ml', collection: 'coffrets',
-    type: 'Coffret', exclusive: true, tone: '#e4dccf',
+    handle: 'coffret-decouverte', name: 'Coffret Découverte', subtitle: 'Discovery set · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
+    card: 'coffret-2ml', hover: 'summer-100', hoverLabel: 'Toute la bibliothèque',
+    gallery: ['coffret-2ml', 'summer-100', 'skin-trio'],
     formats: [
       { id: 'sv', label: 'Summer Vibes · 5 × 2 ml', price: 30 },   // PRIX_A_CONFIRMER
       { id: 'so', label: 'Skin Obsession · 3 × 2 ml', price: 18 }  // PRIX_A_CONFIRMER
     ],
-    keyNotes: 'Formats 2 ml · Crédité sur votre 100 ml',
-    short: "La maison LIBRERY vous invite à parcourir sa bibliothèque olfactive. Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml.",
+    keyNotes: 'Formats 2 ml · Valeur recréditée',
+    tagline: 'Une préface à la collection.',
     description: [
       "La maison LIBRERY vous invite à parcourir sa bibliothèque olfactive. Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml. Chaque fragrance révèle un souvenir, une émotion, un chapitre à explorer au fil de votre lecture sensorielle.",
-      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous sera envoyé par e-mail. Valable pendant 90 jours, il pourra être utilisé lors de l’achat d’un parfum 100 ml."
+      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. Valable 90 jours, il peut être utilisé lors de l’achat d’un parfum 100 ml."
     ]
   },
   {
-    handle: 'coffret-decouverte-30ml', name: 'Coffret Collection', subtitle: 'Discovery set · 30 ml', collection: 'coffrets',
-    type: 'Coffret', exclusive: true, tone: '#d9cfc0',
+    handle: 'coffret-collection', name: 'Coffret Collection', subtitle: 'Discovery set · 30 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
+    card: 'coffret-30ml', hover: 'coffret-30ml-2', hoverLabel: 'Cinq extraits 30 ml',
+    gallery: ['coffret-30ml', 'coffret-30ml-2', 'camp-coffrets'],
     formats: [
       { id: 'sv', label: 'Summer Vibes · 5 × 30 ml', price: 320 },  // PRIX_A_CONFIRMER
       { id: 'so', label: 'Skin Obsession · 3 × 30 ml', price: 200 } // PRIX_A_CONFIRMER
     ],
-    keyNotes: 'Extraits de parfum 30 ml · Une collection complète',
-    short: "Nos coffrets en extrait de parfum 30 ml, réunissant les créations d’une même collection.",
+    keyNotes: 'Extraits 30 ml · Une collection entière',
+    tagline: 'Un chapitre entier, à parcourir.',
     description: [
-      "Découvrez également nos coffrets découverte en extrait de parfum 30 ml, réunissant les créations d’une même collection.",
+      "Nos coffrets en extrait de parfum 30 ml réunissent les créations d’une même collection.",
       "Une immersion plus profonde dans chaque univers, pour parcourir ses chapitres, en saisir les subtilités, ressentir les émotions qu’il raconte et les souvenirs qu’il renferme — comme on feuillette un livre dont chaque page écrit un peu de votre propre histoire."
     ]
   }
@@ -260,56 +231,60 @@ const PRODUCTS = [
 
 const COLLECTIONS = {
   'skin-obsession': {
-    title: 'Skin Obsession', kicker: 'Nouvelle collection', chapter: 'Chapitre II',
-    lead: "Entre sensualité, mémoire et émotion, Skin Obsession capture cette envie irrésistible de revenir à une odeur familière, presque instinctivement. Une collection habitée par la peau, pensée pour laisser une empreinte durable — dans l’instant comme dans la mémoire.",
-    body: [
-      { p: [
-        "Skin Obsession est une exploration de l’attachement invisible qui unit le parfum à la peau. Une collection de trois fragrances pensées comme autant de variations d’une même idée : celle de l’addiction olfactive, de ce besoin subtil mais irrépressible de revenir vers une odeur, encore et encore.",
-        "Ici, la peau n’est pas un support. Elle est le point de départ, le berceau de l’émotion. C’est elle qui donne vie au parfum, qui en révèle la chaleur, la texture, la singularité. Chaque fragrance s’y dépose comme une seconde nature, évolue avec elle, et crée une signature intime, presque instinctive.",
-        "Skin Obsession ne cherche pas la discrétion. Elle travaille l’attraction, ce moment précis où une senteur accroche la mémoire et s’y installe durablement. Porter Skin Obsession, c’est entrer dans un dialogue continu avec sa propre peau.",
-        "Skin Obsession n’est pas une collection que l’on porte. C’est une collection à laquelle on revient. Toujours."
+    title: 'Skin Obsession', number: '03', chapter: 'Collection II', kicker: 'Nouvelle collection',
+    hero: 'hero-skin', side: 'skin-femme-flacons',
+    epigraph: 'La peau est le livre. Le parfum est l’histoire. L’obsession, le désir de le relire.',
+    intro: [
+      "Il est un instant, presque imperceptible, lors d’une première rencontre : un éveil qui trouble les sens. La découverte d’un monde soudain révélé, une matière qui intrigue, un accord qui émeut.",
+      "Skin Obsession est née de cette émotion. Cet instant où un parfum cesse d’être une simple odeur pour devenir une sensation, une émotion, un souvenir. Le moment où quelque chose de plus profond prend forme : la fascination, puis le désir de revivre cette sensation, encore et encore."
+    ],
+    chapters: [
+      { h: 'Peau', p: [
+        "Chez LIBRERY, la peau est au cœur de tout. Elle est la toile vivante sur laquelle le parfum s’écrit ; là où les notes émergent, se transforment, s’intensifient puis s’effacent peu à peu.",
+        "La peau est le livre dans lequel chaque parfum raconte son histoire. Car un parfum ne se révèle jamais entièrement seul : il prend vie au contact de celui qui le porte."
+      ] },
+      { h: 'Obsession', p: [
+        "L’obsession naît de ce qui ne se laisse pas entièrement saisir. Pour cette collection, LIBRERY a créé trois fragrances signatures autour de matières précieuses, d’une qualité exceptionnelle. Intemporelles, complexes et énigmatiques, elles résistent à toute classification immédiate.",
+        "Dès que l’on croit avoir compris un parfum, une autre facette apparaît. On y revient pour retrouver une sensation déjà éprouvée, tout en espérant découvrir autre chose. C’est précisément là que commence l’obsession."
       ] },
       { h: 'La naissance de Skin Obsession', p: [
-        "Chez LIBRERY, chaque parfum est pensé comme un chapitre vivant au sein d’une bibliothèque olfactive où les histoires ne se lisent pas : elles se ressentent. Chaque création prend vie sur la peau, évolue au fil des heures et révèle une interprétation différente selon celui ou celle qui la porte.",
-        "Développée avec DSM-Firmenich, la collection Skin Obsession prolonge cette approche sensorielle du parfum. Réalisées par la parfumeure Coralie Spicher, les trois créations sont nées d’une alchimie immédiate avec le fondateur de la maison. Dès les premiers échanges, une compréhension instinctive des briefs s’est imposée, donnant naissance à une collection fidèle à l’écriture émotionnelle et immersive propre à LIBRERY.",
-        "Ensemble, ils ont imaginé trois extraits de parfum concentrés à 25 %, conçus pour explorer ce lien invisible entre le parfum et la peau, entre l’attraction et la mémoire, entre la présence et le manque. De cette rencontre entre narration, intuition et maîtrise des matières naissent trois interprétations singulières de l’obsession olfactive."
-      ] },
-      { h: 'La peau, territoire vivant du parfum', p: [
-        "Le parfum n’existe jamais isolé. Il trouve sa vérité dans la rencontre intime avec la peau, là où il cesse d’être une formule pour devenir une présence.",
-        "Chaque peau possède sa propre chimie, sa propre intensité. Elle retient certaines notes, en révèle d’autres, en modifie parfois la perception. Ainsi, un même parfum ne se répète jamais. Il devient une lecture unique, une interprétation intime, profondément liée à celui ou celle qui le porte.",
-        "Ici, le parfum ne se porte pas. Il s’accorde. Il s’intègre. Il devient."
+        "Développée avec dsm-firmenich, Skin Obsession prolonge l’approche sensorielle de la maison. Créées par la parfumeure Coralie Spicher, les trois compositions sont nées d’une connivence immédiate avec le fondateur : dès les premiers échanges, une compréhension instinctive de la vision créative s’est imposée.",
+        "Ensemble, ils ont imaginé trois extraits de parfum concentrés à 25 %, construits autour de matières d’exception et d’accords travaillés en profondeur — des compositions pensées pour évoluer, surprendre et révéler peu à peu leur personnalité sur la peau."
       ] }
     ]
   },
   'summer-vibes': {
-    title: 'Summer Vibes', kicker: 'Collection', chapter: 'Chapitre I',
-    image: 'site/fond2_horizontal.webp',
-    lead: "Il est des étés qui ne s’achèvent jamais vraiment. Des étés qui persistent sous la peau, dans la lumière des souvenirs, dans la chaleur invisible que l’on croit avoir oubliée.",
-    body: [
-      { p: [
-        "LIBRERY les a retenus, non pour les figer, mais pour les relire. Les assembler comme un roman lumineux, dont chaque page exhale une émotion différente : Summer Vibes. Une collection comme une traversée.",
-        "Cinq récits solaires s’y déploient, non pas comme des parfums isolés, mais comme les fragments d’une même histoire continue — celle d’un été éternel. Un été que l’on ne regarde pas seulement, mais que l’on reconnaît instinctivement, comme s’il avait toujours existé en nous.",
-        "Dès les premières pages, la lumière se fait matière. Elle glisse sur la peau, s’y dépose, s’y attarde. Puis viennent les fruits — pulpe éclatante, chair juteuse, excès de vie. Plus loin, le temps se rafraîchit. Un souffle glacé traverse la chaleur, comme un sorbet au cœur de l’après-midi. Et enfin, le jour décline. Le crépuscule s’étire, doré, silencieux.",
-        "Fidèle à l’esprit de LIBRERY, cette collection n’impose rien. Elle ouvre. Elle ne raconte pas un été unique. Elle en réveille mille. Et chacun y retrouve le sien."
+    title: 'Summer Vibes', number: '02', chapter: 'Collection I', kicker: 'Collection',
+    hero: 'hero-summer', side: 'summer-socles',
+    epigraph: 'Certains étés ne s’achèvent jamais vraiment. Ils persistent sous la peau, dans l’éclat des souvenirs, dans cette chaleur invisible que l’on croyait avoir laissée derrière soi.',
+    intro: [
+      "L’été a quelque chose de singulier. Pendant quelques semaines précieuses, le temps semble ralentir. Les jours s’étirent sous une lumière sans fin, les heures perdent de leur importance et le quotidien s’éloigne doucement.",
+      "Le parfum d’une peau chauffée par le soleil. Le sel sur les lèvres. L’odeur des fruits mûrs. La fraîcheur d’un sorbet dans la chaleur de l’après-midi. L’ombre des arbres. La lumière dorée des dernières heures du jour. Parfois, il suffit d’une sensation pour que tout revienne."
+    ],
+    chapters: [
+      { h: 'Chronique d’un été sans fin', p: [
+        "LIBRERY a voulu capturer cet instant fugace. Non pas l’été comme une saison, mais ce qu’il laisse en nous : un sentiment de liberté, une douceur tranquille, la sensation rare d’avoir suspendu le temps.",
+        "Summer Vibes est né de ce désir : enfermer le souvenir de l’été dans un flacon. Cinq parfums, comme cinq fragments d’une même parenthèse sans fin. Chaque fragrance devient une porte ouverte sur la mémoire."
       ] },
-      { h: 'Chronique d’un été qui ne s’achève jamais', p: [
-        "Il suffit d’effleurer le flacon pour que la première page s’ouvre. Des grains de sable encore tièdes se mêlent à l’eau de jasmin et à l’orchidée, tandis que la douceur d’une ganache au chocolat blanc fond sous le soleil. Hot Sand est un prélude sensuel où la mer s’étire comme une encre ambrée sur la peau.",
-        "Le chapitre suivant jaillit comme une vague tropicale. Mangue juteuse, orange acidulée et pêche veloutée s’élancent avec énergie. Mango Wave respire l’exubérance des marchés lointains, enveloppée d’ambre et de mousse de chêne, comme un souffle de soleil vibrant.",
-        "Quand la chaleur devient mirage, surgit Sun Ice, granité glacé porté au nez. Cassis pétillant et bergamote italienne givrent l’air, tandis que la pomme croquante s’allie à la pistache grillée et au caramel.",
-        "Palmeira est une sieste sous les frondaisons. Une brassée de framboises, fraises et cassis ruisselle dans la lumière ; violette, rose et prune tissent un hamac floral, tandis qu’une praline boisée fond doucement au creux du soir.",
-        "Au bord du jour qui s’éteint, Ambert Sunset déploie son coucher de soleil éternel. L’abricot s’enflamme de safran, l’osmanthus dialogue avec la rose et l’iris, puis un cuir mordoré et un ambre incandescent ferment la scène, laissant derrière eux un sillage dense comme un ciel de juillet baigné d’or liquide."
+      { h: 'Un voyage capturé en parfum', p: [
+        "Hot Sand s’ouvre sur un rivage encore chauffé par le soleil. Avec Mango Wave, l’été éclate en couleurs. Puis vient la fraîcheur de Sun Ice, comme une brise glacée dans la chaleur. Palmeira ralentit le temps, sous la canopée. Enfin, le jour cède au crépuscule avec Ambert Sunset.",
+        "Summer Vibes n’est pas seulement une collection inspirée de l’été. C’est une tentative de le retenir. Car certains souvenirs ne disparaissent jamais vraiment : ils attendent simplement qu’un parfum les réveille."
       ] }
     ]
   },
   'coffrets': {
-    title: 'Coffrets Découverte', kicker: 'Exclusivité site', chapter: 'Préface',
-    lead: "Parcourir la bibliothèque avant d’y choisir son livre. Nos coffrets ouvrent les premières pages de chaque collection — et la valeur du coffret 2 ml vous est restituée sur l’achat d’un 100 ml.",
-    body: []
+    title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
+    hero: 'hero-collection', side: 'coffret-30ml',
+    epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',
+    intro: ["Nos coffrets ouvrent les premières pages de chaque collection. La valeur du coffret 2 ml vous est recréditée sur l’achat d’un parfum 100 ml, pendant 90 jours."],
+    chapters: []
   },
   'bougies': {
-    title: 'Bougies', kicker: 'Bientôt', chapter: 'Chapitre à venir',
-    lead: "Un nouveau chapitre s’écrit. Les récits LIBRERY s’apprêtent à quitter la peau pour habiter l’espace. Inscrivez-vous pour être parmi les premiers à les découvrir.",
-    body: [], soon: true
+    title: 'Bougies', number: '—', chapter: 'Chapitre à venir', kicker: 'Bientôt',
+    hero: 'camp-coffrets', soon: true,
+    epigraph: 'Un nouveau chapitre s’écrit.',
+    intro: ["Les récits LIBRERY s’apprêtent à quitter la peau pour habiter l’espace. Inscrivez-vous pour être parmi les premiers à les découvrir."],
+    chapters: []
   }
 };
 

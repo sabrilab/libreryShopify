@@ -6,157 +6,210 @@
 <meta name="robots" content="noindex, nofollow">
 <title>LIBRERY — La bibliothèque olfactive</title>
 <meta name="description" content="LIBRERY — la bibliothèque olfactive, où chaque fragrance se fait récit et chaque note, un souvenir. Extraits de parfum, Paris.">
-<link rel="icon" type="image/webp" href="/assets/img/site/logo.webp">
+<link rel="icon" type="image/png" href="/assets/img/v2/emblem-brun.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Libre+Caslon+Text:ital,wght@0,400;1,400&family=Marcellus&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body data-page="home" class="page-home">
 <div id="site-header"></div>
 <main>
 
-<!-- SECTION : hero-video — vidéo cinématographique 30 s en boucle -->
-<section class="s-hero" aria-label="Présentation">
-  <img class="s-hero__poster" src="/assets/img/site/video-hero-poster.webp" alt="">
-  <video autoplay muted loop playsinline preload="auto" poster="/assets/img/site/video-hero-poster.webp">
-    <source src="/assets/img/site/video-hero.mp4" type="video/mp4">
-  </video>
-  <p class="s-hero__note">Vidéo provisoire — film de marque 30 s à venir</p>
-  <button class="s-hero__sound" type="button">Son — off</button>
+<!-- SECTION : hero — film de marque (diaporama en attendant la vidéo 30 s) -->
+<section class="s-hero" aria-label="LIBRERY">
+  <div class="s-hero__slide is-active" data-caption="Summer Vibes · Hot Sand"><img src="/assets/img/v2/hero-portrait-m.webp" srcset="/assets/img/v2/hero-portrait-m.webp 900w, /assets/img/v2/hero-portrait.webp 1800w" sizes="100vw" alt="" fetchpriority="high" decoding="async"></div>
+  <div class="s-hero__slide" data-caption="Skin Obsession · De l’émotion au parfum"><img src="/assets/img/v2/hero-emotion-m.webp" srcset="/assets/img/v2/hero-emotion-m.webp 900w, /assets/img/v2/hero-emotion.webp 1800w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
+  <div class="s-hero__slide" data-caption="Summer Vibes · Collection I"><img src="/assets/img/v2/hero-summer-m.webp" srcset="/assets/img/v2/hero-summer-m.webp 900w, /assets/img/v2/hero-summer.webp 1800w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
+  <div class="s-hero__slide" data-caption="Skin Obsession · Collection II"><img src="/assets/img/v2/hero-skin-m.webp" srcset="/assets/img/v2/hero-skin-m.webp 900w, /assets/img/v2/hero-skin.webp 1800w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
+  <div class="s-hero__slide" data-caption="La bibliothèque · Huit récits"><img src="/assets/img/v2/hero-collection-m.webp" srcset="/assets/img/v2/hero-collection-m.webp 900w, /assets/img/v2/hero-collection.webp 1800w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
   <div class="s-hero__content">
     <div>
       <h1 class="s-hero__title">LIBRERY</h1>
-      <p class="s-hero__tag">La bibliothèque olfactive où chaque fragrance se fait récit et chaque note, un souvenir.</p>
+      <p class="s-hero__tag">La bibliothèque olfactive, où chaque fragrance se fait récit et chaque note, un souvenir.</p>
     </div>
-    <a class="link" href="/bibliotheque" style="color:#fff">Découvrir</a>
+    <div class="s-hero__caption">
+      <a class="link" href="/bibliotheque" style="color:#fff">Entrer dans la bibliothèque <span class="arr">→</span></a>
+      <strong></strong>
+    </div>
   </div>
-  <div class="s-hero__progress"><span></span></div>
+  <div class="s-hero__bars"><button aria-label="Image 1"><span></span></button><button aria-label="Image 2"><span></span></button><button aria-label="Image 3"><span></span></button><button aria-label="Image 4"><span></span></button><button aria-label="Image 5"><span></span></button></div>
 </section>
 
-<!-- SECTION : collection-feature — mise en avant de la nouveauté -->
-<section class="section">
+<!-- SECTION : manifeste d'ouverture -->
+<section class="section s-open">
   <div class="wrap">
-    <div class="s-feature__head reveal">
-      <div>
-        <h2 class="s-feature__title">Skin Obsession</h2>
-        <span class="s-feature__kicker">[ New collection ]</span>
-        <p class="s-feature__lead">Entre sensualité, mémoire et émotion, Skin Obsession capture cette envie irrésistible de revenir à une odeur familière, presque instinctivement. Une collection habitée par la peau, pensée pour laisser une empreinte durable — dans l’instant comme dans la mémoire.</p>
-      </div>
-      <a class="link" href="/collection?c=skin-obsession">Découvrir</a>
-    </div>
-    <div class="s-feature__grid reveal">
-      <div class="ph ph--dark" style="--tone:#6f5a55"><div class="ph__inner"><div class="ph__name">Campagne Skin Obsession</div><div class="ph__tag">Visuel à venir</div></div></div>
-      <div class="ph" style="--tone:#d8cbbb"><div class="ph__inner"><div class="ph__name">Magnetic Flowers</div><div class="ph__tag">Visuel à venir</div></div></div>
-      <div class="ph" style="--tone:#b8a48c"><div class="ph__inner"><div class="ph__name">Tonka Love</div><div class="ph__tag">Visuel à venir</div></div></div>
-    </div>
+    <img class="ornament reveal" src="/assets/img/v2/emblem-or.png" alt="">
+    <p class="quote reveal" style="--d:.1s">Il existe des lieux qui ne se visitent pas, mais se ressentent. <em>LIBRERY est de ceux-là.</em></p>
+    <p class="reveal" style="--d:.2s;margin-top:40px"><a class="link" href="/preface">Lire la Préface <span class="arr">→</span></a></p>
   </div>
 </section>
 
-<!-- SECTION : product-carousel — les créations de la nouvelle collection -->
-<section class="section--tight" style="padding-top:0">
+<!-- SECTION : collection-feature — nouveauté Skin Obsession -->
+<section class="section--tight s-feature" style="padding-top:0">
   <div class="wrap">
-    <div class="s-head">
-      <div class="s-head__txt reveal">
-        <span class="eyebrow">Skin Obsession · dsm-firmenich</span>
-        <h2 class="h2">Trois créations signées Coralie Spicher</h2>
-        <p>À travers trois créations, la collection révèle une attraction sensorielle addictive, où chaque fragrance évolue au contact de la peau pour devenir profondément personnelle.</p>
+    <div class="s-feature__top">
+      <div class="reveal">
+        <span class="runhead">03 · <b>Collection II</b> · Nouveauté</span>
+        <h2 class="s-feature__title">Skin Obsession<small>[ New collection ]</small></h2>
       </div>
-      <div class="carousel__nav"><button data-prev aria-label="Précédent">←</button><button data-next aria-label="Suivant">→</button></div>
+      <a class="btn btn--ghost reveal" href="/collection?c=skin-obsession">Découvrir la collection</a>
     </div>
-    <div class="carousel">
-      <div class="carousel__track" id="so-track"></div>
-      <div class="carousel__bar"><span></span></div>
+    <div class="s-feature__grid">
+      <div class="media unveil" style="aspect-ratio:3/2"><img src="/assets/img/v2/hero-skin-m.webp" srcset="/assets/img/v2/hero-skin-m.webp 900w, /assets/img/v2/hero-skin.webp 1800w" sizes="(max-width: 900px) 100vw, 66vw" alt="Skin Obsession — Tonka Love, Vanilla Plum, Magnetic Flowers" loading="lazy" decoding="async"></div>
+      <div class="col">
+        <div class="s-feature__epi reveal">
+          <span>« La peau est le livre. Le parfum est l’histoire. L’obsession, le désir de le relire. »</span>
+          <span class="label">Trois extraits signés Coralie Spicher · dsm-firmenich</span>
+        </div>
+        <div class="media unveil"><img src="/assets/img/v2/skin-femme-flacons-m.webp" srcset="/assets/img/v2/skin-femme-flacons-m.webp 900w, /assets/img/v2/skin-femme-flacons.webp 1800w" sizes="(max-width: 900px) 100vw, 33vw" alt="" loading="lazy" decoding="async"></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- SECTION : banner — collection Summer Vibes -->
-<section class="s-banner">
-  <picture>
-    <source media="(max-width: 700px)" srcset="/assets/img/site/fond2.webp">
-    <img src="/assets/img/site/fond2_horizontal.webp" alt="Collection Summer Vibes">
-  </picture>
-  <div class="s-banner__content">
-    <div class="reveal">
-      <span class="eyebrow" style="color:#efe8dc">Chapitre I · Collection</span>
-      <h2 class="display" style="font-style:italic;margin-top:12px">Summer Vibes</h2>
-      <p>Il est des étés qui ne s’achèvent jamais vraiment. Cinq récits solaires, comme les fragments d’une même histoire — celle d’un été éternel.</p>
-    </div>
-    <a class="btn btn--light" href="/collection?c=summer-vibes">Lire la collection</a>
-  </div>
-</section>
-
-<!-- SECTION : product-carousel — Summer Vibes -->
+<!-- SECTION : product-carousel — Skin Obsession -->
 <section class="section--tight">
   <div class="wrap">
     <div class="s-head">
       <div class="s-head__txt reveal">
-        <span class="eyebrow">Chronique d’un été qui ne s’achève jamais</span>
-        <h2 class="h2">Cinq récits solaires</h2>
+        <span class="runhead">Trois créations</span>
+        <h2 class="h2">L’obsession, en trois chapitres</h2>
+        <p>Des compositions pensées pour évoluer, surprendre et révéler peu à peu leur personnalité sur la peau.</p>
       </div>
       <div class="carousel__nav"><button data-prev aria-label="Précédent">←</button><button data-next aria-label="Suivant">→</button></div>
     </div>
-    <div class="carousel">
-      <div class="carousel__track" id="sv-track"></div>
-      <div class="carousel__bar"><span></span></div>
+    <div class="carousel"><div class="carousel__track" id="so-track"></div><div class="carousel__bar"><span></span></div></div>
+  </div>
+</section>
+
+<!-- SECTION : banner — De l'émotion au parfum -->
+<section class="s-banner">
+  <div class="bg" data-parallax=".1"><img src="/assets/img/v2/femme-voiture-m.webp" srcset="/assets/img/v2/femme-voiture-m.webp 900w, /assets/img/v2/femme-voiture.webp 1800w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
+  <div class="s-banner__content">
+    <div class="reveal">
+      <span class="runhead">04 · <b>Les Parfumeurs</b></span>
+      <h2 class="display">De l’émotion au parfum</h2>
+      <p>Derrière chaque création, un artiste des sens, capable de donner forme à l’invisible.</p>
     </div>
+    <a class="btn btn--light reveal" href="/preface#parfumeurs">Les rencontrer</a>
   </div>
 </section>
 
-<!-- SECTION : manifesto — accroche de la Préface -->
-<section class="section bg-creme">
-  <div class="wrap">
-    <p class="quote reveal">« Il existe des lieux qui ne se visitent pas, mais se ressentent. <em>LIBRERY est de ceux-là.</em> »</p>
-    <div style="text-align:center;margin-top:44px" class="reveal"><a class="link" href="/preface">Lire la Préface</a></div>
-  </div>
-</section>
-
-<!-- SECTION : image-with-text — extrait de parfum 25 % -->
+<!-- SECTION : image-with-text — Summer Vibes -->
 <section class="section">
-  <div class="wrap s-split">
-    <div class="s-split__media reveal"><img src="/assets/img/site/fond1_horizontal_1.webp" alt="Les flacons LIBRERY dans la bibliothèque" style="aspect-ratio:4/5"></div>
-    <div class="s-split__txt reveal">
-      <span class="eyebrow">L’Écriture de l’Excellence</span>
-      <h2 class="h2">Au sommet de l’art olfactif</h2>
-      <div class="prose">
-        <p>Un livre ne se contente pas de raconter une histoire : il nous transforme, il nous inspire, il révèle ce que nous ne savions pas encore de nous-mêmes.</p>
-        <p>Parce qu’un souvenir marquant exige de l’intensité, l’excellence de la maison se devine dans ses <strong style="font-weight:400">Extraits de Parfum concentrés à 25 %</strong>. Une sélection rigoureuse de matières nobles et des gestes artisanaux qui préservent l’âme de chaque essence.</p>
-      </div>
-      <a class="link" href="/lexique#concentration">Comprendre les concentrations</a>
+  <div class="wrap s-diptych">
+    <div class="s-diptych__media" style="position:relative">
+      <div class="media unveil"><img src="/assets/img/v2/summer-socles-m.webp" srcset="/assets/img/v2/summer-socles-m.webp 900w, /assets/img/v2/summer-socles.webp 1800w" sizes="(max-width: 900px) 100vw, 55vw" alt="Summer Vibes — les cinq extraits" loading="lazy" decoding="async"></div>
+      <div class="s-diptych__small reveal" style="--d:.3s"><div class="media"><img src="/assets/img/v2/camp-livre-m.webp" srcset="/assets/img/v2/camp-livre-m.webp 900w, /assets/img/v2/camp-livre.webp 1800w" sizes="20vw" alt="" loading="lazy" decoding="async"></div></div>
+    </div>
+    <div class="s-diptych__txt reveal">
+      <span class="runhead">02 · <b>Collection I</b></span>
+      <h2 class="h1 italic">Summer Vibes</h2>
+      <p class="lead">Certains étés ne s’achèvent jamais vraiment. Ils persistent sous la peau, dans l’éclat des souvenirs.</p>
+      <div class="prose"><p>Cinq parfums, comme cinq fragments d’une même parenthèse sans fin : le sable chauffé par le soleil, l’abondance des fruits mûrs, la fraîcheur d’un après-midi, la langueur d’une sieste sous les arbres, la dernière lueur d’un soleil couchant.</p></div>
+      <a class="link" href="/collection?c=summer-vibes">Lire la chronique <span class="arr">→</span></a>
     </div>
   </div>
 </section>
 
-<!-- SECTION : perfumers — Les Alchimistes des Souvenirs -->
-<section class="section bg-noir">
+<!-- SECTION : product-carousel — Summer Vibes -->
+<section class="section--tight on-sable">
   <div class="wrap">
     <div class="s-head">
-      <div class="s-head__txt reveal">
-        <span class="eyebrow">Maîtres parfumeurs</span>
-        <h2 class="h2">Les Alchimistes des Souvenirs</h2>
-        <p>Derrière chaque flacon, un maître parfumeur trace les lignes invisibles d’une histoire olfactive.</p>
-      </div>
-      <a class="link" href="/preface#parfumeurs">Les rencontrer</a>
+      <div class="s-head__txt reveal"><span class="runhead">Chronique d’un été sans fin</span><h2 class="h2">Cinq récits solaires</h2></div>
+      <div class="carousel__nav"><button data-prev aria-label="Précédent">←</button><button data-next aria-label="Suivant">→</button></div>
     </div>
-    <div class="perfumers">
-      <div class="perfumer reveal"><span class="eyebrow">Summer Vibes</span><h3 class="h3">Chris Maurice</h3><p>Issu d’une prestigieuse lignée de parfumeurs espagnols, il a signé pour Xerjoff, Nishane ou Masque Milano.</p></div>
-      <div class="perfumer reveal"><span class="eyebrow">Sun Ice</span><h3 class="h3">Nathalie Feisthauer</h3><p>Trente ans de création pour Hermès, Cartier ou État Libre d’Orange. Prix FIFI du parfumeur de l’année 2019.</p></div>
-      <div class="perfumer reveal"><span class="eyebrow">Skin Obsession</span><h3 class="h3">Coralie Spicher</h3><p>Parfumeure dsm-firmenich formée à Genève et Paris, elle signe les trois créations de Skin Obsession.</p></div>
+    <div class="carousel"><div class="carousel__track" id="sv-track"></div><div class="carousel__bar"><span></span></div></div>
+  </div>
+</section>
+
+<!-- SECTION : contents — le sommaire du catalogue -->
+<section class="section on-brun s-contents">
+  <div class="wrap s-contents__grid">
+    <div class="reveal">
+      <span class="runhead"><b>Sommaire</b></span>
+      <h2 class="h2" style="margin:18px 0 44px">Lire la maison comme un livre</h2>
+      <ol class="s-contents__list">
+        <li><a href="/preface"><span class="n">01</span><span class="t">LIBRERY<small>La maison de haute parfumerie</small></span><span class="p">p. 6</span></a></li>
+        <li><a href="/collection?c=summer-vibes"><span class="n">02</span><span class="t">Summer Vibes<small>Collection I</small></span><span class="p">p. 14</span></a></li>
+        <li><a href="/collection?c=skin-obsession"><span class="n">03</span><span class="t">Skin Obsession<small>Collection II</small></span><span class="p">p. 32</span></a></li>
+        <li><a href="/preface#parfumeurs"><span class="n">04</span><span class="t">Les Parfumeurs<small>Les Alchimistes des Souvenirs</small></span><span class="p">p. 50</span></a></li>
+      </ol>
+    </div>
+    <div class="s-contents__preview">
+      <img class="is-on" src="/assets/img/v2/prune-livres-m.webp" alt="" loading="lazy">
+      <img src="/assets/img/v2/summer-socles-m.webp" alt="" loading="lazy">
+      <img src="/assets/img/v2/skin-homme-tonka-m.webp" alt="" loading="lazy">
+      <img src="/assets/img/v2/coralie-spicher-m.webp" alt="" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- SECTION : image-with-text — L'Écriture de l'Excellence -->
+<section class="section">
+  <div class="wrap s-diptych s-diptych--rev">
+    <div class="s-diptych__media"><div class="media unveil"><img src="/assets/img/v2/tonka-capot-m.webp" srcset="/assets/img/v2/tonka-capot-m.webp 900w, /assets/img/v2/tonka-capot.webp 1800w" sizes="(max-width: 900px) 100vw, 55vw" alt="Fèves de tonka sur le capot d’un flacon LIBRERY" loading="lazy" decoding="async"></div></div>
+    <div class="s-diptych__txt reveal">
+      <span class="runhead">01 · <b>La maison</b></span>
+      <h2 class="h1">L’Écriture de l’Excellence</h2>
+      <div class="prose dropcap">
+        <p>Un livre ne se contente pas de raconter une histoire : il nous transforme, il nous inspire, il révèle ce que nous ne savions pas encore de nous-mêmes. Ici, le parfum n’habille pas seulement la peau : il dévoile une part de soi, intime et silencieuse.</p>
+        <p>Parce qu’un souvenir marquant exige de l’intensité, l’excellence de la maison se devine dans ses Extraits de Parfum concentrés à 25 % — chaque parfum, une œuvre miniature reliée comme un livre rare.</p>
+      </div>
+      <a class="link" href="/lexique#concentration">Comprendre l’extrait de parfum <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION : lookbook — la campagne -->
+<section class="section--tight" style="padding-top:0;overflow:hidden">
+  <div class="wrap"><div class="s-head"><div class="s-head__txt reveal"><span class="runhead">La campagne</span><h2 class="h2">Carnet d’images</h2></div>
+    <span class="label reveal">Faites glisser →</span></div></div>
+  <div class="film">
+    <figure><img src="/assets/img/v2/camp-baie-m.webp" srcset="/assets/img/v2/camp-baie-m.webp 900w, /assets/img/v2/camp-baie.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>Summer Vibes, Côte d’Azur</figcaption></figure>
+    <figure><img src="/assets/img/v2/camp-main-m.webp" srcset="/assets/img/v2/camp-main-m.webp 900w, /assets/img/v2/camp-main.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>Hot Sand</figcaption></figure>
+    <figure><img src="/assets/img/v2/hero-voiture-m.webp" srcset="/assets/img/v2/hero-voiture-m.webp 900w, /assets/img/v2/hero-voiture.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>Le voyage</figcaption></figure>
+    <figure><img src="/assets/img/v2/camp-lit-m.webp" srcset="/assets/img/v2/camp-lit-m.webp 900w, /assets/img/v2/camp-lit.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>La sieste</figcaption></figure>
+    <figure><img src="/assets/img/v2/vanilla-plum-mod-m.webp" srcset="/assets/img/v2/vanilla-plum-mod-m.webp 900w, /assets/img/v2/vanilla-plum-mod.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>Vanilla Plum</figcaption></figure>
+    <figure><img src="/assets/img/v2/camp-duo-m.webp" srcset="/assets/img/v2/camp-duo-m.webp 900w, /assets/img/v2/camp-duo.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>Ambert Sunset</figcaption></figure>
+    <figure><img src="/assets/img/v2/magnetic-flowers-mod-m.webp" srcset="/assets/img/v2/magnetic-flowers-mod-m.webp 900w, /assets/img/v2/magnetic-flowers-mod.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>Magnetic Flowers</figcaption></figure>
+    <figure><img src="/assets/img/v2/tonka-love-mod-m.webp" srcset="/assets/img/v2/tonka-love-mod-m.webp 900w, /assets/img/v2/tonka-love-mod.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>Tonka Love</figcaption></figure>
+    <figure><img src="/assets/img/v2/camp-colonne-m.webp" srcset="/assets/img/v2/camp-colonne-m.webp 900w, /assets/img/v2/camp-colonne.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>La lumière du soir</figcaption></figure>
+    <figure><img src="/assets/img/v2/camp-mercedes-m.webp" srcset="/assets/img/v2/camp-mercedes-m.webp 900w, /assets/img/v2/camp-mercedes.webp 1800w" sizes="(max-width: 600px) 68vw, 24vw" alt="" loading="lazy" decoding="async"><figcaption>Summer Vibes, en route</figcaption></figure>
+  </div>
+</section>
+
+<!-- SECTION : catalogue — feuilleter le livre -->
+<section class="section on-sable">
+  <div class="wrap s-catalogue__grid">
+    <a class="book reveal" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener" aria-label="Feuilleter le catalogue en 3D">
+      <div class="book__cover"><img src="/assets/img/v2/cover-pile-m.webp" srcset="/assets/img/v2/cover-pile-m.webp 900w, /assets/img/v2/cover-pile.webp 1800w" sizes="(max-width: 900px) 80vw, 35vw" alt="Couverture du catalogue LIBRERY" loading="lazy" decoding="async">
+        <div class="book__title"><b>LIBRERY</b><i>La Bibliothèque Olfactive</i></div></div>
+      <div class="book__pages"></div>
+    </a>
+    <div class="s-diptych__txt reveal">
+      <span class="runhead"><b>Le catalogue</b> · 56 pages</span>
+      <h2 class="h1">Feuilleter la bibliothèque</h2>
+      <p class="lead">Le catalogue LIBRERY, à tourner page après page comme un livre ancien posé sur le bureau.</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px">
+        <a class="btn" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener">Ouvrir en 3D</a>
+        <a class="btn btn--ghost" href="https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf" target="_blank" rel="noopener">Télécharger le PDF</a>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- SECTION : image-with-text — Coffret Découverte -->
 <section class="section">
-  <div class="wrap s-split s-split--rev">
-    <div class="s-split__media reveal"><img src="/assets/img/produits/hot-sand-3.webp" alt="Coffret LIBRERY" style="aspect-ratio:1/1;background:var(--creme)"></div>
-    <div class="s-split__txt reveal">
-      <span class="eyebrow">Exclusivité site</span>
-      <h2 class="h2">Le Coffret Découverte</h2>
+  <div class="wrap s-diptych">
+    <div class="s-diptych__media"><div class="media unveil" style="aspect-ratio:1/1"><img src="/assets/img/v2/coffret-30ml-m.webp" srcset="/assets/img/v2/coffret-30ml-m.webp 900w, /assets/img/v2/coffret-30ml.webp 1800w" sizes="(max-width: 900px) 100vw, 55vw" alt="Les extraits 30 ml LIBRERY" loading="lazy" decoding="async"></div></div>
+    <div class="s-diptych__txt reveal">
+      <span class="runhead"><b>Exclusivité site</b></span>
+      <h2 class="h1">Le Coffret Découverte</h2>
       <div class="prose"><p>Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml.</p>
       <p>Après votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé — valable 90 jours sur l’achat d’un parfum 100 ml.</p></div>
-      <a class="link" href="/collection?c=coffrets">Découvrir les coffrets</a>
+      <a class="link" href="/collection?c=coffrets">Découvrir les coffrets <span class="arr">→</span></a>
     </div>
   </div>
 </section>
@@ -165,21 +218,21 @@
 <section class="section--tight" style="padding-top:0">
   <div class="wrap duo">
     <a class="duo__item reveal" href="/lexique">
-      <img src="/assets/img/site/atelier-alchimiste.webp" alt="">
-      <div class="duo__txt"><span class="eyebrow" style="color:#e8e2d8">Apprendre</span><h2 class="h2">Le Lexique</h2><p>Notes, matières, procédés : les mots de la haute parfumerie.</p><span class="link">Ouvrir le lexique</span></div>
+      <img src="/assets/img/v2/poire-livres-m.webp" srcset="/assets/img/v2/poire-livres-m.webp 900w, /assets/img/v2/poire-livres.webp 1800w" sizes="(max-width: 900px) 100vw, 50vw" alt="" loading="lazy" decoding="async">
+      <div class="duo__txt"><span class="label">Apprendre</span><h2 class="h2">Le Lexique</h2><p>Notes, matières, procédés : les mots de la haute parfumerie.</p><span class="link">Ouvrir le lexique <span class="arr">→</span></span></div>
     </a>
-    <a class="duo__item reveal" href="/points-de-vente">
-      <img src="/assets/img/site/ambre.webp" alt="">
-      <div class="duo__txt"><span class="eyebrow" style="color:#e8e2d8">La Carte</span><h2 class="h2">Nos points de vente</h2><p>Quelques adresses où nos récits prennent vie.</p><span class="link">Trouver une adresse</span></div>
+    <a class="duo__item reveal" style="--d:.12s" href="/points-de-vente">
+      <img src="/assets/img/v2/camp-coffrets-m.webp" srcset="/assets/img/v2/camp-coffrets-m.webp 900w, /assets/img/v2/camp-coffrets.webp 1800w" sizes="(max-width: 900px) 100vw, 50vw" alt="" loading="lazy" decoding="async">
+      <div class="duo__txt"><span class="label">La Carte</span><h2 class="h2">Nos points de vente</h2><p>Quelques adresses où nos récits prennent vie.</p><span class="link">Trouver une adresse <span class="arr">→</span></span></div>
     </a>
   </div>
 </section>
 
 <!-- SECTION : newsletter -->
-<section class="section bg-creme s-news">
+<section class="section s-news">
   <div class="wrap">
-    <span class="eyebrow">Newsletter</span>
-    <h2 class="h2 italic">Une goutte de poésie dans votre boîte mail</h2>
+    <span class="runhead">Newsletter</span>
+    <h2 class="h2">Une goutte de poésie dans votre boîte mail</h2>
     <form data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail"><button>Rejoindre</button></form>
   </div>
 </section>
