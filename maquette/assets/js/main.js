@@ -114,7 +114,7 @@
             <p>L’histoire continue sur la peau.<br>Jusqu’au prochain chapitre.<br>Jusqu’à ce que vous écriviez le vôtre.</p>
           </div>
           <div class="footer__top">
-            <div class="footer__brand"><div class="logo">${LOGO_SVG}</div>
+            <div class="footer__brand"><div class="logo">${LOGO_SVG_PARIS}</div>
               <p>La bibliothèque olfactive, où chaque fragrance se fait récit et chaque note, un souvenir. Maison de parfum fondée à Paris par Bey Rafik.</p></div>
             <div><h4>Bibliothèque</h4><ul>
               <li><a href="/collection?c=skin-obsession">Skin Obsession</a></li>

@@ -15,7 +15,7 @@ for f in sorted((root / 'src').glob('[!_]*.html')):
     src = f.read_text(encoding='utf8')
     meta = dict(re.findall(r'(\w+):\s*([^|]+?)\s*(?:\||-->)', src.split('\n', 1)[0]))
     body = re.sub(r'\{\{pic ([^}]+)\}\}', pic, src.split('\n', 1)[1])
-    body = body.replace('{{logo-serre}}', (root / 'assets/img/v2/logo-librery-serre.svg').read_text()).replace('{{logo}}', (root / 'assets/img/v2/logo-librery.svg').read_text())
+    body = body.replace('{{logo-couverture}}', (root / 'assets/img/v2/logo-couverture.svg').read_text()).replace('{{logo}}', (root / 'assets/img/v2/logo-librery.svg').read_text())
     out = (head.replace('{{TITLE}}', meta.get('title', 'LIBRERY'))
            + f'</head>\n<body data-page="{meta.get("page", "")}" class="{meta.get("body", "")}">\n'
            + '<div id="site-header"></div>\n<main>\n' + body.rstrip() + '\n</main>\n<div id="site-footer"></div>\n'
