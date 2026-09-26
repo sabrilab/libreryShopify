@@ -55,7 +55,7 @@
               <a href="/points-de-vente" ${cur('carte')}>La Carte</a>
             </nav>
           </div>
-          <a href="/" class="logo" aria-label="LIBRERY — accueil">LIBRERY</a>
+          <a href="/" class="logo" aria-label="LIBRERY — accueil">${LOGO_SVG}</a>
           <div class="utils">
             <a href="/contact" class="u-hide">Contact</a>
             <button type="button" class="u-hide u-hide-sm" data-toast="L’espace client sera celui de Shopify">Compte</button>
@@ -114,7 +114,7 @@
             <p>L’histoire continue sur la peau.<br>Jusqu’au prochain chapitre.<br>Jusqu’à ce que vous écriviez le vôtre.</p>
           </div>
           <div class="footer__top">
-            <div class="footer__brand"><div class="logo">LIBRERY</div>
+            <div class="footer__brand"><div class="logo">${LOGO_SVG}</div>
               <p>La bibliothèque olfactive, où chaque fragrance se fait récit et chaque note, un souvenir. Maison de parfum fondée à Paris par Bey Rafik.</p></div>
             <div><h4>Bibliothèque</h4><ul>
               <li><a href="/collection?c=skin-obsession">Skin Obsession</a></li>
@@ -183,7 +183,7 @@
       + `<div class="bar"><span style="width:${Math.min(100, total / FREE_SHIPPING * 100)}%"></span></div>`;
     $('#cart-items').innerHTML = items.length ? items.map((i, idx) => `
       <div class="line">
-        <img class="line__img" src="${IMG + i.p.card}-m.webp" alt="">
+        <img class="line__img" src="${IMG + (i.p.pack || i.p.card)}-m.webp" alt="">
         <div><div class="line__name">${esc(i.p.name)}</div><div class="line__var">${esc(i.fmt.label)}</div>
           <div class="qty"><button data-q="-1" data-i="${idx}" aria-label="Retirer un">−</button><span>${i.q}</span><button data-q="1" data-i="${idx}" aria-label="Ajouter un">+</button></div></div>
         <div class="line__right"><span>${eur(i.total)}</span><button data-rm="${idx}">Retirer</button></div>
@@ -221,7 +221,7 @@
       <a class="card reveal" style="--d:${(i % 3) * .12}s" href="/produit?p=${p.handle}">
         <div class="card__media">
           ${p.isNew ? '<span class="card__badge">Nouveauté</span>' : ''}${p.exclusive ? '<span class="card__badge">Exclusivité site</span>' : ''}
-          ${pic(p.card, p.name, '(max-width: 900px) 50vw, 33vw')}
+          ${pic(p.pack || p.card, p.name, '(max-width: 900px) 50vw, 33vw')}
           ${p.hover ? pic(p.hover, '', '(max-width: 900px) 50vw, 33vw', 'alt') : ''}
           ${p.hoverLabel ? `<span class="card__hover">${p.hoverLabel}</span>` : ''}
         </div>
