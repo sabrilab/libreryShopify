@@ -1,58 +1,33 @@
-<!-- title: La Bibliothèque — LIBRERY | page: bibliotheque -->
-<section class="page-hero">
-  <div class="wrap">
-    <span class="runhead"><b>Fragrances</b> · Extraits de parfum 25 %</span>
-    <h1 class="display">La Bibliothèque</h1>
-    <p class="lead">Chaque collection est un livre. Chaque fragrance, un chapitre. Chaque sillage, une histoire.</p>
-  </div>
-</section>
-<section class="section--tight" style="padding-top:0">
-  <div class="wrap">
-    <div class="filters">
-      <div class="pills" id="lib-pills">
-        <button class="pill is-active" data-f="all">Tout</button>
-        <button class="pill" data-f="skin-obsession">Skin Obsession</button>
-        <button class="pill" data-f="summer-vibes">Summer Vibes</button>
-        <button class="pill" data-f="coffrets">Coffrets</button>
+<!-- title: La Bibliothèque — LIBRERY | page: bibliotheque | run: La Bibliothèque -->
+<section class="page-head"><div class="wrap">
+  <h1 class="h1">La Bibliothèque</h1>
+  <p class="lede">Chaque collection est un livre, chaque parfum un chapitre. Tous sont des extraits de parfum concentrés à 25 %, en 100 ml, 30 ml et 2 ml.</p>
+</div></section>
+<section style="padding-bottom:var(--block)"><div class="wrap">
+  <div class="filters">
+    <div class="filters__row">
+      <div class="tabs" id="lib-cols">
+        <button data-f="all" class="is-active">Tout</button>
+        <button data-f="skin-obsession">Skin Obsession</button>
+        <button data-f="summer-vibes">Summer Vibes</button>
+        <button data-f="coffrets">Coffrets</button>
       </div>
-      <div style="display:flex;gap:26px;align-items:center">
-        <span class="filters__count" id="lib-count"></span>
-        <select id="lib-sort" aria-label="Trier">
-          <option value="default">Par chapitre</option>
-          <option value="az">Nom A → Z</option>
-          <option value="asc">Prix croissant</option>
-          <option value="desc">Prix décroissant</option>
-        </select>
-      </div>
+      <div class="tabs"><span class="ui" id="lib-count"></span>
+        <select id="lib-sort" aria-label="Trier"><option value="default">Par collection</option><option value="az">De A à Z</option><option value="asc">Prix croissant</option><option value="desc">Prix décroissant</option></select></div>
     </div>
-    <div class="fams" id="lib-fams"></div>
-    <p class="fams__desc" id="lib-fam-desc"></p>
-    <div id="library"></div>
+    <div class="tabs" id="lib-fams"></div>
+    <p class="filters__desc" id="lib-desc"></p>
   </div>
-</section>
-<!-- SECTION : faq — bien choisir (inspiration Diptyque) -->
-<section class="section on-sable">
-  <div class="wrap faq-grid">
-    <div class="reveal"><span class="runhead"><b>Bien choisir</b></span><h2 class="h2" style="margin-top:16px">Questions de lecteurs</h2>
-      <p class="muted" style="margin-top:18px">Et si vous hésitez encore : <a class="link" href="/portrait-olfactif">faites votre portrait olfactif <span class="arr">→</span></a></p></div>
-    <div class="accordion reveal">
-      <div class="acc"><button type="button" aria-expanded="false">Qu’est-ce qu’un extrait de parfum ?</button><div class="acc__panel"><div><div class="prose"><p>La forme la plus concentrée d’un parfum. Toutes les créations LIBRERY sont des extraits à 25 % : plus de tenue, un sillage plus riche, quelques vaporisations suffisent.</p></div></div></div></div>
-      <div class="acc"><button type="button" aria-expanded="false">Comment choisir entre 100 ml, 30 ml et 2 ml ?</button><div class="acc__panel"><div><div class="prose"><p>Le 2 ml permet de découvrir un parfum sur sa peau. Le 30 ml accompagne en voyage ou complète une bibliothèque. Le 100 ml est le format de la signature. Et avec chaque flacon, un 2 ml du même parfum vous est offert pour l’essayer avant d’ouvrir.</p></div></div></div></div>
-      <div class="acc"><button type="button" aria-expanded="false">Les parfums sont-ils mixtes ?</button><div class="acc__panel"><div><div class="prose"><p>Chez LIBRERY, un parfum n’a pas de genre : il se révèle différemment sur chaque peau. Choisissez une histoire, pas une case.</p></div></div></div></div>
-      <div class="acc"><button type="button" aria-expanded="false">Que sont les familles olfactives ?</button><div class="acc__panel"><div><div class="prose"><p><em>Gourmand</em> — Vanille, caramel, praline, chocolat : des notes que l’on voudrait presque goûter.</p><p><em>Floral</em> — Rose, jasmin, tubéreuse, fleur d’oranger : le cœur fleuri de la parfumerie.</p><p><em>Fruité</em> — Baies, mangue, abricot : l’éclat juteux des fruits mûrs.</p><p><em>Ambré</em> — Ambre, résines, benjoin : une chaleur enveloppante et sensuelle.</p><p><em>Boisé</em> — Santal, cèdre, bois modernes : la structure et la profondeur.</p></div></div></div></div>
-      <div class="acc"><button type="button" aria-expanded="false">Comment fonctionne le Coffret Découverte ?</button><div class="acc__panel"><div><div class="prose"><p>Vous découvrez les créations en 2 ml. Après votre commande, un code de la valeur du coffret vous est envoyé, valable 90 jours sur un flacon 100 ml.</p></div></div></div></div>
-    </div>
-  </div>
-</section>
+  <div id="library"></div>
+</div></section>
 
-<section class="section on-brun">
-  <div class="wrap s-diptych">
-    <div class="s-diptych__media"><div class="media unveil" style="aspect-ratio:3/2">{{pic camp-coffrets|Coffrets LIBRERY|(max-width: 900px) 100vw, 55vw}}</div></div>
-    <div class="s-diptych__txt reveal">
-      <span class="runhead"><b>Chapitre à venir</b></span>
-      <h2 class="h1 italic">Les Bougies</h2>
-      <p class="lead">Les récits LIBRERY s’apprêtent à quitter la peau pour habiter l’espace.</p>
-      <a class="btn btn--or" href="/collection?c=bougies">Être prévenu</a>
-    </div>
+<!-- SECTION : faq -->
+<section class="block"><div class="wrap faq">
+  <div><h2 class="h2">Bien choisir</h2><p class="muted" style="margin-top:14px">Ou laissez-vous guider : <a class="tlink" href="/portrait-olfactif">Portrait olfactif</a></p></div>
+  <div class="accordion">
+    <div class="acc"><button type="button">Qu’est-ce qu’un extrait de parfum ?</button><div class="acc__panel"><p>La forme la plus concentrée d’un parfum. Nos créations sont des extraits à 25 % : plus de tenue, un sillage plus riche, deux ou trois vaporisations suffisent.</p></div></div>
+    <div class="acc"><button type="button">100 ml, 30 ml ou 2 ml ?</button><div class="acc__panel"><p>Le 2 ml pour découvrir un parfum sur sa peau, le 30 ml pour voyager, le 100 ml pour en faire sa signature. Chaque flacon est accompagné d’un 2 ml du même parfum, pour l’essayer avant d’ouvrir.</p></div></div>
+    <div class="acc"><button type="button">Les familles olfactives</button><div class="acc__panel"><p><em>Gourmand</em> : vanille, caramel, praline. <em>Floral</em> : jasmin, tubéreuse, fleur d’oranger. <em>Fruité</em> : baies, mangue, abricot. <em>Ambré</em> : ambre, résines, benjoin. <em>Boisé</em> : santal, cèdre.</p></div></div>
+    <div class="acc"><button type="button">Comment fonctionnent les coffrets ?</button><div class="acc__panel"><p>Vous découvrez nos parfums en 2 ml. Après commande, un code de la valeur du coffret vous est envoyé, valable 90 jours sur un flacon 100 ml.</p></div></div>
   </div>
-</section>
+</div></section>

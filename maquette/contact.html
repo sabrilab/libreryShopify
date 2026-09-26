@@ -9,42 +9,34 @@
 <link rel="icon" type="image/png" href="/assets/img/v2/emblem-brun.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Libre+Caslon+Text:ital,wght@0,400;1,400&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=e777c135">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css?v=22a61d60">
 </head>
-<body data-page="contact" class="">
+<body data-page="contact" class="" data-run="Contact">
 <div id="site-header"></div>
 <main>
-<section class="page-hero">
-  <div class="wrap">
-    <span class="runhead"><b>Écrire à la maison</b></span>
-    <h1 class="display">Contact</h1>
-    <p class="lead">Une question sur une fragrance, une commande, une collaboration ? Chaque lettre reçoit sa réponse.</p>
+<section class="page-head"><div class="wrap">
+  <h1 class="h1">Contact</h1>
+  <p class="lede">Une question sur un parfum, une commande, une collaboration.</p>
+</div></section>
+<section style="padding-bottom:var(--block)"><div class="wrap contact">
+  <div class="contact__info">
+    <p><span class="ui muted">E-mail</span><br><a class="tlink" href="mailto:contact@libreryparfum.com">contact@libreryparfum.com</a></p>
+    <p><span class="ui muted">Maison</span><br>LIBRERY — Bey Industrie<br>58 avenue de Wagram, 75017 Paris</p>
+    <p><span class="ui muted">Revendeurs</span><br>Choisissez « Devenir revendeur » dans le formulaire.</p>
   </div>
-</section>
-<section class="section--tight" style="padding-top:0">
-  <div class="wrap contact">
-    <div class="contact__info reveal">
-      <div class="media unveil" style="aspect-ratio:4/5;margin-bottom:34px"><img src="/assets/img/v2/coralie-spicher-m.webp" srcset="/assets/img/v2/coralie-spicher-m.webp 900w, /assets/img/v2/coralie-spicher.webp 1800w" sizes="(max-width: 900px) 100vw, 40vw" alt="Écrire" loading="lazy" decoding="async"></div>
-      <p><span class="label">E-mail</span><br><a class="lead" href="mailto:contact@libreryparfum.com">contact@libreryparfum.com</a></p>
-      <p><span class="label">La maison</span><br>LIBRERY — Bey Industrie<br>58 avenue de Wagram, 75017 Paris</p>
-    </div>
-    <form class="form reveal" id="contact-form" style="align-self:start">
-      <div class="row">
-        <div class="field"><label for="c-name">Nom</label><input id="c-name" required autocomplete="name"></div>
-        <div class="field"><label for="c-mail">E-mail</label><input id="c-mail" type="email" required autocomplete="email"></div>
-      </div>
-      <div class="field"><label for="c-sub">Sujet</label>
-        <select id="c-sub"><option>Une question sur un parfum</option><option>Ma commande</option><option>Devenir revendeur</option><option>Presse &amp; collaboration</option><option>Autre</option></select></div>
-      <div class="field"><label for="c-msg">Message</label><textarea id="c-msg" required></textarea></div>
-      <div><button class="btn">Envoyer</button></div>
-    </form>
-  </div>
-</section>
+  <form class="form" id="contact-form">
+    <div class="row"><div class="field"><label for="c-name">Nom</label><input id="c-name" required autocomplete="name"></div>
+      <div class="field"><label for="c-mail">E-mail</label><input id="c-mail" type="email" required autocomplete="email"></div></div>
+    <div class="field"><label for="c-sub">Sujet</label><select id="c-sub"><option>Une question sur un parfum</option><option>Ma commande</option><option>Devenir revendeur</option><option>Presse et collaboration</option><option>Autre</option></select></div>
+    <div class="field"><label for="c-msg">Message</label><textarea id="c-msg" required></textarea></div>
+    <div><button class="btn">Envoyer</button></div>
+  </form>
+</div></section>
 </main>
 <div id="site-footer"></div>
 <script src="/assets/js/logo.js?v=5a17e5f9"></script>
-<script src="/assets/js/data.js?v=158f35de"></script>
-<script src="/assets/js/main.js?v=493d5e6a"></script>
+<script src="/assets/js/data.js?v=155aeed4"></script>
+<script src="/assets/js/main.js?v=2cd30199"></script>
 </body>
 </html>

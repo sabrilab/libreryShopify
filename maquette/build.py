@@ -23,7 +23,8 @@ for f in sorted((root / 'src').glob('[!_]*.html')):
     css = '/assets/css/style.css?v=' + ver('/assets/css/style.css')
     js = ''.join('<script src="/assets/js/%s?v=%s"></script>\n' % (n, ver('/assets/js/' + n)) for n in ('logo.js', 'data.js', 'main.js'))
     out = (head.replace('{{TITLE}}', meta.get('title', 'LIBRERY')).replace('/assets/css/style.css', css)
-           + f'</head>\n<body data-page="{meta.get("page", "")}" class="{meta.get("body", "")}">\n'
+           + '</head>\n<body data-page="%s" class="%s"%s%s>\n' % (meta.get('page', ''), meta.get('body', ''),
+                 (' data-run="%s"' % meta['run']) if meta.get('run') else '', (' data-folio="%s"' % meta['folio']) if meta.get('folio') else '')
            + '<div id="site-header"></div>\n<main>\n' + body.rstrip() + '\n</main>\n<div id="site-footer"></div>\n'
            + meta.get('scripts', '').replace('\\n', '\n')
            + js + '</body>\n</html>\n')
