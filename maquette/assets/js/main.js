@@ -24,7 +24,7 @@
 
   /* Image responsive : <nom>-m.webp (petit) et <nom>.webp (grand) */
   function pic(name, alt = '', sizes = '(max-width: 800px) 100vw, 50vw', cls = '', eager = false) {
-    return `<img class="${cls}" src="${IMG + name}-m.webp" srcset="${IMG + name}-m.webp 800w, ${IMG + name}.webp 1600w" sizes="${sizes}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+    return `<img class="${cls}" src="${IMG + name}-m.webp" srcset="${IMG + name}-m.webp ${(IMGW[name] || [800])[0]}w, ${IMG + name}.webp ${(IMGW[name] || [0, 1600])[1]}w" sizes="${sizes}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
   }
 
   /* Icônes au trait (32 px, trait 1 px) — snippet icon.liquid dans Shopify */
@@ -44,8 +44,8 @@
     const cur = k => (k === page ? 'aria-current="page"' : '');
     host.outerHTML = `
       <div class="announce" id="announce">
-        <span class="is-on">Un échantillon 2 ml offert avec chaque flacon, pour l’essayer avant de l’ouvrir</span>
-        <span>Livraison offerte dès 100 € · deux échantillons au choix</span>
+        <span class="is-on">Un échantillon 2 ml offert avec chaque flacon</span>
+        <span>Livraison offerte dès 100 €</span>
         <span>Écrin cadeau et mot manuscrit offerts</span>
       </div>
       <header class="header" id="header">
@@ -130,11 +130,11 @@
     const host = $('#site-footer'); if (!host) return;
     host.outerHTML = `
       <section class="block" aria-label="Services"><div class="wrap">
-        <div class="services">${SERVICES.map(x => `<a href="/services">${icon(x.i)}<b>${x.t}</b><span>${x.d}</span></a>`).join('')}</div>
-        <div class="letter" style="margin-top:56px">
+        ${page === 'services' ? '' : `<div class="services">${SERVICES.map(x => `<a href="/services">${icon(x.i)}<b>${x.t}</b><span>${x.d}</span></a>`).join('')}</div>`}
+        ${$('main form[data-news]') ? '' : `<div class="letter"${page === 'services' ? '' : ' style="margin-top:56px"'}>
           <div><h2 class="h2">Lettre de la maison</h2><p>Les nouveaux chapitres avant tout le monde, et un 2 ml glissé dans votre première commande.</p></div>
           <form class="field-line" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail"><button>S’inscrire</button></form>
-        </div>
+        </div>`}
       </div></section>
       <footer class="footer"><div class="wrap">
         <div class="footer__grid">
@@ -217,18 +217,18 @@
     const tryFirst = [...new Set(items.filter(i => ['100', '30'].includes(i.f)).map(i => i.p))];
     const perfumes = PRODUCTS.filter(p => !p.type);
     const opt = v => perfumes.map(p => `<option value="${p.handle}" ${v === p.handle ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
-    const thumb = p => `${IMG + (p.pack || p.card)}-m.webp`;
+    const thumb = (p, f) => `${IMG + (f === '30' && p.pack30 ? p.pack30 : p.pack || p.card)}-m.webp`;
 
     $('#cart-items').innerHTML = items.length ? items.map((i, idx) => `
       <div class="line">
-        <img class="line__img" src="${thumb(i.p)}" alt="">
+        <span class="line__img${i.p.pack ? ' is-pack' : ''}"><img src="${thumb(i.p, i.fmt.id)}" alt=""></span>
         <div><div class="line__name">${nm(i.p.name)}</div><div class="line__var">${esc(i.fmt.label)}</div>
           ${i.sel ? `<div class="line__sel">${i.sel.map(h => esc(byHandle(h)?.name || h)).join(', ')}</div>` : ''}
           <div class="qty"><button data-q="-1" data-i="${idx}" aria-label="Retirer un">−</button><span>${i.q}</span><button data-q="1" data-i="${idx}" aria-label="Ajouter un">+</button></div></div>
         <div class="line__right"><span>${eur(i.total)}</span><button data-rm="${idx}">Retirer</button></div>
       </div>`).join('') + tryFirst.map(p => `
       <div class="line line--gift">
-        <img class="line__img" src="${thumb(p)}" alt="">
+        <span class="line__img${p.pack ? ' is-pack' : ''}"><img src="${thumb(p)}" alt=""></span>
         <div><div class="line__name">${nm(p.name)}, 2 ml</div><div class="line__var">Pour l’essayer avant d’ouvrir le flacon</div></div>
         <div class="line__right"><span>Offert</span></div>
       </div>`).join('') + `
@@ -317,16 +317,23 @@
       <a class="card tile" href="${href}"><div class="card__media">${pic(img, '', S_CARD)}</div>
         <div class="card__body"><h3 class="card__name">${title}</h3><span class="card__meta">${meta}</span></div></a>`;
   /* grande tuile sur deux colonnes : l'image de campagne dans la grille */
-  const wideTile = (key) => { const c = COLLECTIONS[key]; return c && c.wide ? `
-      <a class="card tile card--wide" href="/collection?c=${key}"><div class="card__media">${pic(c.wide, c.title, '(max-width: 800px) 100vw, 66vw')}</div>
+  const wideTile = (key, img) => { const c = COLLECTIONS[key]; return c && c.wide ? `
+      <a class="card tile card--wide" href="/collection?c=${key}"><div class="card__media">${pic(img || c.wide, c.title, '(max-width: 800px) 100vw, 66vw')}</div>
         <div class="card__body"><span class="card__flag">${esc(c.chapter)}</span><h3 class="card__name">${nm(c.title)}</h3><span class="card__meta">Lire le chapitre${c.folio ? ', p. ' + c.folio : ''}</span></div></a>` : ''; };
   /* mosaïque de trois images légendées (bloc « image-mosaic » dans Shopify) */
   const mosaic = (key, n0 = 1) => { const c = COLLECTIONS[key]; return c && c.mosaic ? `<div class="mosaic">${c.mosaic.map(([img, cap], i) =>
       `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}<figcaption class="fig">fig. ${n0 + i} — ${esc(cap)}</figcaption></figure>`).join('')}</div>` : ''; };
-  const builderTile = () => tile('/produit?p=coffret-a-composer', 'summer-100', 'Coffret <em>à composer</em>', 'Cinq parfums en 2 ml — 30 €');
+  const builderTile = () => tile('/produit?p=coffret-a-composer', 'summer-socles', 'Coffret <em>à composer</em>', 'Cinq parfums en 2 ml — 30 €');
   const storesTile = () => tile('/points-de-vente', 'camp-mercedes', 'Nos <em>adresses</em>', 'Treize lieux où nos récits prennent vie');
   const quizTile = () => tile('/portrait-olfactif', 'camp-livre', 'Portrait <em>olfactif</em>', 'Quatre questions pour trouver votre parfum');
 
+  /* mobile, deux colonnes : si le nombre de cartes simples est impair, la première passe en pleine largeur (pas d'orpheline) */
+  function balanceGrids(root = document) {
+    $$('.grid:not(.grid--rail)', root).forEach(g => {
+      const singles = [...g.children].filter(c => !c.classList.contains('card--wide')).length;
+      g.classList.toggle('grid--lead', singles % 2 === 1);
+    });
+  }
   function accordions(root = document) {
     $$('.acc > button', root).forEach(b => { if (b.dataset.bound) return; b.dataset.bound = 1; b.addEventListener('click', () => { const o = b.parentElement.classList.toggle('is-open'); b.setAttribute('aria-expanded', o); }); });
   }
@@ -341,7 +348,7 @@
     const so = $('#so-grid'), sv = $('#sv-grid'); if (!so) return;
     so.innerHTML = PRODUCTS.filter(p => p.collection === 'skin-obsession').map(card).join('');
     const svp = PRODUCTS.filter(p => p.collection === 'summer-vibes').map(card);
-    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes') + svp.slice(3).join('') + builderTile() + quizTile();
+    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + builderTile() + quizTile();
     $$('[data-mosaic]').forEach(el => { el.innerHTML = mosaic(el.dataset.mosaic, +el.dataset.fig || 1); });
     const sh = $('#shelf');
     if (sh) sh.innerHTML = SHELF.map(m => { const p = byHandle(m.h); return `<a class="shelf__item" href="/produit?p=${m.h}"><figure>${pic(m.img, m.t, '(max-width: 800px) 62vw, 22vw')}</figure>
@@ -374,6 +381,7 @@
                       : items.map(card).join('')}</div>`;
           }).join('')
         : `<div class="grid">${list.map(card).join('') || '<p class="muted">Aucune création pour ce filtre.</p>'}</div>`;
+      balanceGrids(root);
     };
     const url = () => { const u = new URLSearchParams(); if (filter !== 'all') u.set('f', filter); if (fam) u.set('famille', fam); history.replaceState(null, '', '/bibliotheque' + (u.toString() ? '?' + u : '')); };
     $$('#lib-cols button').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; url(); render(); }));
@@ -402,9 +410,8 @@
           <form class="field-line" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="E-mail"><button>M’inscrire</button></form></div></section>` : ''}
       ${items.length ? `<section class="block"><div class="wrap">
           <div class="row-head"><div><h2 class="h2">Les parfums</h2></div><span class="ui muted">${items.length} ${items.length > 1 ? 'créations' : 'création'}</span></div>
-          <div class="grid">${items.map(card).join('')}${key === 'coffrets' ? '' : (items.length % 3 === 0 ? wideTile(key) : '') + builderTile()}</div></div></section>` : ''}
+          <div class="grid">${items.map(card).join('')}${key === 'coffrets' ? '' : builderTile() + (items.length % 3 === 0 ? quizTile() + storesTile() : '')}</div></div></section>` : ''}
       ${col.mosaic ? `<section class="block block--tight"><div class="wrap">${mosaic(key)}</div></section>` : ''}
-      ${col.side ? `<section class="s-figure">${pic(col.side, '', '100vw')}<div class="wrap"><p class="fig">fig. — ${esc(col.title)}, la campagne</p></div></section>` : ''}
       ${col.chapters.length ? `<section class="block"><div class="wrap chapters">
           ${col.chapters.map(ch => `<article class="split"><h2 class="h2">${ch.h}</h2><div class="prose">${ch.p.map(t => `<p>${t}</p>`).join('')}</div></article>`).join('')}
         </div></section>` : ''}`;
@@ -428,6 +435,8 @@
     const acc = (t, c) => `<div class="acc"><button type="button" aria-expanded="false">${t}</button><div class="acc__panel">${c}</div></div>`;
     const cta = () => p.builder && picks.length < p.builder ? `Choisissez encore ${p.builder - picks.length} parfum${p.builder - picks.length > 1 ? 's' : ''}` : `Ajouter au panier — ${eur(current.price)}`;
     const story = p.description.slice(0, 2), more = p.description.slice(2);
+    // une seule pyramide : si la « lecture des matières » (catalogue) existe, elle fait foi
+    const notes = p.materials ? p.materials.list : p.notes;
 
     root.innerHTML = `
       <section class="pdp">
@@ -448,14 +457,14 @@
           <p class="pdp__desc">${p.tagline}</p>
           ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${eur(f.price)}</small></button>`).join('')}</div>` : ''}
           ${p.builder ? `<div class="builder"><div class="builder__head"><span>Vos parfums</span><b id="b-count">0 / ${p.builder}</b></div>
-            <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><img src="${IMG + x.pack}-m.webp" alt=""><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
+            <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><span class="builder__thumb"><img src="${IMG + x.pack}-m.webp" alt=""></span><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
           <button class="btn btn--block" id="add" ${p.builder ? 'disabled' : ''}>${cta()}</button>
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
           <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, valable 90 jours sur un flacon 100 ml.`}</p>
           <p class="pdp__small">Expédié sous 24 h depuis Paris, livré ${eta()}. Deux échantillons et écrin offerts.</p>
           ${perf ? `<p class="pdp__by">Composé par <a href="#parfumeur">${esc(perf.name)}</a></p>` : ''}
           <div class="accordion">
-            ${p.notes ? acc('Notes', `<dl class="notes-dl"><div><dt>Tête</dt><dd>${p.notes.tete}</dd></div><div><dt>Cœur</dt><dd>${p.notes.coeur}</dd></div><div><dt>Fond</dt><dd>${p.notes.fond}</dd></div></dl>`) : ''}
+            ${notes ? acc('Notes', `<dl class="notes-dl"><div><dt>Tête</dt><dd>${notes.tete}</dd></div><div><dt>Cœur</dt><dd>${notes.coeur}</dd></div><div><dt>Fond</dt><dd>${notes.fond}</dd></div></dl>`) : ''}
             ${isPerfume ? acc('Conseils d’utilisation', '<p>Un extrait se dépose, il ne se frotte pas. Deux ou trois vaporisations à vingt centimètres, sur le cou, les poignets ou les vêtements.</p>') : ''}
             ${acc('Ingrédients', '<p class="muted">Liste INCI complète et allergènes, renseignés dans la fiche produit Shopify.</p>')}
             ${acc('Livraison, retours et écrin', '<p>Livraison offerte dès 100 €, retours offerts sous 30 jours pour tout flacon scellé. Écrin et mot manuscrit offerts, facture sans prix sur demande.</p>')}
@@ -468,7 +477,7 @@
         <div class="story__margin">${p.folio ? `<span class="folio">p. ${p.folio}</span>` : ''}</div>
         <div class="prose">${story.map(t => `<p>${t}</p>`).join('')}
           ${more.length ? `<div id="more" hidden>${more.map(t => `<p>${t}</p>`).join('')}${p.coda ? `<p>${p.coda.join(' ')}</p>` : ''}</div><button class="tlink more" id="more-btn">Lire la suite</button>` : ''}</div>
-        ${p.notes ? `<dl class="story__notes"><div><dt>Tête</dt><dd>${p.notes.tete}</dd></div><div><dt>Cœur</dt><dd>${p.notes.coeur}</dd></div><div><dt>Fond</dt><dd>${p.notes.fond}</dd></div></dl>` : '<div></div>'}
+        ${p.notes && !p.materials ? `<dl class="story__notes"><div><dt>Tête</dt><dd>${p.notes.tete}</dd></div><div><dt>Cœur</dt><dd>${p.notes.coeur}</dd></div><div><dt>Fond</dt><dd>${p.notes.fond}</dd></div></dl>` : '<div></div>'}
       </div></section>
 
       ${p.materials ? `<section class="block materials"><div class="wrap split">
@@ -521,9 +530,11 @@
 
     // barre d'achat collante
     const st = $('#sticky');
-    if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => {
-      const show = !en.isIntersecting && en.boundingClientRect.top < 0; st.classList.toggle('is-on', show); st.setAttribute('aria-hidden', !show);
-    }).observe($('#add'));
+    // (un écouteur de défilement plutôt qu'un IntersectionObserver : un défilement rapide peut sauter le bouton sans le croiser)
+    let ticking = false;
+    const syncSticky = () => { ticking = false; const show = $('#add').getBoundingClientRect().bottom < 0; st.classList.toggle('is-on', show); st.setAttribute('aria-hidden', !show); };
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(syncSticky); } }, { passive: true });
+    syncSticky();
     accordions(root);
   }
 
@@ -578,7 +589,7 @@
       const top = Object.entries(score).sort((a, b) => b[1] - a[1])[0];
       $('#quiz-title').textContent = top ? `Un portrait ${top[0].toLowerCase()}` : 'Votre portrait';
       $('#quiz-sub').textContent = top ? FAMILIES[top[0]] : '';
-      $('#quiz-results').innerHTML = `<div class="grid">${ranked.map(card).join('')}</div>`;
+      $('#quiz-results').innerHTML = `<div class="grid">${ranked.map(card).join('')}</div>`; balanceGrids($('#quiz-results'));
       const c = $('#quiz-cta'); c.textContent = forGift ? 'Voir les idées cadeaux' : 'Les essayer en 2 ml'; c.href = forGift ? '/offrir' : '/produit?p=coffret-a-composer';
       show(steps.length - 1);
     }));
@@ -588,6 +599,7 @@
   function initGifts() {
     $$('[data-gift]').forEach(el => {
       el.innerHTML = el.dataset.gift.split(',').map(t => {
+        if (t === 'quiz') return quizTile();
         const [h, f] = t.split('@'); const p = byHandle(h); if (!p) return '';
         const fmt = f && formatsOf(p).find(x => x.id === f);
         return card(fmt ? Object.assign({}, p, { formats: [fmt] }, fmt.id === '30' && p.pack30 ? { pack: p.pack30, pack30: null } : {}) : p);
@@ -605,5 +617,5 @@
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
   initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initContact();
-  renderCart(); bindToasts(); bindCards(); accordions(); newsletters();
+  renderCart(); bindToasts(); bindCards(); accordions(); newsletters(); balanceGrids();
 })();

@@ -156,7 +156,7 @@ const PRODUCTS = [
     tagline: 'Jasmin lumineux, chocolat blanc fondant et santal crémeux, dans une gourmandise solaire et addictive.',
     keyNotes: 'Jasmin · Chocolat blanc · Santal', families: ['Gourmand', 'Floral'],
     pack: 'hot-sand-pack', card: 'hot-sand-1', pack30: 'hot-sand-pack30', scene: 'hot-sand-1',
-    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'hot-sand-1', 'hot-sand-mod', 'camp-colonne', 'hot-sand-30'],
+    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'hot-sand-1', 'hot-sand-mod', 'camp-blanche', 'hot-sand-30'],
     description: [
       "Hot Sand capture la douceur aérienne d’une gourmandise d’été, où le sable encore tiède caresse la peau dorée par le soleil.",
       "En tête, l’eau de jasmin et l’orchidée flottent comme un souffle léger et lumineux, tandis que la ganache de chocolat blanc, la crème chantilly et le lait d’amande fondent en un cœur délicieusement crémeux. En fond, le cèdre, le santal crémeux et le musc blanc enveloppent la peau d’une chaleur douce et réconfortante, comme le souvenir tendre d’une journée au soleil.",
@@ -219,9 +219,9 @@ const PRODUCTS = [
 
   /* ============ Coffrets — exclusivité site ============ */
   {
-    handle: 'coffret-decouverte', name: 'Coffret Découverte', subtitle: 'Discovery set · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
-    card: 'coffret-2ml', scene: 'summer-100',
-    gallery: ['coffret-2ml', 'summer-100', 'skin-trio'],
+    handle: 'coffret-decouverte', name: 'Coffret Découverte', subtitle: 'Deux collections · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
+    card: 'coffret-2ml', scene: 'skin-trio',
+    gallery: ['coffret-2ml', 'skin-trio', 'camp-coffrets'],
     formats: [
       { id: 'sv', label: 'Summer Vibes · 5 × 2 ml', price: 30 },   // PRIX_A_CONFIRMER
       { id: 'so', label: 'Skin Obsession · 3 × 2 ml', price: 18 }  // PRIX_A_CONFIRMER
@@ -235,8 +235,8 @@ const PRODUCTS = [
   },
   {
     handle: 'coffret-a-composer', name: 'Coffret à composer', subtitle: 'Cinq extraits · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true, builder: 5,
-    card: 'summer-100', scene: 'coffret-2ml',
-    gallery: ['summer-100', 'skin-trio', 'coffret-2ml'],
+    card: 'summer-100', scene: 'cover-pile',
+    gallery: ['summer-100', 'cover-pile', 'skin-trio'],
     formats: [{ id: '5x2', label: '5 × 2 ml', price: 30 }],   // PRIX_A_CONFIRMER
     keyNotes: 'Vos cinq parfums · Valeur recréditée',
     tagline: 'Composez votre propre préface : cinq parfums de la bibliothèque, choisis par vous.',
@@ -246,9 +246,9 @@ const PRODUCTS = [
     ]
   },
   {
-    handle: 'coffret-collection', name: 'Coffret Collection', subtitle: 'Discovery set · 30 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
-    card: 'coffret-30ml', scene: 'coffret-30ml-2',
-    gallery: ['coffret-30ml', 'coffret-30ml-2', 'camp-coffrets'],
+    handle: 'coffret-collection', name: 'Coffret Collection', subtitle: 'Une collection · 30 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
+    card: 'coffret-30ml', scene: 'camp-coffrets',
+    gallery: ['coffret-30ml', 'camp-coffrets', 'cover-pile'],
     formats: [
       { id: 'sv', label: 'Summer Vibes · 5 × 30 ml', price: 320 },  // PRIX_A_CONFIRMER
       { id: 'so', label: 'Skin Obsession · 3 × 30 ml', price: 200 } // PRIX_A_CONFIRMER
@@ -288,7 +288,7 @@ const COLLECTIONS = {
     ]
   },
   'summer-vibes': {
-    mosaic: [['camp-baie', 'Summer Vibes, la campagne'], ['hot-sand-mod', 'Hot Sand'], ['summer-socles', 'Les cinq fragments']], wide: 'hero-summer',
+    mosaic: [['camp-baie', 'Summer Vibes, la campagne'], ['hot-sand-mod', 'Hot Sand'], ['palmeira-2', 'Palmeira']], wide: 'hero-portrait',
     title: 'Summer Vibes', folio: 14, number: '02', chapter: 'Collection I', kicker: 'Collection',
     hero: 'hero-summer', side: 'summer-socles',
     epigraph: 'Certains étés ne s’achèvent jamais vraiment. Ils persistent sous la peau, dans l’éclat des souvenirs, dans cette chaleur invisible que l’on croyait avoir laissée derrière soi.',
@@ -308,7 +308,7 @@ const COLLECTIONS = {
     ]
   },
   'coffrets': {
-    mosaic: [['coffret-30ml-2', 'Le coffret Collection'], ['cover-pile', 'La bibliothèque'], ['camp-coffrets', 'L’écrin']],
+    mosaic: [['camp-mains', 'Le 100 ml et le 30 ml'], ['cover-pile', 'La bibliothèque'], ['camp-main', 'La campagne']],
     title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
     hero: 'hero-collection', side: 'coffret-30ml',
     epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',
@@ -317,7 +317,7 @@ const COLLECTIONS = {
   },
   'bougies': {
     title: 'Bougies', number: '—', chapter: 'Chapitre à venir', kicker: 'Bientôt',
-    hero: 'camp-coffrets', soon: true,
+    hero: 'hero-collection', soon: true,
     epigraph: 'Un nouveau chapitre s’écrit.',
     intro: ["Les récits LIBRERY s’apprêtent à quitter la peau pour habiter l’espace. Inscrivez-vous pour être parmi les premiers à les découvrir."],
     chapters: []
