@@ -23,8 +23,11 @@
   const nm = n => { const w = String(n).split(' '); return w.length > 1 ? `${esc(w[0])} <em>${esc(w.slice(1).join(' '))}</em>` : esc(n); };
 
   /* Image responsive : <nom>-m.webp (petit) et <nom>.webp (grand) */
+  /* adresse d'une image, versionnée par son empreinte (jamais d'ancienne version en cache) */
+  const src = (name, big) => `${IMG + name}${big ? '' : '-m'}.webp?v=${(IMGW[name] || [])[2] || ''}`;
   function pic(name, alt = '', sizes = '(max-width: 800px) 100vw, 50vw', cls = '', eager = false) {
-    return `<img class="${cls}" src="${IMG + name}-m.webp" srcset="${IMG + name}-m.webp ${(IMGW[name] || [800])[0]}w, ${IMG + name}.webp ${(IMGW[name] || [0, 1600])[1]}w" sizes="${sizes}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+    const w = IMGW[name] || [800, 1600];
+    return `<img class="${cls}" src="${src(name)}" srcset="${src(name)} ${w[0]}w, ${src(name, 1)} ${w[1]}w" sizes="${sizes}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
   }
 
   /* Icônes au trait (32 px, trait 1 px) — snippet icon.liquid dans Shopify */
@@ -217,7 +220,7 @@
     const tryFirst = [...new Set(items.filter(i => ['100', '30'].includes(i.f)).map(i => i.p))];
     const perfumes = PRODUCTS.filter(p => !p.type);
     const opt = v => perfumes.map(p => `<option value="${p.handle}" ${v === p.handle ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
-    const thumb = (p, f) => `${IMG + (f === '30' && p.pack30 ? p.pack30 : p.pack || p.card)}-m.webp`;
+    const thumb = (p, f) => src(f === '30' && p.pack30 ? p.pack30 : p.pack || p.card);
 
     $('#cart-items').innerHTML = items.length ? items.map((i, idx) => `
       <div class="line">
@@ -272,7 +275,7 @@
     const f = formatsOf(p), isPerfume = !p.type;
     const f30 = f.find(x => x.id === '30');
     const scene = p.video
-      ? `<video class="card__scene" src="${p.video}" poster="${IMG + p.scene}-m.webp" muted loop playsinline preload="none"></video>`
+      ? `<video class="card__scene" src="${p.video}" poster="${src(p.scene)}" muted loop playsinline preload="none"></video>`
       : p.scene ? pic(p.scene, '', S_CARD, 'card__scene') : '';
     const prices = isPerfume
       ? `<span class="card__fmts"><span>${f[0].label} — ${eur(f[0].price)}</span>${f30 && p.pack30 ? `<span class="card__f30" data-f30>${f30.label} — ${eur(f30.price)}</span>` : ''}</span>`
@@ -457,7 +460,7 @@
           <p class="pdp__desc">${p.tagline}</p>
           ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${eur(f.price)}</small></button>`).join('')}</div>` : ''}
           ${p.builder ? `<div class="builder"><div class="builder__head"><span>Vos parfums</span><b id="b-count">0 / ${p.builder}</b></div>
-            <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><span class="builder__thumb"><img src="${IMG + x.pack}-m.webp" alt=""></span><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
+            <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><span class="builder__thumb"><img src="${src(x.pack)}" alt=""></span><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
           <button class="btn btn--block" id="add" ${p.builder ? 'disabled' : ''}>${cta()}</button>
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
           <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, valable 90 jours sur un flacon 100 ml.`}</p>
