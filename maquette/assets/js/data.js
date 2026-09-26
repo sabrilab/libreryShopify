@@ -11,7 +11,8 @@ const CATALOGUE_URL = 'https://librery-catalogue-3d.vercel.app/';
 const CATALOGUE_PDF = 'https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf';
 
 /* Visuels produit : pack = flacon détouré sur fond clair (grille façon D'orsay),
-   card = photo d'ambiance, hover = visuel au survol (30 ml ou campagne). */
+   pack / pack30 = packshots studio à échelle commune (flacon ≈ 40 % du cadre),
+   scene = mise en situation révélée au survol (ou `video` : boucle muette, métafield Shopify). */
 
 /* Formats — catalogue : « Extrait de Parfum 25 % · 100 ml & 30 ml » ; échantillon 2 ml (« dès 6 € », maquette Canva). */
 /* Familles olfactives (filtre Bibliothèque) — classement proposé, À VALIDER par la maison */
@@ -25,10 +26,10 @@ const FAMILIES = {
 
 /* Services — promesses affichées partout (bandeau, fiche produit, panier) */
 const SERVICES = [
-  { t: 'Essayez-le avant de l’ouvrir', d: 'Un échantillon 2 ml du parfum glissé avec chaque flacon : testez-le d’abord, retour gratuit si le flacon reste scellé.' },
-  { t: 'Deux échantillons offerts', d: 'À choisir dans la bibliothèque, avec chaque commande.' },
-  { t: 'Écrin & mot manuscrit', d: 'Emballage cadeau offert, message personnalisé, facture sans prix sur demande.' },
-  { t: 'Livraison offerte dès 100 €', d: 'Expédition soignée depuis Paris, retours gratuits sous 30 jours.' }
+  { i: 'vial', t: 'Essayez-le avant de l’ouvrir', d: 'Un échantillon 2 ml du parfum glissé avec chaque flacon : testez-le d’abord, retour gratuit si le flacon reste scellé.' },
+  { i: 'vials', t: 'Deux échantillons offerts', d: 'À choisir dans la bibliothèque, avec chaque commande.' },
+  { i: 'gift', t: 'Écrin & mot manuscrit', d: 'Emballage cadeau offert, message personnalisé, facture sans prix sur demande.' },
+  { i: 'parcel', t: 'Livraison offerte dès 100 €', d: 'Expédition soignée depuis Paris, retours gratuits sous 30 jours.' }
 ];
 
 const FORMATS = [
@@ -75,8 +76,8 @@ const PRODUCTS = [
     handle: 'vanilla-plum', folio: 39, name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une douceur que l’on veut retenir.',
     keyNotes: 'Prune · Accord lait · Vanille', families: ['Gourmand', 'Ambré'],
-    pack: 'vanilla-plum-pack', card: 'vanilla-plum-1', hover: 'vanilla-plum-pack30', hoverLabel: 'Existe en 30 ml',
-    gallery: ['vanilla-plum-studio-100ml', 'vanilla-plum-studio-flacon', 'vanilla-plum-studio-reflet', 'vanilla-plum-1', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres'],
+    pack: 'vanilla-plum-pack', card: 'vanilla-plum-1', pack30: 'vanilla-plum-pack30', scene: 'vanilla-plum-2',
+    gallery: ['vanilla-plum-pack', 'vanilla-plum-pack30', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres', 'vanilla-plum-1'],
     description: [
       "Il y a les parfums que l’on découvre. Et il y a ceux vers lesquels on se surprend à revenir.",
       "Vanilla Plum est né du désir de retrouver une sensation : celle d’un fruit mûr enveloppé dans une étreinte chaude, crémeuse et réconfortante.",
@@ -101,8 +102,8 @@ const PRODUCTS = [
     handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une attraction florale.',
     keyNotes: 'Poire · Tubéreuse · Santal', families: ['Floral'],
-    pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', hover: 'magnetic-flowers-pack30', hoverLabel: 'Existe en 30 ml',
-    gallery: ['magnetic-flowers-studio-100ml', 'magnetic-flowers-studio-variante-2', 'magnetic-flowers-studio-flacon', 'magnetic-flowers-1', 'magnetic-flowers-30', 'magnetic-flowers-mod', 'poire-livres'],
+    pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', pack30: 'magnetic-flowers-pack30', scene: 'magnetic-flowers-1',
+    gallery: ['magnetic-flowers-pack', 'magnetic-flowers-pack30', 'magnetic-flowers-1', 'magnetic-flowers-mod', 'poire-livres', 'magnetic-flowers-30'],
     description: [
       "Certaines fleurs sont admirées pour leur beauté. D’autres possèdent un pouvoir d’attraction presque instinctif.",
       "Magnetic Flowers est né de cette fascination : un bouquet de fleurs blanches, lumineux et opulent, dont les facettes se dévoilent lentement sur la peau.",
@@ -127,8 +128,8 @@ const PRODUCTS = [
     handle: 'tonka-love', folio: 43, name: 'Tonka Love', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’irrésistible chaleur de la tonka.',
     keyNotes: 'Amande grillée · Caramel salé · Tonka', families: ['Gourmand', 'Boisé'],
-    pack: 'tonka-love-pack', card: 'tonka-love-1', hover: 'tonka-love-pack30', hoverLabel: 'Existe en 30 ml',
-    gallery: ['tonka-love-studio-100ml', 'tonka-love-studio-flacon', 'tonka-love-studio-reflet', 'tonka-love-1', 'tonka-love-2', 'tonka-love-mod', 'tonka-capot'],
+    pack: 'tonka-love-pack', card: 'tonka-love-1', pack30: 'tonka-love-pack30', scene: 'tonka-love-1',
+    gallery: ['tonka-love-pack', 'tonka-love-pack30', 'tonka-love-1', 'tonka-love-mod', 'tonka-capot', 'tonka-love-2'],
     description: [
       "Certains ingrédients ont une présence qui s’attarde dans la mémoire. La tonka est de ceux-là. Chaude, veloutée, naturellement addictive, elle est au cœur de Tonka Love.",
       "Le parfum s’ouvre sur l’amande grillée, à la facette chaude et toastée, éclairée par la bergamote d’Italie. Le poivre et la cardamome du Guatemala ajoutent une étincelle vive et aromatique.",
@@ -154,8 +155,8 @@ const PRODUCTS = [
     handle: 'hot-sand', folio: 21, name: 'Hot Sand', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Jasmin lumineux, chocolat blanc fondant et santal crémeux, dans une gourmandise solaire et addictive.',
     keyNotes: 'Jasmin · Chocolat blanc · Santal', families: ['Gourmand', 'Floral'],
-    pack: 'hot-sand-pack', card: 'hot-sand-1', hover: 'hot-sand-pack30', hoverLabel: 'Existe en 30 ml',
-    gallery: ['hot-sand-studio-100ml', 'hot-sand-studio-flacon', 'hot-sand-studio-reflet', 'hot-sand-1', 'hot-sand-30', 'hot-sand-mod'],
+    pack: 'hot-sand-pack', card: 'hot-sand-1', pack30: 'hot-sand-pack30', scene: 'hot-sand-1',
+    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'hot-sand-1', 'hot-sand-mod', 'camp-colonne', 'hot-sand-30'],
     description: [
       "Hot Sand capture la douceur aérienne d’une gourmandise d’été, où le sable encore tiède caresse la peau dorée par le soleil.",
       "En tête, l’eau de jasmin et l’orchidée flottent comme un souffle léger et lumineux, tandis que la ganache de chocolat blanc, la crème chantilly et le lait d’amande fondent en un cœur délicieusement crémeux. En fond, le cèdre, le santal crémeux et le musc blanc enveloppent la peau d’une chaleur douce et réconfortante, comme le souvenir tendre d’une journée au soleil.",
@@ -167,8 +168,8 @@ const PRODUCTS = [
     handle: 'mango-wave', folio: 23, name: 'Mango Wave', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Mangue juteuse, framboise éclatante et ambre gourmand, dans un sillage solaire, fruité et irrésistible.',
     keyNotes: 'Mangue · Framboise · Ambre', families: ['Fruité', 'Ambré'],
-    pack: 'mango-wave-pack', card: 'mango-wave-1', hover: 'mango-wave-pack30', hoverLabel: 'Existe en 30 ml',
-    gallery: ['mango-wave-studio-100ml', 'mango-wave-studio-flacon', 'mango-wave-1', 'mango-wave-30', 'mango-wave-2'],
+    pack: 'mango-wave-pack', card: 'mango-wave-1', pack30: 'mango-wave-pack30', scene: 'mango-wave-1',
+    gallery: ['mango-wave-pack', 'mango-wave-pack30', 'mango-wave-1', 'mango-wave-2', 'summer-socles', 'mango-wave-30'],
     description: [
       "Mango Wave est une vague d’énergie fruitée et de douceur gourmande. En tête, la mangue juteuse et l’orange acidulée éclatent comme un souffle lumineux, vibrant sur la peau.",
       "Le cœur, fruité et floral, mêle grenade, framboise et jasmin, esquissant la douceur d’un soir d’été suspendu entre chaleur et éclat. En fond, l’ambre, la mousse de chêne et la cassonade caramélisée composent un sillage captivant, riche et enveloppant.",
@@ -180,8 +181,8 @@ const PRODUCTS = [
     handle: 'sun-ice', folio: 25, name: 'Sun Ice', collection: 'summer-vibes', perfumer: 'nathalie-feisthauer',
     tagline: 'Pistache grillée, vanille de Tahiti et bois de santal, dans une gourmandise solaire, crémeuse et enveloppante.',
     keyNotes: 'Cassis · Pistache grillée · Vanille', families: ['Gourmand', 'Fruité'],
-    pack: 'sun-ice-pack', card: 'sun-ice-1', hover: 'sun-ice-pack30', hoverLabel: 'Existe en 30 ml',
-    gallery: ['sun-ice-studio-100ml', 'sun-ice-studio-flacon', 'sun-ice-studio-reflet', 'sun-ice-1', 'sun-ice-30', 'sun-ice-2'],
+    pack: 'sun-ice-pack', card: 'sun-ice-1', pack30: 'sun-ice-pack30', scene: 'sun-ice-1',
+    gallery: ['sun-ice-pack', 'sun-ice-pack30', 'sun-ice-1', 'sun-ice-2', 'camp-livre', 'sun-ice-30'],
     description: [
       "Sun Ice est une composition solaire, florale et gourmande, inspirée du plaisir d’une glace artisanale à la pistache, ce délice glacé qui fond lentement sous le soleil d’été, entre douceur sucrée et fraîcheur réconfortante.",
       "La fragrance s’ouvre sur une envolée pétillante de cassis et de bergamote d’Italie. Au cœur, la pomme croquante, la pistache grillée, le toffee caramélisé et l’héliotrope velouté composent une partition savoureuse, rappelant les notes dorées d’une gelateria au bord de mer.",
@@ -193,8 +194,8 @@ const PRODUCTS = [
     handle: 'palmeira', folio: 27, name: 'Palmeira', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Fruits rouges juteux, violette et rose élégante, puis praline et santal, dans un sillage fruité, floral et chaleureux.',
     keyNotes: 'Framboise · Violette · Praline', families: ['Fruité', 'Floral'],
-    pack: 'palmeira-pack', card: 'palmeira-1', hover: 'palmeira-pack30', hoverLabel: 'Existe en 30 ml',
-    gallery: ['palmeira-studio-100ml', 'palmeira-studio-reflet', 'palmeira-1', 'baies-colonne', 'palmeira-2'],
+    pack: 'palmeira-pack', card: 'palmeira-1', pack30: 'palmeira-pack30', scene: 'palmeira-1',
+    gallery: ['palmeira-pack', 'palmeira-pack30', 'palmeira-1', 'palmeira-2', 'baies-colonne', 'hero-summer'],
     description: [
       "Palmeira s’ouvre comme une promenade sous les frondaisons d’un jardin d’été, où la lumière danse entre les feuilles et s’attarde sur les fruits.",
       "En tête, framboise, fraise, cassis et myrtille éclatent en un accord lumineux et juteux, comme un panier de baies fraîchement cueillies. Au cœur, un bouquet élégant de violette, rose, prune et Ambroxan apporte profondeur et sophistication, telle une lumière qui traverse les pages d’un récit d’été.",
@@ -206,8 +207,8 @@ const PRODUCTS = [
     handle: 'ambert-sunset', folio: 29, name: 'Ambert Sunset', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Abricot doré, safran et osmanthus, puis rose, iris et jasmin, sur un fond d’ambre, de cuir et de santal.',
     keyNotes: 'Abricot · Iris · Cuir · Ambre', families: ['Ambré', 'Floral'],
-    pack: 'ambert-sunset-pack', card: 'ambert-sunset-1', hover: 'ambert-sunset-pack30', hoverLabel: 'Existe en 30 ml',
-    gallery: ['ambert-sunset-studio-100ml', 'ambert-sunset-studio-flacon', 'ambert-sunset-studio-reflet', 'ambert-sunset-1', 'ambert-sunset-mod', 'ambert-sunset-2'],
+    pack: 'ambert-sunset-pack', card: 'ambert-sunset-1', pack30: 'ambert-sunset-pack30', scene: 'ambert-sunset-1',
+    gallery: ['ambert-sunset-pack', 'ambert-sunset-pack30', 'ambert-sunset-1', 'ambert-sunset-2', 'ambert-sunset-mod', 'hero-collection'],
     description: [
       "Ambert Sunset s’ouvre comme le dernier souffle d’un jour d’été, lorsque le ciel se pare de teintes dorées et que l’air devient plus doux, presque tangible.",
       "Dès l’ouverture, l’abricot velouté, le safran épicé et l’osmanthus lumineux esquissent les premiers rayons d’un coucher de soleil. Au cœur, la rose, l’iris pallida poudré et le jasmin composent une partition florale noble et vibrante, presque crépusculaire. En fond, le cuir, l’ambre et le santal s’entrelacent en un sillage riche, sophistiqué et profondément sensuel.",
@@ -219,7 +220,7 @@ const PRODUCTS = [
   /* ============ Coffrets — exclusivité site ============ */
   {
     handle: 'coffret-decouverte', name: 'Coffret Découverte', subtitle: 'Discovery set · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
-    card: 'coffret-2ml', hover: 'summer-100', hoverLabel: 'Toute la bibliothèque',
+    card: 'coffret-2ml', scene: 'summer-100',
     gallery: ['coffret-2ml', 'summer-100', 'skin-trio'],
     formats: [
       { id: 'sv', label: 'Summer Vibes · 5 × 2 ml', price: 30 },   // PRIX_A_CONFIRMER
@@ -234,7 +235,7 @@ const PRODUCTS = [
   },
   {
     handle: 'coffret-a-composer', name: 'Coffret à composer', subtitle: 'Cinq extraits · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true, builder: 5,
-    card: 'summer-100', hover: 'coffret-2ml', hoverLabel: 'Choisissez vos cinq chapitres',
+    card: 'summer-100', scene: 'coffret-2ml',
     gallery: ['summer-100', 'skin-trio', 'coffret-2ml'],
     formats: [{ id: '5x2', label: '5 × 2 ml', price: 30 }],   // PRIX_A_CONFIRMER
     keyNotes: 'Vos cinq parfums · Valeur recréditée',
@@ -246,7 +247,7 @@ const PRODUCTS = [
   },
   {
     handle: 'coffret-collection', name: 'Coffret Collection', subtitle: 'Discovery set · 30 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
-    card: 'coffret-30ml', hover: 'coffret-30ml-2', hoverLabel: 'Cinq extraits 30 ml',
+    card: 'coffret-30ml', scene: 'coffret-30ml-2',
     gallery: ['coffret-30ml', 'coffret-30ml-2', 'camp-coffrets'],
     formats: [
       { id: 'sv', label: 'Summer Vibes · 5 × 30 ml', price: 320 },  // PRIX_A_CONFIRMER
@@ -263,6 +264,7 @@ const PRODUCTS = [
 
 const COLLECTIONS = {
   'skin-obsession': {
+    mosaic: [['camp-lit', 'Skin Obsession, la campagne'], ['skin-homme-tonka', 'Tonka Love'], ['vanilla-plum-mod', 'Vanilla Plum']], wide: 'skin-trio',
     title: 'Skin Obsession', folio: 32, number: '03', chapter: 'Collection II', kicker: 'Nouvelle collection',
     hero: 'hero-skin', side: 'skin-femme-flacons',
     epigraph: 'La peau est le livre. Le parfum est l’histoire. L’obsession, le désir de le relire.',
@@ -286,6 +288,7 @@ const COLLECTIONS = {
     ]
   },
   'summer-vibes': {
+    mosaic: [['camp-baie', 'Summer Vibes, la campagne'], ['hot-sand-mod', 'Hot Sand'], ['summer-socles', 'Les cinq fragments']], wide: 'hero-summer',
     title: 'Summer Vibes', folio: 14, number: '02', chapter: 'Collection I', kicker: 'Collection',
     hero: 'hero-summer', side: 'summer-socles',
     epigraph: 'Certains étés ne s’achèvent jamais vraiment. Ils persistent sous la peau, dans l’éclat des souvenirs, dans cette chaleur invisible que l’on croyait avoir laissée derrière soi.',
@@ -305,6 +308,7 @@ const COLLECTIONS = {
     ]
   },
   'coffrets': {
+    mosaic: [['coffret-30ml-2', 'Le coffret Collection'], ['cover-pile', 'La bibliothèque'], ['camp-coffrets', 'L’écrin']],
     title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
     hero: 'hero-collection', side: 'coffret-30ml',
     epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',
@@ -319,6 +323,18 @@ const COLLECTIONS = {
     chapters: []
   }
 };
+
+/* L'étagère des matières : une nature morte par parfum (métaobjet Shopify « matiere ») */
+const SHELF = [
+  { img: 'prune-livres', t: 'La prune', h: 'vanilla-plum' },
+  { img: 'poire-livres', t: 'La poire', h: 'magnetic-flowers' },
+  { img: 'tonka-capot', t: 'La fève tonka', h: 'tonka-love' },
+  { img: 'mango-wave-2', t: 'La mangue', h: 'mango-wave' },
+  { img: 'baies-colonne', t: 'Les baies', h: 'palmeira' },
+  { img: 'sun-ice-2', t: 'Le cassis', h: 'sun-ice' },
+  { img: 'ambert-sunset-2', t: 'L’abricot', h: 'ambert-sunset' },
+  { img: 'hot-sand-1', t: 'Le jasmin', h: 'hot-sand' }
+];
 
 /* Points de vente — coordonnées géocodées depuis les adresses du site actuel */
 const STORES = [

@@ -27,6 +27,15 @@
     return `<img class="${cls}" src="${IMG + name}-m.webp" srcset="${IMG + name}-m.webp 800w, ${IMG + name}.webp 1600w" sizes="${sizes}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
   }
 
+  /* Icônes au trait (32 px, trait 1 px) — snippet icon.liquid dans Shopify */
+  const ICONS = {
+    vial: '<path d="M11 13.5h7v13.2a1.3 1.3 0 0 1-1.3 1.3h-4.4a1.3 1.3 0 0 1-1.3-1.3z"/><path d="M12.2 9h4.6v4.5h-4.6z"/><path d="M13.4 9V6.5h2.2V9"/><path d="M11 19h7"/><path d="M24 7.5c1.3 1.8 2 3 2 4a2 2 0 0 1-4 0c0-1 .7-2.2 2-4z"/>',
+    vials: '<path d="M7.5 13h6v12.8a1.2 1.2 0 0 1-1.2 1.2H8.7a1.2 1.2 0 0 1-1.2-1.2z"/><path d="M8.6 9h3.8v4H8.6z"/><path d="M7.5 18.5h6"/><path d="M18.5 13h6v12.8a1.2 1.2 0 0 1-1.2 1.2h-3.6a1.2 1.2 0 0 1-1.2-1.2z"/><path d="M19.6 9h3.8v4h-3.8z"/><path d="M18.5 18.5h6"/>',
+    gift: '<path d="M6 13h20v4H6z"/><path d="M7.5 17h17v10h-17z"/><path d="M16 13v14"/><path d="M16 13c-1.5-3.8-5.5-5.2-6.3-3.2-.7 1.8 2.6 3.2 6.3 3.2z"/><path d="M16 13c1.5-3.8 5.5-5.2 6.3-3.2.7 1.8-2.6 3.2-6.3 3.2z"/>',
+    parcel: '<path d="M16 5.5 26.5 10v12L16 26.5 5.5 22V10z"/><path d="M5.5 10 16 14.5 26.5 10"/><path d="M16 14.5v12"/><path d="m10.8 7.8 10.5 4.5v4.2"/>'
+  };
+  const icon = k => ICONS[k] ? `<svg class="icon" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>` : '';
+
   /* ------------------------------------------------------------------ */
   /* En-tête, menu, titre courant, pied de page                          */
   /* ------------------------------------------------------------------ */
@@ -121,7 +130,7 @@
     const host = $('#site-footer'); if (!host) return;
     host.outerHTML = `
       <section class="block" aria-label="Services"><div class="wrap">
-        <div class="services">${SERVICES.map(x => `<a href="/services"><b>${x.t}</b><span>${x.d}</span></a>`).join('')}</div>
+        <div class="services">${SERVICES.map(x => `<a href="/services">${icon(x.i)}<b>${x.t}</b><span>${x.d}</span></a>`).join('')}</div>
         <div class="letter" style="margin-top:56px">
           <div><h2 class="h2">Lettre de la maison</h2><p>Les nouveaux chapitres avant tout le monde, et un 2 ml glissé dans votre première commande.</p></div>
           <form class="field-line" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail"><button>S’inscrire</button></form>
@@ -254,30 +263,68 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Carte produit : packshot 100 ml, 30 ml au survol, deux lignes       */
+  /* Carte produit : packshot 100 ml ; au survol, la mise en situation   */
+  /* s'ouvre en fondu avec un lent travelling (ou joue la vidéo) ;       */
+  /* survoler « 30 ml » montre le flacon de voyage. Mobile : on glisse.  */
   /* ------------------------------------------------------------------ */
+  const S_CARD = '(max-width: 800px) 50vw, 33vw';
   function card(p) {
-    const f = formatsOf(p);
-    const meta = p.type ? `${esc(p.subtitle || p.type)} — dès ${eur(minPrice(p))}` : `Extrait de parfum, ${f[0].label} — ${eur(f[0].price)}`;
+    const f = formatsOf(p), isPerfume = !p.type;
+    const f30 = f.find(x => x.id === '30');
+    const scene = p.video
+      ? `<video class="card__scene" src="${p.video}" poster="${IMG + p.scene}-m.webp" muted loop playsinline preload="none"></video>`
+      : p.scene ? pic(p.scene, '', S_CARD, 'card__scene') : '';
+    const prices = isPerfume
+      ? `<span class="card__fmts"><span>${f[0].label} — ${eur(f[0].price)}</span>${f30 && p.pack30 ? `<span class="card__f30" data-f30>${f30.label} — ${eur(f30.price)}</span>` : ''}</span>`
+      : `<span class="card__meta">${esc(p.subtitle || p.type)} — dès ${eur(minPrice(p))}</span>`;
     return `
       <a class="card" href="/produit?p=${p.handle}">
         <div class="card__media">
-          ${pic(p.pack || p.card, p.name, '(max-width: 800px) 50vw, 33vw')}
-          ${p.hover ? pic(p.hover, '', '(max-width: 800px) 50vw, 33vw', 'alt') : ''}
-          ${p.hoverLabel ? `<span class="card__alt-label">${esc(p.hoverLabel)}</span>` : ''}
+          <div class="card__track">
+            <div class="card__slide">${pic(p.pack || p.card, p.name, S_CARD)}${p.pack30 ? pic(p.pack30, '', S_CARD, 'card__30') : ''}</div>
+            ${scene ? `<div class="card__slide card__slide--scene">${scene}</div>` : ''}
+          </div>
+          ${scene ? '<span class="card__dots" aria-hidden="true"><i class="on"></i><i></i></span>' : ''}
         </div>
         <div class="card__body">
           ${p.isNew ? '<span class="card__flag">Nouveauté</span>' : p.exclusive ? '<span class="card__flag">Exclusivité site</span>' : ''}
           <h3 class="card__name">${nm(p.name)}</h3>
-          <span class="card__meta">${meta}</span>
+          ${isPerfume && p.keyNotes ? `<span class="card__notes">${esc(p.keyNotes.replace(/ · /g, ', '))}</span>` : ''}
+          ${prices}
         </div>
       </a>`;
   }
+  /* comportements des cartes : vidéo au survol, 30 ml, points du glisser mobile */
+  function bindCards() {
+    document.addEventListener('mouseover', e => {
+      const c = e.target.closest && e.target.closest('.card'); if (!c || c.contains(e.relatedTarget)) return;
+      const v = $('video', c); if (v) v.play().catch(() => {});
+    });
+    document.addEventListener('mouseout', e => {
+      const c = e.target.closest && e.target.closest('.card'); if (!c || c.contains(e.relatedTarget)) return;
+      const v = $('video', c); if (v) v.pause(); c.classList.remove('show-30');
+    });
+    document.addEventListener('mouseover', e => { const t = e.target.closest && e.target.closest('[data-f30]'); if (t) t.closest('.card').classList.add('show-30'); });
+    document.addEventListener('mouseout', e => { const t = e.target.closest && e.target.closest('[data-f30]'); if (t && !t.contains(e.relatedTarget)) t.closest('.card').classList.remove('show-30'); });
+    document.addEventListener('scroll', e => {
+      const t = e.target; if (!t.classList || !t.classList.contains('card__track')) return;
+      const i = Math.round(t.scrollLeft / t.clientWidth);
+      $$('.card__dots i', t.parentElement).forEach((d, k) => d.classList.toggle('on', k === i));
+    }, true);
+  }
   /* tuile éditoriale dans une grille (même gabarit qu'une carte) */
   const tile = (href, img, title, meta) => `
-      <a class="card tile" href="${href}"><div class="card__media">${pic(img, '', '(max-width: 800px) 50vw, 33vw')}</div>
+      <a class="card tile" href="${href}"><div class="card__media">${pic(img, '', S_CARD)}</div>
         <div class="card__body"><h3 class="card__name">${title}</h3><span class="card__meta">${meta}</span></div></a>`;
+  /* grande tuile sur deux colonnes : l'image de campagne dans la grille */
+  const wideTile = (key) => { const c = COLLECTIONS[key]; return c && c.wide ? `
+      <a class="card tile card--wide" href="/collection?c=${key}"><div class="card__media">${pic(c.wide, c.title, '(max-width: 800px) 100vw, 66vw')}</div>
+        <div class="card__body"><span class="card__flag">${esc(c.chapter)}</span><h3 class="card__name">${nm(c.title)}</h3><span class="card__meta">Lire le chapitre${c.folio ? ', p. ' + c.folio : ''}</span></div></a>` : ''; };
+  /* mosaïque de trois images légendées (bloc « image-mosaic » dans Shopify) */
+  const mosaic = (key, n0 = 1) => { const c = COLLECTIONS[key]; return c && c.mosaic ? `<div class="mosaic">${c.mosaic.map(([img, cap], i) =>
+      `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}<figcaption class="fig">fig. ${n0 + i} — ${esc(cap)}</figcaption></figure>`).join('')}</div>` : ''; };
   const builderTile = () => tile('/produit?p=coffret-a-composer', 'summer-100', 'Coffret <em>à composer</em>', 'Cinq parfums en 2 ml — 30 €');
+  const storesTile = () => tile('/points-de-vente', 'camp-mercedes', 'Nos <em>adresses</em>', 'Treize lieux où nos récits prennent vie');
   const quizTile = () => tile('/portrait-olfactif', 'camp-livre', 'Portrait <em>olfactif</em>', 'Quatre questions pour trouver votre parfum');
 
   function accordions(root = document) {
@@ -293,7 +340,13 @@
   function initHome() {
     const so = $('#so-grid'), sv = $('#sv-grid'); if (!so) return;
     so.innerHTML = PRODUCTS.filter(p => p.collection === 'skin-obsession').map(card).join('');
-    sv.innerHTML = PRODUCTS.filter(p => p.collection === 'summer-vibes').map(card).join('') + builderTile();
+    const svp = PRODUCTS.filter(p => p.collection === 'summer-vibes').map(card);
+    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes') + svp.slice(3).join('') + builderTile() + quizTile();
+    $$('[data-mosaic]').forEach(el => { el.innerHTML = mosaic(el.dataset.mosaic, +el.dataset.fig || 1); });
+    const sh = $('#shelf');
+    if (sh) sh.innerHTML = SHELF.map(m => { const p = byHandle(m.h); return `<a class="shelf__item" href="/produit?p=${m.h}"><figure>${pic(m.img, m.t, '(max-width: 800px) 62vw, 22vw')}</figure>
+        <span class="fig">${esc(m.t)}</span><span class="shelf__name">${nm(p.name)}</span></a>`; }).join('');
+    $$('[data-shelf]').forEach(b => b.addEventListener('click', () => sh.scrollBy({ left: +b.dataset.shelf * (sh.clientWidth + 20) / 2, behavior: 'smooth' })));
   }
 
   function initLibrary() {
@@ -316,7 +369,9 @@
         ? ORDER.map(c => {
             const col = COLLECTIONS[c], items = list.filter(p => p.collection === c);
             return `<div class="chapter"><h2 class="h2">${nm(col.title)}</h2>${col.folio ? `<span class="folio">p. ${col.folio}</span>` : ''}<a class="tlink" href="/collection?c=${c}">Lire</a></div>
-                    <div class="grid">${items.map(card).join('')}${c === 'summer-vibes' ? quizTile() : ''}</div>`;
+                    <div class="grid">${c === 'skin-obsession' ? items.map(card).join('') + wideTile(c) + builderTile()
+                      : c === 'summer-vibes' ? items.slice(0, 3).map(card).join('') + wideTile(c) + items.slice(3).map(card).join('') + quizTile() + storesTile()
+                      : items.map(card).join('')}</div>`;
           }).join('')
         : `<div class="grid">${list.map(card).join('') || '<p class="muted">Aucune création pour ce filtre.</p>'}</div>`;
     };
@@ -347,7 +402,8 @@
           <form class="field-line" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="E-mail"><button>M’inscrire</button></form></div></section>` : ''}
       ${items.length ? `<section class="block"><div class="wrap">
           <div class="row-head"><div><h2 class="h2">Les parfums</h2></div><span class="ui muted">${items.length} ${items.length > 1 ? 'créations' : 'création'}</span></div>
-          <div class="grid">${items.map(card).join('')}${key === 'coffrets' ? '' : builderTile()}</div></div></section>` : ''}
+          <div class="grid">${items.map(card).join('')}${key === 'coffrets' ? '' : (items.length % 3 === 0 ? wideTile(key) : '') + builderTile()}</div></div></section>` : ''}
+      ${col.mosaic ? `<section class="block block--tight"><div class="wrap">${mosaic(key)}</div></section>` : ''}
       ${col.side ? `<section class="s-figure">${pic(col.side, '', '100vw')}<div class="wrap"><p class="fig">fig. — ${esc(col.title)}, la campagne</p></div></section>` : ''}
       ${col.chapters.length ? `<section class="block"><div class="wrap chapters">
           ${col.chapters.map(ch => `<article class="split"><h2 class="h2">${ch.h}</h2><div class="prose">${ch.p.map(t => `<p>${t}</p>`).join('')}</div></article>`).join('')}
@@ -376,7 +432,12 @@
     root.innerHTML = `
       <section class="pdp">
         <div class="pdp__media">
-          <div class="pdp__gallery" id="gallery">${p.gallery.map((g, i) => `<figure>${pic(g, p.name, '(max-width: 900px) 100vw, 58vw', '', i === 0)}</figure>`).join('')}</div>
+          <div class="pdp__gallery" id="gallery">${p.gallery.map((g, i) => {
+            const cap = g === p.pack ? `${esc(p.name)}, 100 ml` : g === p.pack30 ? `${esc(p.name)}, 30 ml` : '';
+            // rythme : deux packshots côte à côte, une pleine largeur, deux, une…
+            const full = !(g === p.pack || g === p.pack30) && ((i - (p.pack30 ? 2 : 0)) % 3 === 0 || i === p.gallery.length - 1 && (i - (p.pack30 ? 2 : 0)) % 3 === 1);
+            return `<figure class="${full ? 'is-full' : ''}${g === p.pack || g === p.pack30 ? ' is-pack' : ''}">${pic(g, p.name, full ? '(max-width: 900px) 100vw, 58vw' : '(max-width: 900px) 100vw, 29vw', '', i === 0)}<figcaption class="fig">fig. ${i + 1}${cap ? ' — ' + cap : ''}</figcaption></figure>`;
+          }).join('')}</div>
           <span class="pdp__count" id="gcount">1 / ${p.gallery.length}</span>
         </div>
         <div class="pdp__info"><div class="pdp__box">
@@ -407,7 +468,7 @@
         <div class="story__margin">${p.folio ? `<span class="folio">p. ${p.folio}</span>` : ''}</div>
         <div class="prose">${story.map(t => `<p>${t}</p>`).join('')}
           ${more.length ? `<div id="more" hidden>${more.map(t => `<p>${t}</p>`).join('')}${p.coda ? `<p>${p.coda.join(' ')}</p>` : ''}</div><button class="tlink more" id="more-btn">Lire la suite</button>` : ''}</div>
-        <figure>${pic(p.gallery[p.gallery.length - 1], '', '(max-width: 800px) 100vw, 25vw')}<figcaption class="fig">fig. — ${esc(p.name)}</figcaption></figure>
+        ${p.notes ? `<dl class="story__notes"><div><dt>Tête</dt><dd>${p.notes.tete}</dd></div><div><dt>Cœur</dt><dd>${p.notes.coeur}</dd></div><div><dt>Fond</dt><dd>${p.notes.fond}</dd></div></dl>` : '<div></div>'}
       </div></section>
 
       ${p.materials ? `<section class="block materials"><div class="wrap split">
@@ -433,6 +494,9 @@
       current = fmts.find(f => f.id === id) || current;
       $$('#sizes button').forEach(x => x.classList.toggle('is-active', x.dataset.f === current.id));
       $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-price').textContent = eur(current.price);
+      // mobile : la galerie glisse sur le flacon du format choisi
+      const gi = p.gallery.indexOf(current.id === '30' ? p.pack30 : p.pack), gal = $('#gallery');
+      if (gi > -1 && gal.scrollWidth > gal.clientWidth + 4) gal.scrollTo({ left: gi * gal.clientWidth, behavior: 'smooth' });
     };
     $$('#sizes button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.f)));
     const add = () => {
@@ -526,7 +590,7 @@
       el.innerHTML = el.dataset.gift.split(',').map(t => {
         const [h, f] = t.split('@'); const p = byHandle(h); if (!p) return '';
         const fmt = f && formatsOf(p).find(x => x.id === f);
-        return card(fmt ? Object.assign({}, p, { formats: [fmt] }) : p);
+        return card(fmt ? Object.assign({}, p, { formats: [fmt] }, fmt.id === '30' && p.pack30 ? { pack: p.pack30, pack30: null } : {}) : p);
       }).join('');
     });
   }
@@ -541,5 +605,5 @@
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
   initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initContact();
-  renderCart(); bindToasts(); accordions(); newsletters();
+  renderCart(); bindToasts(); bindCards(); accordions(); newsletters();
 })();
