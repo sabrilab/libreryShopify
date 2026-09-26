@@ -1,8 +1,12 @@
 """Assemble les pages : src/<page>.html (+ en-tête commun src/_head.html) -> <page>.html
 Chaque fichier src commence par une ligne « <!-- title: ... | page: ... | body: ... --> »."""
-import re, pathlib
+import re, pathlib, hashlib
 root = pathlib.Path(__file__).parent
 IMG = '/assets/img/v2/'
+
+def ver(path):
+    """empreinte du fichier : force le navigateur à recharger CSS/JS après chaque modification"""
+    return hashlib.md5((root / path.lstrip('/')).read_bytes()).hexdigest()[:8]
 
 def pic(m):
     """{{pic nom|alt|sizes|eager}} -> <img> responsive (nom-m.webp 900w + nom.webp 1800w)"""
@@ -16,10 +20,12 @@ for f in sorted((root / 'src').glob('[!_]*.html')):
     meta = dict(re.findall(r'(\w+):\s*([^|]+?)\s*(?:\||-->)', src.split('\n', 1)[0]))
     body = re.sub(r'\{\{pic ([^}]+)\}\}', pic, src.split('\n', 1)[1])
     body = body.replace('{{logo-couverture}}', (root / 'assets/img/v2/logo-couverture.svg').read_text()).replace('{{logo}}', (root / 'assets/img/v2/logo-librery.svg').read_text())
-    out = (head.replace('{{TITLE}}', meta.get('title', 'LIBRERY'))
+    css = '/assets/css/style.css?v=' + ver('/assets/css/style.css')
+    js = ''.join('<script src="/assets/js/%s?v=%s"></script>\n' % (n, ver('/assets/js/' + n)) for n in ('logo.js', 'data.js', 'main.js'))
+    out = (head.replace('{{TITLE}}', meta.get('title', 'LIBRERY')).replace('/assets/css/style.css', css)
            + f'</head>\n<body data-page="{meta.get("page", "")}" class="{meta.get("body", "")}">\n'
            + '<div id="site-header"></div>\n<main>\n' + body.rstrip() + '\n</main>\n<div id="site-footer"></div>\n'
            + meta.get('scripts', '').replace('\\n', '\n')
-           + '<script src="/assets/js/logo.js"></script>\n<script src="/assets/js/data.js"></script>\n<script src="/assets/js/main.js"></script>\n</body>\n</html>\n')
+           + js + '</body>\n</html>\n')
     (root / f.name).write_text(out, encoding='utf8')
     print('ok', f.name)
