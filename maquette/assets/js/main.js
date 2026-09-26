@@ -323,7 +323,7 @@
   /* mosaïque de trois images légendées (bloc « image-mosaic » dans Shopify) */
   const mosaic = (key, n0 = 1) => { const c = COLLECTIONS[key]; return c && c.mosaic ? `<div class="mosaic">${c.mosaic.map(([img, cap], i) =>
       `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}<figcaption class="fig">fig. ${n0 + i} — ${esc(cap)}</figcaption></figure>`).join('')}</div>` : ''; };
-  const builderTile = () => tile('/produit?p=coffret-a-composer', 'summer-socles', 'Coffret <em>à composer</em>', 'Cinq parfums en 2 ml — 30 €');
+  const builderTile = () => tile('/produit?p=coffret-a-composer', 'hero-collection', 'Coffret <em>à composer</em>', 'Cinq parfums en 2 ml — 30 €');
   const storesTile = () => tile('/points-de-vente', 'camp-mercedes', 'Nos <em>adresses</em>', 'Treize lieux où nos récits prennent vie');
   const quizTile = () => tile('/portrait-olfactif', 'camp-livre', 'Portrait <em>olfactif</em>', 'Quatre questions pour trouver votre parfum');
 

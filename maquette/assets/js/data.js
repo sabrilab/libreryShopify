@@ -156,7 +156,7 @@ const PRODUCTS = [
     tagline: 'Jasmin lumineux, chocolat blanc fondant et santal crémeux, dans une gourmandise solaire et addictive.',
     keyNotes: 'Jasmin · Chocolat blanc · Santal', families: ['Gourmand', 'Floral'],
     pack: 'hot-sand-pack', card: 'hot-sand-1', pack30: 'hot-sand-pack30', scene: 'hot-sand-1',
-    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'hot-sand-1', 'hot-sand-mod', 'camp-blanche', 'hot-sand-30'],
+    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'hot-sand-1', 'hot-sand-mod', 'camp-blanche', 'hero-portrait'],
     description: [
       "Hot Sand capture la douceur aérienne d’une gourmandise d’été, où le sable encore tiède caresse la peau dorée par le soleil.",
       "En tête, l’eau de jasmin et l’orchidée flottent comme un souffle léger et lumineux, tandis que la ganache de chocolat blanc, la crème chantilly et le lait d’amande fondent en un cœur délicieusement crémeux. En fond, le cèdre, le santal crémeux et le musc blanc enveloppent la peau d’une chaleur douce et réconfortante, comme le souvenir tendre d’une journée au soleil.",
@@ -169,7 +169,7 @@ const PRODUCTS = [
     tagline: 'Mangue juteuse, framboise éclatante et ambre gourmand, dans un sillage solaire, fruité et irrésistible.',
     keyNotes: 'Mangue · Framboise · Ambre', families: ['Fruité', 'Ambré'],
     pack: 'mango-wave-pack', card: 'mango-wave-1', pack30: 'mango-wave-pack30', scene: 'mango-wave-1',
-    gallery: ['mango-wave-pack', 'mango-wave-pack30', 'mango-wave-1', 'mango-wave-2', 'summer-socles', 'mango-wave-30'],
+    gallery: ['mango-wave-pack', 'mango-wave-pack30', 'mango-wave-1', 'mango-wave-2', 'hero-summer'],
     description: [
       "Mango Wave est une vague d’énergie fruitée et de douceur gourmande. En tête, la mangue juteuse et l’orange acidulée éclatent comme un souffle lumineux, vibrant sur la peau.",
       "Le cœur, fruité et floral, mêle grenade, framboise et jasmin, esquissant la douceur d’un soir d’été suspendu entre chaleur et éclat. En fond, l’ambre, la mousse de chêne et la cassonade caramélisée composent un sillage captivant, riche et enveloppant.",
@@ -182,7 +182,7 @@ const PRODUCTS = [
     tagline: 'Pistache grillée, vanille de Tahiti et bois de santal, dans une gourmandise solaire, crémeuse et enveloppante.',
     keyNotes: 'Cassis · Pistache grillée · Vanille', families: ['Gourmand', 'Fruité'],
     pack: 'sun-ice-pack', card: 'sun-ice-1', pack30: 'sun-ice-pack30', scene: 'sun-ice-1',
-    gallery: ['sun-ice-pack', 'sun-ice-pack30', 'sun-ice-1', 'sun-ice-2', 'camp-livre', 'sun-ice-30'],
+    gallery: ['sun-ice-pack', 'sun-ice-pack30', 'sun-ice-1', 'sun-ice-2', 'camp-livre'],
     description: [
       "Sun Ice est une composition solaire, florale et gourmande, inspirée du plaisir d’une glace artisanale à la pistache, ce délice glacé qui fond lentement sous le soleil d’été, entre douceur sucrée et fraîcheur réconfortante.",
       "La fragrance s’ouvre sur une envolée pétillante de cassis et de bergamote d’Italie. Au cœur, la pomme croquante, la pistache grillée, le toffee caramélisé et l’héliotrope velouté composent une partition savoureuse, rappelant les notes dorées d’une gelateria au bord de mer.",
@@ -194,8 +194,8 @@ const PRODUCTS = [
     handle: 'palmeira', folio: 27, name: 'Palmeira', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Fruits rouges juteux, violette et rose élégante, puis praline et santal, dans un sillage fruité, floral et chaleureux.',
     keyNotes: 'Framboise · Violette · Praline', families: ['Fruité', 'Floral'],
-    pack: 'palmeira-pack', card: 'palmeira-1', pack30: 'palmeira-pack30', scene: 'palmeira-1',
-    gallery: ['palmeira-pack', 'palmeira-pack30', 'palmeira-1', 'palmeira-2', 'baies-colonne', 'hero-summer'],
+    pack: 'palmeira-pack', card: 'palmeira-pack', pack30: 'palmeira-pack30', scene: 'baies-colonne',
+    gallery: ['palmeira-pack', 'palmeira-pack30', 'baies-colonne', 'hero-summer', 'cover-pile'],
     description: [
       "Palmeira s’ouvre comme une promenade sous les frondaisons d’un jardin d’été, où la lumière danse entre les feuilles et s’attarde sur les fruits.",
       "En tête, framboise, fraise, cassis et myrtille éclatent en un accord lumineux et juteux, comme un panier de baies fraîchement cueillies. Au cœur, un bouquet élégant de violette, rose, prune et Ambroxan apporte profondeur et sophistication, telle une lumière qui traverse les pages d’un récit d’été.",
@@ -235,8 +235,8 @@ const PRODUCTS = [
   },
   {
     handle: 'coffret-a-composer', name: 'Coffret à composer', subtitle: 'Cinq extraits · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true, builder: 5,
-    card: 'summer-100', scene: 'cover-pile',
-    gallery: ['summer-100', 'cover-pile', 'skin-trio'],
+    card: 'camp-mains', scene: 'skin-trio',
+    gallery: ['camp-mains', 'skin-trio', 'cover-pile'],
     formats: [{ id: '5x2', label: '5 × 2 ml', price: 30 }],   // PRIX_A_CONFIRMER
     keyNotes: 'Vos cinq parfums · Valeur recréditée',
     tagline: 'Composez votre propre préface : cinq parfums de la bibliothèque, choisis par vous.',
@@ -266,7 +266,7 @@ const COLLECTIONS = {
   'skin-obsession': {
     mosaic: [['camp-lit', 'Skin Obsession, la campagne'], ['skin-homme-tonka', 'Tonka Love'], ['vanilla-plum-mod', 'Vanilla Plum']], wide: 'skin-trio',
     title: 'Skin Obsession', folio: 32, number: '03', chapter: 'Collection II', kicker: 'Nouvelle collection',
-    hero: 'hero-skin', side: 'skin-femme-flacons',
+    hero: 'hero-skin',
     epigraph: 'La peau est le livre. Le parfum est l’histoire. L’obsession, le désir de le relire.',
     intro: [
       "Il est un instant, presque imperceptible, lors d’une première rencontre : un éveil qui trouble les sens. La découverte d’un monde soudain révélé, une matière qui intrigue, un accord qui émeut.",
@@ -288,9 +288,9 @@ const COLLECTIONS = {
     ]
   },
   'summer-vibes': {
-    mosaic: [['camp-baie', 'Summer Vibes, la campagne'], ['hot-sand-mod', 'Hot Sand'], ['palmeira-2', 'Palmeira']], wide: 'hero-portrait',
+    mosaic: [['camp-baie', 'Summer Vibes, la campagne'], ['hot-sand-mod', 'Hot Sand'], ['ambert-sunset-mod', 'Ambert Sunset']], wide: 'hero-portrait',
     title: 'Summer Vibes', folio: 14, number: '02', chapter: 'Collection I', kicker: 'Collection',
-    hero: 'hero-summer', side: 'summer-socles',
+    hero: 'hero-summer',
     epigraph: 'Certains étés ne s’achèvent jamais vraiment. Ils persistent sous la peau, dans l’éclat des souvenirs, dans cette chaleur invisible que l’on croyait avoir laissée derrière soi.',
     intro: [
       "L’été a quelque chose de singulier. Pendant quelques semaines précieuses, le temps semble ralentir. Les jours s’étirent sous une lumière sans fin, les heures perdent de leur importance et le quotidien s’éloigne doucement.",
@@ -308,9 +308,9 @@ const COLLECTIONS = {
     ]
   },
   'coffrets': {
-    mosaic: [['camp-mains', 'Le 100 ml et le 30 ml'], ['cover-pile', 'La bibliothèque'], ['camp-main', 'La campagne']],
+    mosaic: [['camp-main', 'Magnetic Flowers'], ['cover-pile', 'La bibliothèque'], ['hero-voiture', 'La campagne']],
     title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
-    hero: 'hero-collection', side: 'coffret-30ml',
+    hero: 'hero-collection',
     epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',
     intro: ["Nos coffrets ouvrent les premières pages de chaque collection. La valeur du coffret 2 ml vous est recréditée sur l’achat d’un parfum 100 ml, pendant 90 jours."],
     chapters: []
