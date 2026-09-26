@@ -14,6 +14,23 @@ const CATALOGUE_PDF = 'https://librery-catalogue-3d.vercel.app/telechargements/L
    card = photo d'ambiance, hover = visuel au survol (30 ml ou campagne). */
 
 /* Formats — catalogue : « Extrait de Parfum 25 % · 100 ml & 30 ml » ; échantillon 2 ml (« dès 6 € », maquette Canva). */
+/* Familles olfactives (filtre Bibliothèque) — classement proposé, À VALIDER par la maison */
+const FAMILIES = {
+  'Gourmand': 'Vanille, caramel, praline, chocolat : des notes que l’on voudrait presque goûter.',
+  'Floral': 'Rose, jasmin, tubéreuse, fleur d’oranger : le cœur fleuri de la parfumerie.',
+  'Fruité': 'Baies, mangue, abricot : l’éclat juteux des fruits mûrs.',
+  'Ambré': 'Ambre, résines, benjoin : une chaleur enveloppante et sensuelle.',
+  'Boisé': 'Santal, cèdre, bois modernes : la structure et la profondeur.'
+};
+
+/* Services — promesses affichées partout (bandeau, fiche produit, panier) */
+const SERVICES = [
+  { t: 'Essayez-le avant de l’ouvrir', d: 'Un échantillon 2 ml du parfum glissé avec chaque flacon : testez-le d’abord, retour gratuit si le flacon reste scellé.' },
+  { t: 'Deux échantillons offerts', d: 'À choisir dans la bibliothèque, avec chaque commande.' },
+  { t: 'Écrin & mot manuscrit', d: 'Emballage cadeau offert, message personnalisé, facture sans prix sur demande.' },
+  { t: 'Livraison offerte dès 100 €', d: 'Expédition soignée depuis Paris, retours gratuits sous 30 jours.' }
+];
+
 const FORMATS = [
   { id: '100', label: '100 ml', price: 170 },
   { id: '30', label: '30 ml', price: 75 },   // PRIX_A_CONFIRMER
@@ -57,7 +74,7 @@ const PRODUCTS = [
   {
     handle: 'vanilla-plum', name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une douceur que l’on veut retenir.',
-    keyNotes: 'Prune · Accord lait · Vanille',
+    keyNotes: 'Prune · Accord lait · Vanille', families: ['Gourmand', 'Ambré'],
     pack: 'vanilla-plum-pack', card: 'vanilla-plum-1', hover: 'vanilla-plum-mod', hoverLabel: 'La campagne',
     gallery: ['vanilla-plum-pack', 'vanilla-plum-1', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres'],
     description: [
@@ -83,7 +100,7 @@ const PRODUCTS = [
   {
     handle: 'magnetic-flowers', name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une attraction florale.',
-    keyNotes: 'Poire · Tubéreuse · Santal',
+    keyNotes: 'Poire · Tubéreuse · Santal', families: ['Floral'],
     pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', hover: 'magnetic-flowers-30', hoverLabel: 'Existe en 30 ml',
     gallery: ['magnetic-flowers-pack', 'magnetic-flowers-1', 'magnetic-flowers-30', 'magnetic-flowers-mod', 'poire-livres'],
     description: [
@@ -109,7 +126,7 @@ const PRODUCTS = [
   {
     handle: 'tonka-love', name: 'Tonka Love', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’irrésistible chaleur de la tonka.',
-    keyNotes: 'Amande grillée · Caramel salé · Tonka',
+    keyNotes: 'Amande grillée · Caramel salé · Tonka', families: ['Gourmand', 'Boisé'],
     pack: 'tonka-love-pack', card: 'tonka-love-1', hover: 'tonka-love-mod', hoverLabel: 'La campagne',
     gallery: ['tonka-love-pack', 'tonka-love-1', 'tonka-love-2', 'tonka-love-mod', 'tonka-capot'],
     description: [
@@ -136,7 +153,7 @@ const PRODUCTS = [
   {
     handle: 'hot-sand', name: 'Hot Sand', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Jasmin lumineux, chocolat blanc fondant et santal crémeux, dans une gourmandise solaire et addictive.',
-    keyNotes: 'Jasmin · Chocolat blanc · Santal',
+    keyNotes: 'Jasmin · Chocolat blanc · Santal', families: ['Gourmand', 'Floral'],
     pack: 'hot-sand-pack', card: 'hot-sand-1', hover: 'hot-sand-30', hoverLabel: 'Existe en 30 ml',
     gallery: ['hot-sand-pack', 'hot-sand-1', 'hot-sand-30', 'hot-sand-mod'],
     description: [
@@ -149,7 +166,7 @@ const PRODUCTS = [
   {
     handle: 'mango-wave', name: 'Mango Wave', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Mangue juteuse, framboise éclatante et ambre gourmand, dans un sillage solaire, fruité et irrésistible.',
-    keyNotes: 'Mangue · Framboise · Ambre',
+    keyNotes: 'Mangue · Framboise · Ambre', families: ['Fruité', 'Ambré'],
     pack: 'mango-wave-pack', card: 'mango-wave-1', hover: 'mango-wave-30', hoverLabel: 'Existe en 30 ml',
     gallery: ['mango-wave-pack', 'mango-wave-1', 'mango-wave-30', 'mango-wave-2'],
     description: [
@@ -162,7 +179,7 @@ const PRODUCTS = [
   {
     handle: 'sun-ice', name: 'Sun Ice', collection: 'summer-vibes', perfumer: 'nathalie-feisthauer',
     tagline: 'Pistache grillée, vanille de Tahiti et bois de santal, dans une gourmandise solaire, crémeuse et enveloppante.',
-    keyNotes: 'Cassis · Pistache grillée · Vanille',
+    keyNotes: 'Cassis · Pistache grillée · Vanille', families: ['Gourmand', 'Fruité'],
     pack: 'sun-ice-pack', card: 'sun-ice-1', hover: 'sun-ice-30', hoverLabel: 'Existe en 30 ml',
     gallery: ['sun-ice-pack', 'sun-ice-1', 'sun-ice-30', 'sun-ice-2'],
     description: [
@@ -175,7 +192,7 @@ const PRODUCTS = [
   {
     handle: 'palmeira', name: 'Palmeira', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Fruits rouges juteux, violette et rose élégante, puis praline et santal, dans un sillage fruité, floral et chaleureux.',
-    keyNotes: 'Framboise · Violette · Praline',
+    keyNotes: 'Framboise · Violette · Praline', families: ['Fruité', 'Floral'],
     pack: 'palmeira-pack', card: 'palmeira-1', hover: 'baies-colonne', hoverLabel: 'Framboise, fraise, cassis',
     gallery: ['palmeira-pack', 'palmeira-1', 'baies-colonne', 'palmeira-2'],
     description: [
@@ -188,7 +205,7 @@ const PRODUCTS = [
   {
     handle: 'ambert-sunset', name: 'Ambert Sunset', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Abricot doré, safran et osmanthus, puis rose, iris et jasmin, sur un fond d’ambre, de cuir et de santal.',
-    keyNotes: 'Abricot · Iris · Cuir · Ambre',
+    keyNotes: 'Abricot · Iris · Cuir · Ambre', families: ['Ambré', 'Floral'],
     pack: 'ambert-sunset-pack', card: 'ambert-sunset-1', hover: 'ambert-sunset-mod', hoverLabel: 'La campagne',
     gallery: ['ambert-sunset-pack', 'ambert-sunset-1', 'ambert-sunset-mod', 'ambert-sunset-2'],
     description: [
@@ -213,6 +230,18 @@ const PRODUCTS = [
     description: [
       "La maison LIBRERY vous invite à parcourir sa bibliothèque olfactive. Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml. Chaque fragrance révèle un souvenir, une émotion, un chapitre à explorer au fil de votre lecture sensorielle.",
       "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. Valable 90 jours, il peut être utilisé lors de l’achat d’un parfum 100 ml."
+    ]
+  },
+  {
+    handle: 'coffret-a-composer', name: 'Coffret à composer', subtitle: 'Cinq extraits · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true, builder: 5,
+    card: 'coffret-2ml', hover: 'skin-trio', hoverLabel: 'Choisissez vos cinq chapitres',
+    gallery: ['summer-100', 'skin-trio', 'coffret-2ml'],
+    formats: [{ id: '5x2', label: '5 × 2 ml', price: 30 }],   // PRIX_A_CONFIRMER
+    keyNotes: 'Vos cinq parfums · Valeur recréditée',
+    tagline: 'Composez votre propre préface : cinq parfums de la bibliothèque, choisis par vous.',
+    description: [
+      "Parce que chaque lecteur a sa manière de parcourir une bibliothèque, le Coffret à composer vous laisse choisir cinq extraits parmi toutes nos créations, en format 2 ml.",
+      "Comme pour le Coffret Découverte, un code de la valeur du coffret vous est envoyé après commande, valable 90 jours sur un flacon 100 ml."
     ]
   },
   {

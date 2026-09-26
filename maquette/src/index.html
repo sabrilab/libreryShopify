@@ -193,7 +193,10 @@
       <h2 class="h1">Le Coffret Découverte</h2>
       <div class="prose"><p>Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml.</p>
       <p>Après votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé — valable 90 jours sur l’achat d’un parfum 100 ml.</p></div>
-      <a class="link" href="/collection?c=coffrets">Découvrir les coffrets <span class="arr">→</span></a>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:34px">
+        <a class="btn" href="/produit?p=coffret-a-composer">Composer mon coffret</a>
+        <a class="btn btn--ghost" href="/portrait-olfactif">Portrait olfactif</a>
+      </div>
     </div>
   </div>
 </section>
@@ -215,8 +218,13 @@
 <!-- SECTION : newsletter -->
 <section class="section s-news">
   <div class="wrap">
-    <span class="runhead">Newsletter</span>
+    <span class="runhead"><b>Le Cercle des Lecteurs</b></span>
     <h2 class="h2">Une goutte de poésie dans votre boîte mail</h2>
-    <form data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail"><button>Rejoindre</button></form>
+    <div class="cercle">
+      <div><strong>Les avant-premières</strong><span>Chaque nouveau chapitre, avant tout le monde.</span></div>
+      <div><strong>Un 2 ml de bienvenue</strong><span>Glissé dans votre première commande.</span></div>
+      <div><strong>Les invitations</strong><span>Lectures olfactives et rencontres avec les parfumeurs.</span></div>
+    </div>
+    <form data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail"><button>Rejoindre le Cercle</button></form>
   </div>
 </section>
