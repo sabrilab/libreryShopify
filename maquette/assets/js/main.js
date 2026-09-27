@@ -143,27 +143,33 @@
         </div>`}
       </div></section>
       <footer class="footer"><div class="wrap">
-        <div class="footer__grid">
-          <div><a href="/" class="logo">${LOGO_SVG_PARIS}</a>
-            <p class="footer__about">Maison de parfum fondée à Paris par Bey Rafik. Extraits de parfum concentrés à 25 %.</p></div>
+        <div class="footer__top">
+          <p class="footer__claim">La bibliothèque olfactive, où chaque fragrance se fait récit et chaque note, <em>un souvenir</em>.</p>
+          <div class="footer__contact"><span>Maison de parfum, Paris</span>
+            <a href="/contact">Écrire à la maison</a><a href="/points-de-vente">Nos points de vente</a><a href="/services">Services</a></div>
+        </div>
+        <div class="footer__cols">
           <div><h4>Bibliothèque</h4><ul>
             <li><a href="/collection?c=skin-obsession">Skin Obsession</a></li>
             <li><a href="/collection?c=summer-vibes">Summer Vibes</a></li>
             <li><a href="/collection?c=coffrets">Coffrets</a></li>
-            <li><a href="/bibliotheque#familles">Par famille</a></li>
-            <li><a href="/portrait-olfactif">Portrait olfactif</a></li></ul></div>
+            <li><a href="/bibliotheque#familles">Par famille</a></li></ul></div>
           <div><h4>La maison</h4><ul>
-            <li><a href="/preface">Préface</a></li>
-            <li><a href="/preface#parfumeurs">Parfumeurs</a></li>
-            <li><a href="/lexique">Lexique</a></li>
-            <li><a href="${CATALOGUE_URL}" target="_blank" rel="noopener">Catalogue</a></li></ul></div>
-          <div><h4>Aide</h4><ul>
-            <li><a href="/services">Services</a></li>
-            <li><a href="/offrir">Offrir</a></li>
-            <li><a href="/points-de-vente">Points de vente</a></li>
-            <li><a href="/contact">Contact</a></li></ul></div>
+            <li><a href="/preface">La Préface</a></li>
+            <li><a href="/preface#parfumeurs">Les parfumeurs</a></li>
+            <li><a href="/lexique">Le Lexique</a></li>
+            <li><a href="${CATALOGUE_URL}" target="_blank" rel="noopener">Le catalogue</a></li></ul></div>
+          <div><h4>Choisir</h4><ul>
+            <li><a href="/portrait-olfactif">Portrait olfactif</a></li>
+            <li><a href="/produit?p=coffret-a-composer">Coffret à composer</a></li>
+            <li><a href="/offrir">Offrir</a></li></ul></div>
+          <div><h4>Extraits de parfum</h4><ul>
+            <li><a href="/lexique#concentration">Concentrés à 25 %</a></li>
+            <li><a href="/services">Un 2 ml avec chaque flacon</a></li>
+            <li><a href="/services">Livraison offerte dès 100 €</a></li></ul></div>
         </div>
-        <div class="footer__legal"><span>© LIBRERY ${new Date().getFullYear()}, Paris</span><span><a href="#" data-toast="Pages légales reprises de Shopify">CGV · Mentions légales · Confidentialité</a></span></div>
+        <a href="/" class="footer__mark" aria-label="LIBRERY, accueil">${LOGO_SVG}</a>
+        <div class="footer__legal"><span>© LIBRERY ${new Date().getFullYear()} · Maison fondée à Paris par Bey Rafik</span><span><a href="#" data-toast="Pages légales reprises de Shopify">CGV</a> · <a href="#" data-toast="Pages légales reprises de Shopify">Mentions légales</a> · <a href="#" data-toast="Pages légales reprises de Shopify">Confidentialité</a></span></div>
       </div></footer>`;
   }
 

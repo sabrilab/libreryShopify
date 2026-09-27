@@ -30,22 +30,22 @@
   <div class="wrap" data-mosaic="skin-obsession" data-fig="2"></div>
 </section>
 
-<!-- SECTION : table-of-contents — le sommaire du catalogue -->
-<section class="block">
-  <div class="wrap toc">
-    <div>
+<!-- SECTION : book — le catalogue, présenté comme un livre ouvert (index + couverture) -->
+<section class="book" id="catalogue" aria-label="Le catalogue">
+  <div class="wrap book__in">
+    <a class="book__cover" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener" aria-label="Feuilleter le catalogue">
+      <img src="/assets/img/v2/catalogue-couverture.webp" alt="Couverture du catalogue LIBRERY" loading="lazy">
+    </a>
+    <div class="book__page">
+      <p class="book__kicker">Le catalogue · 56 pages</p>
       <h2 class="h2">Sommaire</h2>
-      <ol>
-        <li><a href="/preface"><span class="t">LIBRERY<small>La maison</small></span><span class="dots"></span><span class="folio">6</span></a></li>
-        <li><a href="/collection?c=summer-vibes"><span class="t">Summer <em>Vibes</em><small>Collection I</small></span><span class="dots"></span><span class="folio">14</span></a></li>
-        <li><a href="/collection?c=skin-obsession"><span class="t">Skin <em>Obsession</em><small>Collection II</small></span><span class="dots"></span><span class="folio">32</span></a></li>
-        <li><a href="/preface#parfumeurs"><span class="t">Les parfumeurs</span><span class="dots"></span><span class="folio">50</span></a></li>
-        <li><a href="/lexique"><span class="t">Lexique</span><span class="dots"></span><span class="folio">—</span></a></li>
+      <ol class="book__toc">
+        <li><a href="/preface"><span class="book__f">6</span><span class="book__t">La maison<small>Préface, manifeste, fondateur</small></span><span class="book__th">{{pic camp-coffrets|La bibliothèque LIBRERY|96px}}</span></a></li>
+        <li><a href="/collection?c=summer-vibes"><span class="book__f">14</span><span class="book__t">Summer <em>Vibes</em><small>Collection I, cinq parfums</small></span><span class="book__th">{{pic camp-blanche|Summer Vibes|96px}}</span></a></li>
+        <li><a href="/collection?c=skin-obsession"><span class="book__f">32</span><span class="book__t">Skin <em>Obsession</em><small>Collection II, trois extraits</small></span><span class="book__th">{{pic hero-skin|Skin Obsession|96px}}</span></a></li>
+        <li><a href="/preface#parfumeurs"><span class="book__f">50</span><span class="book__t">Les parfumeurs<small>Chris Maurice, Nathalie Feisthauer, Coralie Spicher</small></span><span class="book__th">{{pic coralie-spicher|Coralie Spicher|96px}}</span></a></li>
       </ol>
-    </div>
-    <div>
-      <a class="toc__cover" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener"><img src="/assets/img/v2/catalogue-couverture-m.webp" alt="Couverture du catalogue LIBRERY" loading="lazy"></a>
-      <div class="toc__links"><a class="tlink" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener">Feuilleter le catalogue</a><a class="tlink" href="https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf" target="_blank" rel="noopener">PDF</a></div>
+      <div class="book__cta"><a class="btn" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener">Feuilleter le catalogue</a><a class="tlink" href="https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf" target="_blank" rel="noopener">Télécharger le PDF</a></div>
     </div>
   </div>
 </section>
