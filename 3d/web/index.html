@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flacon Librery 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ece6dd; --ink: #2b231d; --muted: #7a6d62; --line: rgba(43,35,29,.18);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+    font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  header { position: fixed; top: 24px; left: 0; right: 0; text-align: center; pointer-events: none; }
+  header small { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+  header h1 { margin: 6px 0 0; font: 400 clamp(28px, 5vw, 44px)/1.1 "Libre Caslon Display", serif; }
+  nav { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;
+    max-width: calc(100% - 32px); }
+  .swatch { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line);
+    cursor: pointer; padding: 0; outline-offset: 3px; transition: transform .2s; }
+  .swatch[aria-pressed="true"] { outline: 1px solid var(--ink); transform: scale(1.08); }
+  .toggle { margin-left: 8px; height: 30px; padding: 0 14px; border-radius: 15px; background: transparent;
+    border: 1px solid var(--ink); color: var(--ink); font: 500 11px/1 "Hanken Grotesk", sans-serif;
+    letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+  #loading { position: fixed; inset: 0; display: grid; place-items: center; font-size: 12px;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div id="loading">Chargement…</div>
+<header><small>Extrait de parfum · 100 ml</small><h1 id="nom">&nbsp;</h1></header>
+<nav id="nav"></nav>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
+
+RectAreaLightUniformsLib.init();
+
+const canvas = document.getElementById("scene");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+// « PBR Neutral » (Khronos) : restitue les couleurs produit sans les délaver.
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 1.0;
+
+const scene = new THREE.Scene();
+// Le verre réfracte ce qui est rendu derrière lui : il faut un vrai fond.
+scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.02).texture;
+scene.environmentIntensity = 0.9;
+
+// Deux bandes lumineuses verticales : les longs reflets du verre et de l'or.
+for (const [x, z, i] of [[-0.25, 0.18, 2.2], [0.28, 0.08, 1.6]]) {
+  const l = new THREE.RectAreaLight(0xfff4e8, i, 0.05, 0.4);
+  l.position.set(x, 0.08, z); l.lookAt(0, 0.065, 0); scene.add(l);
+}
+const key = new THREE.DirectionalLight(0xfff1e0, 1.2);
+key.position.set(-0.3, 0.5, 0.4); scene.add(key);
+
+const camera = new THREE.PerspectiveCamera(26, 1, 0.01, 5);
+camera.position.set(0.16, 0.10, 0.36);
+const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 0.062, 0);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.minDistance = 0.18;
+controls.autoRotate = !new URLSearchParams(location.search).has("fixe"); controls.autoRotateSpeed = 0.8;
+controls.addEventListener("start", () => (controls.autoRotate = false));
+
+// Ombre douce au sol.
+const shadowTex = (() => {
+  const c = document.createElement("canvas"); c.width = c.height = 128;
+  const g = c.getContext("2d"), grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grd.addColorStop(0, "rgba(43,35,29,.35)"); grd.addColorStop(1, "rgba(43,35,29,0)");
+  g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+})();
+const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.08),
+  new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
+shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.0005; scene.add(shadow);
+
+const [gltf, parfums] = await Promise.all([
+  new GLTFLoader().loadAsync("flacon-100ml.glb"),
+  fetch("parfums.json").then((r) => r.json()),
+]);
+const flacon = gltf.scene;
+scene.add(flacon);
+const parts = {};
+flacon.traverse((o) => { if (o.isMesh) parts[o.name] = o; });
+
+// Réglages matière : le GLB porte déjà transmission, IOR et volume ;
+// on affine ce que l'export Blender ne sait pas exprimer.
+// Dans Three.js un objet transmissif n'en voit pas un autre au travers :
+// le verre reste transmissif (une seule face) et le jus devient un volume
+// opaque que le verre réfracte.
+const glass = parts.Verre.material;
+Object.assign(glass, { roughness: 0.02, side: THREE.FrontSide, envMapIntensity: 1.2 });
+const juice = parts.Jus.material;
+Object.assign(juice, { roughness: 0.12, transmission: 0, metalness: 0, side: THREE.FrontSide });
+glass.attenuationDistance = 0.15;
+const label = parts.Etiquette.material;
+Object.assign(label, { transparent: true, depthWrite: false, alphaTest: 0.02,
+  metalness: 0.45, roughness: 0.3 });
+label.color.setRGB(1.0, 0.96, 0.88, THREE.SRGBColorSpace);
+parts.Etiquette.renderOrder = 2;
+
+const texLoader = new THREE.TextureLoader();
+const labels = {};
+function labelTexture(handle) {
+  if (!labels[handle]) {
+    const t = texLoader.load(`labels/${handle}.png`);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.flipY = false;               // convention glTF
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    labels[handle] = t;
+  }
+  return labels[handle];
+}
+
+function select(handle) {
+  const p = parfums[handle];
+  document.getElementById("nom").textContent = p.nom;
+  glass.color.setRGB(...p.verre, THREE.SRGBColorSpace);
+  glass.attenuationColor.setRGB(...p.verre, THREE.SRGBColorSpace);
+  juice.color.setRGB(...p.jus, THREE.SRGBColorSpace);
+  juice.emissive.setRGB(...p.jus, THREE.SRGBColorSpace).multiplyScalar(0.12);
+  label.map = labelTexture(handle);
+  label.needsUpdate = true;
+  for (const b of nav.querySelectorAll(".swatch"))
+    b.setAttribute("aria-pressed", b.dataset.handle === handle);
+  history.replaceState(null, "", `#${handle}`);
+}
+
+// Nuancier + capot.
+const nav = document.getElementById("nav");
+for (const [handle, p] of Object.entries(parfums)) {
+  const b = document.createElement("button");
+  b.className = "swatch"; b.dataset.handle = handle; b.title = p.nom;
+  b.setAttribute("aria-label", p.nom);
+  const [r, g, bl] = p.jus.map((v) => Math.round(v * 255));
+  b.style.background = `rgb(${r},${g},${bl})`;
+  b.onclick = () => select(handle);
+  nav.append(b);
+}
+const capBtn = document.createElement("button");
+capBtn.className = "toggle"; capBtn.textContent = "Ôter le capot";
+nav.append(capBtn);
+let capOpen = false, capT = 0;
+capBtn.onclick = () => {
+  capOpen = !capOpen;
+  capBtn.textContent = capOpen ? "Remettre le capot" : "Ôter le capot";
+};
+
+window.flacon = { THREE, scene, renderer, parts };   // pour le débogage en console
+select(location.hash.slice(1) in parfums ? location.hash.slice(1) : "tonka-love");
+document.getElementById("loading").remove();
+
+const capHome = parts.Capot.position.clone();
+const CAP_BASE = new THREE.Box3().setFromObject(parts.Capot).min.y;   // hauteur du bas du capot
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  // Recule la caméra pour cadrer le flacon (22 cm de haut, 15 de large),
+  // titre et nuancier compris, quel que soit le format d'écran.
+  const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const dist = Math.max(0.11 / t, 0.075 / (t * camera.aspect));
+  camera.position.sub(controls.target).setLength(dist).add(controls.target);
+  controls.maxDistance = dist * 1.6;
+}
+addEventListener("resize", resize); resize();
+
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = clock.getDelta();
+  capT += ((capOpen ? 1 : 0) - capT) * Math.min(1, dt * 5);
+  const e = capT * capT * (3 - 2 * capT);
+  // Le capot se soulève puis se pose sur la table, à droite du flacon.
+  parts.Capot.position.set(capHome.x + e * 0.068,
+    capHome.y - e * CAP_BASE + Math.sin(Math.PI * e) * 0.035, capHome.z + e * 0.01);
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

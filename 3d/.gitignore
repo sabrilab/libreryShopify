@@ -1,0 +1,4 @@
+scripts/controle-*.png
+scripts/__pycache__/
+renders/_tmp-*
+*.blend1
