@@ -23,6 +23,9 @@ const FAMILIES = {
   'Ambré': 'Ambre, résines, benjoin : une chaleur enveloppante et sensuelle.',
   'Boisé': 'Santal, cèdre, bois modernes : la structure et la profondeur.'
 };
+/* Image de chaque famille (métaobjet Shopify « famille » : nom, texte, image ; les produits y sont reliés
+   par un métachamp liste, la première famille étant la famille principale) */
+const FAMILY_ART = { 'Gourmand': 'tonka-capot', 'Floral': 'poire-livres', 'Fruité': 'baies-colonne', 'Ambré': 'ambert-sunset-1', 'Boisé': 'camp-coffrets' };
 
 /* Services — promesses affichées partout (bandeau, fiche produit, panier) */
 const SERVICES = [
@@ -101,7 +104,7 @@ const PRODUCTS = [
   {
     handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une attraction florale.',
-    keyNotes: 'Poire · Tubéreuse · Santal', families: ['Floral'],
+    keyNotes: 'Poire · Tubéreuse · Santal', families: ['Floral', 'Fruité'],
     pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', pack30: 'magnetic-flowers-pack30', scene: 'magnetic-flowers-1',
     gallery: ['magnetic-flowers-pack', 'magnetic-flowers-pack30', 'magnetic-flowers-1', 'magnetic-flowers-mod', 'poire-livres', 'magnetic-flowers-30'],
     description: [

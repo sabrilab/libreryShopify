@@ -89,7 +89,7 @@ input, textarea, select { font: inherit; color: inherit; }
 .header.is-hidden { transform: translateY(-100%); }
 
 .has-sub { position: relative; }
-.mega { position: absolute; top: calc(100% + 22px); left: -24px; width: 540px; background: var(--paper); color: var(--ink); border: 1px solid var(--line); padding: 26px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; opacity: 0; visibility: hidden; transition: opacity .15s, visibility .15s; text-transform: none; letter-spacing: 0; }
+.mega { position: absolute; top: calc(100% + 22px); left: -24px; width: 720px; background: var(--paper); color: var(--ink); border: 1px solid var(--line); padding: 26px 24px; display: grid; grid-template-columns: 1.1fr 1.1fr .8fr; gap: 28px; opacity: 0; visibility: hidden; transition: opacity .15s, visibility .15s; text-transform: none; letter-spacing: 0; }
 .has-sub:hover .mega, .has-sub:focus-within .mega { opacity: 1; visibility: visible; }
 .has-sub::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 24px; }
 .mega__col { display: grid; gap: 8px; align-content: start; }
@@ -572,3 +572,42 @@ input, textarea, select { font: inherit; color: inherit; }
 .story__notes dd { margin: 0; font-size: 15px; line-height: 1.5; }
 .inline-link { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; color: var(--ink); }
 body:has(#sticky.is-on) { padding-bottom: 68px; }
+
+/* ---------- Familles olfactives ---------- */
+.fams-head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; margin-bottom: 22px; }
+.fams-head p { margin: 0; color: var(--grey); font-size: 16px; max-width: 44ch; }
+.fams { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-bottom: 48px; scroll-margin-top: calc(var(--header-h) + 20px); }
+.fam { display: grid; gap: 3px; text-align: left; transition: opacity .3s; }
+.fam__img { display: block; aspect-ratio: 4 / 5; overflow: hidden; background: var(--studio); margin-bottom: 9px; position: relative; }
+.fam__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(.16, .6, .2, 1); }
+.fam__img::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px transparent; transition: box-shadow .3s; }
+.fam.is-active .fam__img::after { box-shadow: inset 0 0 0 1px var(--ink); }
+@media (hover: hover) { .fam:hover .fam__img img { transform: scale(1.04); } }
+.fam__name { font-family: var(--serif); font-size: 18px; }
+.fam__count { font-family: var(--sans); font-size: 12px; color: var(--grey); }
+.fams.has-active .fam:not(.is-active) { opacity: .45; }
+.fam.is-active .fam__name { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+#familles { scroll-margin-top: calc(var(--header-h) + 20px); }
+.filters { scroll-margin-top: calc(var(--header-h) + 12px); }
+.filters__desc b { font-weight: 400; color: var(--ink); }
+.filters__desc .inline-link { font-size: 13px; font-family: var(--sans); margin-left: 8px; }
+.pdp__fams { font-family: var(--sans); font-size: 12.5px; color: var(--grey); margin: -6px 0 16px; }
+.pdp__fams a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; margin-left: 4px; }
+
+@media (max-width: 800px) {
+  .fams-head { display: block; }
+  .fams-head p { margin-top: 8px; }
+  .fams { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 40%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: 10px; margin: 0 calc(-1 * var(--gutter)) 36px; padding: 0 var(--gutter); scroll-padding: 0 var(--gutter); }
+  .fams::-webkit-scrollbar { display: none; }
+  .fam { scroll-snap-align: start; }
+  .fam__name { font-size: 16px; }
+}
+.fam-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; border-top: 1px solid var(--line); }
+.fam-row { display: grid; grid-template-columns: 110px 1fr; gap: 22px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.fam-row__img { display: block; aspect-ratio: 4 / 5; overflow: hidden; background: var(--studio); }
+.fam-row__img img { width: 100%; height: 100%; object-fit: cover; }
+.fam-row__txt { display: grid; gap: 6px; }
+.fam-row__d { color: var(--grey); font-size: 15.5px; line-height: 1.5; }
+.fam-row__p { font-family: var(--serif); font-size: 15px; }
+@media (hover: hover) { .fam-row:hover .fam-row__txt .h3 { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; } }
+@media (max-width: 800px) { .fam-list { grid-template-columns: 1fr; } .fam-row { grid-template-columns: 86px 1fr; gap: 16px; } }

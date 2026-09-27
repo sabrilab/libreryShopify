@@ -69,6 +69,8 @@
                     <a href="/produit?p=coffret-a-composer">Coffret à composer</a>
                     <a href="/offrir">Offrir</a>
                     <a href="${CATALOGUE_URL}" target="_blank" rel="noopener">Le catalogue</a></div>
+                  <div class="mega__col"><span class="ui">Familles</span>
+                    ${Object.keys(FAMILIES).map(f => `<a href="/bibliotheque?famille=${encodeURIComponent(f)}#familles">${f}</a>`).join('')}</div>
                 </div>
               </div>
               <a href="/preface" ${cur('preface')}>Préface</a>
@@ -92,6 +94,7 @@
             <a href="/collection?c=skin-obsession">Skin <em>Obsession</em></a>
             <a href="/collection?c=summer-vibes">Summer <em>Vibes</em></a>
             <a href="/collection?c=coffrets">Coffrets</a>
+            <a href="/bibliotheque#familles">Par famille olfactive</a>
             <a href="/portrait-olfactif">Portrait olfactif</a>
           </div>
           <a href="/preface">Préface <span class="folio">p. 6</span></a>
@@ -147,6 +150,7 @@
             <li><a href="/collection?c=skin-obsession">Skin Obsession</a></li>
             <li><a href="/collection?c=summer-vibes">Summer Vibes</a></li>
             <li><a href="/collection?c=coffrets">Coffrets</a></li>
+            <li><a href="/bibliotheque#familles">Par famille</a></li>
             <li><a href="/portrait-olfactif">Portrait olfactif</a></li></ul></div>
           <div><h4>La maison</h4><ul>
             <li><a href="/preface">Préface</a></li>
@@ -364,17 +368,24 @@
     const ORDER = ['skin-obsession', 'summer-vibes', 'coffrets'];
     const q = new URLSearchParams(location.search);
     let filter = q.get('f') || 'all', fam = q.get('famille') || '', sort = 'default';
-    $('#lib-fams').innerHTML = `<span class="ui">Famille</span><button data-fam="" class="is-active">Toutes</button>` + Object.keys(FAMILIES).map(f =>
-      `<button data-fam="${f}">${f}<sup>${PRODUCTS.filter(p => (p.families || []).includes(f)).length}</sup></button>`).join('');
+    const famCount = f => PRODUCTS.filter(p => (p.families || []).includes(f)).length;
+    $('#lib-fams').innerHTML = Object.keys(FAMILIES).map(f => `
+      <button type="button" class="fam" data-fam="${f}" aria-pressed="false"><span class="fam__img">${pic(FAMILY_ART[f], '', '(max-width: 800px) 42vw, 18vw')}</span>
+        <span class="fam__name">${f}</span><span class="fam__count">${famCount(f)} parfum${famCount(f) > 1 ? 's' : ''}</span></button>`).join('');
     const render = () => {
       let list = PRODUCTS.filter(p => (filter === 'all' || p.collection === filter) && (!fam || (p.families || []).includes(fam)));
       if (sort === 'asc') list = [...list].sort((a, b) => minPrice(a) - minPrice(b));
       if (sort === 'desc') list = [...list].sort((a, b) => minPrice(b) - minPrice(a));
+      if (fam && sort === 'default') list = [...list].sort((a, b) => a.families.indexOf(fam) - b.families.indexOf(fam));   // famille dominante d'abord
       if (sort === 'az') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
       $('#lib-count').textContent = list.length + (list.length > 1 ? ' créations' : ' création');
       $$('#lib-cols button').forEach(b => b.classList.toggle('is-active', b.dataset.f === filter));
-      $$('#lib-fams button').forEach(b => b.classList.toggle('is-active', b.dataset.fam === fam));
-      $('#lib-desc').textContent = fam ? FAMILIES[fam] : '';
+      $$('#lib-fams .fam').forEach(b => { b.classList.toggle('is-active', b.dataset.fam === fam); b.setAttribute('aria-pressed', b.dataset.fam === fam); });
+      $('#lib-fams').classList.toggle('has-active', !!fam);
+      const act = $('#lib-fams .fam.is-active'), rail = $('#lib-fams');
+      if (act && rail.scrollWidth > rail.clientWidth) rail.scrollTo({ left: act.offsetLeft - rail.offsetLeft - 20, behavior: 'smooth' });
+      $('#lib-desc').innerHTML = fam ? `<b>${fam}</b> — ${esc(FAMILIES[fam])} <button type="button" class="inline-link" data-fam-reset>Toutes les familles</button>` : '';
+      $('[data-fam-reset]')?.addEventListener('click', () => { fam = ''; url(); render(); });
       root.innerHTML = (filter === 'all' && !fam && sort === 'default')
         ? ORDER.map(c => {
             const col = COLLECTIONS[c], items = list.filter(p => p.collection === c);
@@ -383,12 +394,15 @@
                       : c === 'summer-vibes' ? items.slice(0, 3).map(card).join('') + wideTile(c) + items.slice(3).map(card).join('') + quizTile() + storesTile()
                       : items.map(card).join('')}</div>`;
           }).join('')
-        : `<div class="grid">${list.map(card).join('') || '<p class="muted">Aucune création pour ce filtre.</p>'}</div>`;
+        : `<div class="grid">${list.map(card).join('') || '<p class="muted">Aucune création pour ce filtre.</p>'}${list.length % 3 ? [builderTile(), quizTile()].slice(0, 3 - list.length % 3).join('') : ''}</div>`;
       balanceGrids(root);
     };
-    const url = () => { const u = new URLSearchParams(); if (filter !== 'all') u.set('f', filter); if (fam) u.set('famille', fam); history.replaceState(null, '', '/bibliotheque' + (u.toString() ? '?' + u : '')); };
+    const url = () => { const u = new URLSearchParams(); if (filter !== 'all') u.set('f', filter); if (fam) u.set('famille', fam); history.replaceState(null, '', '/bibliotheque' + (u.toString() ? '?' + u : '') + (fam ? '#familles' : '')); };
     $$('#lib-cols button').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; url(); render(); }));
-    $$('#lib-fams button').forEach(b => b.addEventListener('click', () => { fam = b.dataset.fam; url(); render(); }));
+    $$('#lib-fams .fam').forEach(b => b.addEventListener('click', () => {
+      fam = fam === b.dataset.fam ? '' : b.dataset.fam; url(); render();
+      if (fam) $('.filters').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
     $('#lib-sort').addEventListener('change', e => { sort = e.target.value; render(); });
     render();
   }
@@ -457,6 +471,7 @@
           <h1 class="pdp__name">${nm(p.name)}</h1>
           <p class="pdp__type">${isPerfume ? `Extrait de parfum 25 %${p.isNew ? ' · Nouveauté' : ''}` : esc(p.subtitle)}</p>
           ${p.keyNotes && isPerfume ? `<p class="pdp__notes-line">${esc(p.keyNotes.replace(/ · /g, ', '))}</p>` : ''}
+          ${p.families && isPerfume ? `<p class="pdp__fams">Famille ${p.families.map(f => `<a href="/bibliotheque?famille=${encodeURIComponent(f)}#familles">${f}</a>`).join(' · ')}</p>` : ''}
           <p class="pdp__desc">${p.tagline}</p>
           ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${eur(f.price)}</small></button>`).join('')}</div>` : ''}
           ${p.builder ? `<div class="builder"><div class="builder__head"><span>Vos parfums</span><b id="b-count">0 / ${p.builder}</b></div>
@@ -610,6 +625,18 @@
     });
   }
 
+  /* Lexique : les cinq familles, leurs parfums (dominante en premier) */
+  function initFamilies() {
+    const el = $('#fam-list'); if (!el) return;
+    el.innerHTML = Object.keys(FAMILIES).map(f => {
+      const ps = PRODUCTS.filter(p => (p.families || []).includes(f)).sort((a, b) => a.families.indexOf(f) - b.families.indexOf(f));
+      return `<a class="fam-row" href="/bibliotheque?famille=${encodeURIComponent(f)}#familles">
+        <span class="fam-row__img">${pic(FAMILY_ART[f], '', '(max-width: 800px) 30vw, 12vw')}</span>
+        <span class="fam-row__txt"><span class="h3">${f}</span><span class="fam-row__d">${esc(FAMILIES[f])}</span>
+        <span class="fam-row__p">${ps.map(p => nm(p.name)).join(', ')}</span></span></a>`;
+    }).join('');
+  }
+
   function initContact() {
     const f = $('#contact-form'); if (!f) return;
     f.addEventListener('submit', e => { e.preventDefault(); f.outerHTML = '<p class="lede">Merci. Nous vous répondons sous deux jours ouvrés.</p>'; });
@@ -619,6 +646,6 @@
   initCollection();            // avant l'en-tête : fixe le titre courant
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
-  initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initContact();
+  initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initContact();
   renderCart(); bindToasts(); bindCards(); accordions(); newsletters(); balanceGrids();
 })();
