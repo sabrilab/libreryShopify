@@ -93,10 +93,14 @@ jsDelivr.
 
 Deux choix de rendu à connaître si vous intégrez le modèle ailleurs :
 
-- **Le jus est rendu opaque** dans Three.js. Un objet transmissif n'en
-  voit pas un autre au travers : si le jus était transparent, il
-  disparaîtrait derrière le verre. Le verre, lui, reste transmissif et
-  réfracte le jus.
+- **Jus double face, verre simple face.** Three.js ne montre un objet
+  transmissif au travers d'un autre que par sa face arrière, et seulement
+  s'il est double face : le jus l'est, le verre non, sinon ses parois
+  intérieures masqueraient le jus. Le tube plongeur est opaque (translucide)
+  pour rester visible.
+- **Studio virtuel** (`studio()` dans index.html) : bandes lumineuses,
+  plafonnier, réflecteur avant et drapeaux noirs, comme en photo produit.
+  C'est lui qui dessine les reflets du verre et de l'or.
 - **Tone mapping `NeutralToneMapping`** (PBR Neutral de Khronos), et le
   même dans les rendus Cycles : les couleurs restent fidèles aux photos,
   là où ACES ou AgX les délavent ou les virent au rose.
@@ -106,8 +110,10 @@ transparent, le verre n'a rien à réfracter et devient blanc.
 
 ## Limites connues
 
-- **Matières en cours** : la géométrie est calée, le rendu du verre, du
-  jus et de l'or reste à régler en comparant aux photos, caméra identique.
+- Matières : réglées dans la visionneuse en comparant aux photos depuis la
+  même caméra (`scripts/comparer_web.mjs`, planche `renders/comparaison-web.jpg`).
+  Three.js n'applique qu'une épaisseur de verre pour tout le flacon : le
+  socle massif est teinté artificiellement pour ne pas paraître dépoli.
 - Gravure « LIBRERY Paris » sous le socle : pas encore modélisée.
 - Format 30 ml : même flacon, à décliner en changeant les cotes.
 - Dans le navigateur, la réfraction est une approximation (une seule

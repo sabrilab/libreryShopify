@@ -30,6 +30,7 @@
   #version { position: fixed; right: 16px; top: 16px; font-size: 11px; line-height: 1.5;
     color: var(--muted); text-align: right; letter-spacing: .04em; }
   @media (max-width: 600px) { #version { top: 88px; right: 0; left: 0; text-align: center; font-size: 10px; } }
+  body.capture header, body.capture nav, body.capture #version { display: none; }
   #loading { position: fixed; inset: 0; display: grid; place-items: center; font-size: 12px;
     letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
 </style>
@@ -51,10 +52,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
-
-RectAreaLightUniformsLib.init();
 
 const canvas = document.getElementById("scene");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -66,17 +63,38 @@ renderer.toneMappingExposure = 1.0;
 const scene = new THREE.Scene();
 // Le verre réfracte ce qui est rendu derrière lui : il faut un vrai fond.
 scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.02).texture;
-scene.environmentIntensity = 0.9;
-
-// Deux bandes lumineuses verticales : les longs reflets du verre et de l'or.
-for (const [x, z, i] of [[-0.25, 0.18, 2.2], [0.28, 0.08, 1.6]]) {
-  const l = new THREE.RectAreaLight(0xfff4e8, i, 0.05, 0.4);
-  l.position.set(x, 0.08, z); l.lookAt(0, 0.065, 0); scene.add(l);
+// Studio virtuel : pièce sombre et chaude, grandes boîtes à lumière. Ce sont
+// elles qui dessinent les longs reflets sur les arêtes du verre et le contraste
+// de l'or poli, comme sur les photos produit.
+function studio() {
+  const env = new THREE.Scene();
+  const room = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 16),
+    new THREE.MeshBasicMaterial({ color: 0x7d736a, side: THREE.BackSide }));
+  env.add(room);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(10, 10),
+    new THREE.MeshBasicMaterial({ color: 0xd9d0c4 }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -0.6; env.add(floor);
+  const box = (w, h, x, y, z, k, tint = 0xfff6ec) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color(tint).multiplyScalar(k), side: THREE.DoubleSide }));
+    m.position.set(x, y, z); m.lookAt(0, 0.3, 0); env.add(m);
+  };
+  box(0.5, 3.2, -2.2, 0.8, 1.2, 9);    // bande verticale gauche
+  box(0.4, 3.2, 2.3, 0.8, 0.6, 7);     // bande verticale droite
+  box(2.6, 1.6, 0, 3.2, 0.4, 3);       // plafonnier
+  box(3.0, 1.4, 0, 0.6, -2.6, 2, 0xffe9d2);   // fond chaud, éclaire le jus par derrière
+  box(1.2, 0.5, -1.2, 1.8, 2.4, 3);    // petite face avant, points brillants
+  box(2.4, 1.2, 0.3, 0.5, 3.0, 1.6, 0xfff1e4);   // grand réflecteur côté photographe
+  // Drapeaux noirs : les bandes sombres qui dessinent les arêtes du verre et de l'or.
+  box(1.0, 3.4, -1.3, 0.8, 2.3, 0.02, 0x000000);
+  box(1.0, 3.4, 1.5, 0.8, 2.1, 0.02, 0x000000);
+  box(1.2, 3.4, 2.7, 0.8, -1.2, 0.02, 0x000000);
+  box(1.2, 3.4, -2.8, 0.8, -1.0, 0.02, 0x000000);
+  return env;
 }
-const key = new THREE.DirectionalLight(0xfff1e0, 1.2);
-key.position.set(-0.3, 0.5, 0.4); scene.add(key);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(studio(), 0.01).texture;
+scene.environmentIntensity = 1.0;
 
 const camera = new THREE.PerspectiveCamera(26, 1, 0.01, 5);
 camera.position.set(0.16, 0.10, 0.36);
@@ -117,20 +135,30 @@ scene.add(flacon);
 const parts = {};
 flacon.traverse((o) => { if (o.isMesh) parts[o.name] = o; });
 
-// Réglages matière : le GLB porte déjà transmission, IOR et volume ;
-// on affine ce que l'export Blender ne sait pas exprimer.
-// Dans Three.js un objet transmissif n'en voit pas un autre au travers :
-// le verre reste transmissif (une seule face) et le jus devient un volume
-// opaque que le verre réfracte.
+// Matières. Three.js ne montre pas un objet transmissif à travers un autre,
+// sauf la face arrière des objets double face : le jus est donc transmissif
+// et double face (sa paroi du fond entre dans l'image que le verre réfracte),
+// le verre transmissif en simple face. Le tube plongeur est opaque, pour
+// rester visible au travers du jus et du verre.
 const glass = parts.Verre.material;
-Object.assign(glass, { roughness: 0.02, side: THREE.FrontSide, envMapIntensity: 1.2 });
+Object.assign(glass, { roughness: 0, metalness: 0, transmission: 1, ior: 1.5,
+  thickness: 0.02, attenuationDistance: 0.1, specularIntensity: 1,
+  side: THREE.FrontSide, envMapIntensity: 1 });
 const juice = parts.Jus.material;
-Object.assign(juice, { roughness: 0.12, transmission: 0, metalness: 0, side: THREE.FrontSide });
-glass.attenuationDistance = 0.15;
+Object.assign(juice, { roughness: 0, metalness: 0, transmission: 1, ior: 1.36,
+  thickness: 0.03, attenuationDistance: 0.028, side: THREE.DoubleSide, envMapIntensity: 0.6 });
+const or = parts.Capot.material;
+Object.assign(or, { metalness: 1, roughness: 0.08, envMapIntensity: 1.1 });
+or.color.setRGB(0.95, 0.83, 0.70, THREE.SRGBColorSpace);   // or champagne, légèrement rosé
+for (const n of ["Virole", "Col", "Poussoir"]) if (parts[n]) parts[n].material = or;
+const plastique = new THREE.MeshStandardMaterial({ color: 0xf4f1ec, roughness: 0.25, transparent: true, opacity: 0.55 });
+for (const n of ["TubePlongeur", "Tige"]) if (parts[n]) parts[n].material = plastique;
 const label = parts.Etiquette.material;
 Object.assign(label, { transparent: true, depthWrite: false, alphaTest: 0.02,
-  metalness: 0.45, roughness: 0.3 });
-label.color.setRGB(1.0, 0.96, 0.88, THREE.SRGBColorSpace);
+  metalness: 0.35, roughness: 0.3, envMapIntensity: 1.2 });
+label.color.setRGB(1.0, 0.95, 0.86, THREE.SRGBColorSpace);
+label.emissive.setRGB(0.8, 0.74, 0.62);    // la dorure reste lisible sur un jus sombre
+label.emissiveMap = null;
 parts.Etiquette.renderOrder = 2;
 
 const texLoader = new THREE.TextureLoader();
@@ -149,11 +177,23 @@ function labelTexture(handle) {
 function select(handle) {
   const p = parfums[handle];
   document.getElementById("nom").textContent = p.nom;
-  glass.color.setRGB(...p.verre, THREE.SRGBColorSpace);
-  glass.attenuationColor.setRGB(...p.verre, THREE.SRGBColorSpace);
-  juice.color.setRGB(...p.jus, THREE.SRGBColorSpace);
-  juice.emissive.setRGB(...p.jus, THREE.SRGBColorSpace).multiplyScalar(0.12);
+  // Même un verre clair prend la couleur du jus dans ses parties épaisses
+  // (socle, épaules) : il la renvoie par réflexions internes.
+  const jus = new THREE.Color().setRGB(...p.jus, THREE.SRGBColorSpace);
+  // Three.js applique une épaisseur unique à tout le verre : on force la
+  // teinte pour que le socle massif ne paraisse pas dépoli. Les verres
+  // teintés (Mango Wave, Palmeira…) sont plus denses que les verres clairs.
+  const teinte = p.verre.some((c) => c < 0.95);
+  glass.attenuationColor.setRGB(...p.verre, THREE.SRGBColorSpace).lerp(jus, teinte ? 0.2 : 0.5);
+  glass.attenuationDistance = teinte ? 0.035 : 0.06;
+  // Teinte de surface en plus : sur un fond clair, l'atténuation seule laisse
+  // le socle presque blanc, alors qu'en vrai il renvoie la couleur du jus.
+  glass.color.set(1, 1, 1).lerp(glass.attenuationColor, teinte ? 0.55 : 0.4);
+  // Le jus se colore dans sa masse (atténuation), pas en surface.
+  juice.attenuationColor.copy(jus);
+  juice.color.set(1, 1, 1);
   label.map = labelTexture(handle);
+  label.emissiveMap = label.map;
   label.needsUpdate = true;
   for (const b of nav.querySelectorAll(".swatch"))
     b.setAttribute("aria-pressed", b.dataset.handle === handle);
@@ -180,7 +220,26 @@ capBtn.onclick = () => {
   capBtn.textContent = capOpen ? "Remettre le capot" : "Ôter le capot";
 };
 
-window.flacon = { THREE, scene, renderer, parts };   // pour le débogage en console
+// Pour le débogage et les comparaisons photo | rendu (3d/scripts/comparer_web.mjs).
+window.flacon = { THREE, scene, renderer, parts, camera, controls, select,
+  // Caméra ajustée sur une photo (voir ajuster.py) : lacet, tangage (°),
+  // distance (mm), focale et centre optique (px) pour une image w × h.
+  photo([yaw, pitch, dist, f, cx, cy], w, h) {
+    const y = THREE.MathUtils.degToRad(yaw), p = THREE.MathUtils.degToRad(pitch);
+    const t = [0, 65, 0];   // cible, en mm, repère Three.js (y vers le haut)
+    camera.position.set(t[0] + dist * Math.sin(y) * Math.cos(p), t[1] + dist * Math.sin(p),
+      t[2] + dist * Math.cos(y) * Math.cos(p)).multiplyScalar(0.001);
+    camera.up.set(0, 1, 0);
+    camera.lookAt(0, 0.065, 0);
+    camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(h / 2 / f));
+    camera.aspect = w / h;
+    camera.setViewOffset(w, h, w / 2 - cx, h / 2 - cy, w, h);
+    camera.updateProjectionMatrix();
+    controls.enabled = false; controls.autoRotate = false; photoMode = true;
+    document.body.classList.add("capture");
+  },
+};
+let photoMode = false;
 select(location.hash.slice(1) in parfums ? location.hash.slice(1) : "tonka-love");
 document.getElementById("loading").remove();
 
@@ -189,6 +248,7 @@ const CAP_BASE = new THREE.Box3().setFromObject(parts.Capot).min.y;   // hauteur
 function resize() {
   const w = innerWidth, h = innerHeight;
   renderer.setSize(w, h, false);
+  if (photoMode) return;
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
   // Recule la caméra pour cadrer le flacon (22 cm de haut, 15 de large),
@@ -208,7 +268,7 @@ renderer.setAnimationLoop(() => {
   // Le capot se soulève puis se pose sur la table, à droite du flacon.
   parts.Capot.position.set(capHome.x + e * 0.068,
     capHome.y - e * CAP_BASE + Math.sin(Math.PI * e) * 0.035, capHome.z + e * 0.01);
-  controls.update();
+  if (!photoMode) controls.update();
   renderer.render(scene, camera);
 });
 </script>

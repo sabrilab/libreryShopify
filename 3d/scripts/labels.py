@@ -1,7 +1,8 @@
 """Génère l'étiquette (sérigraphie dorée) de chaque parfum, et parfums.json.
 
 La texture couvre un carré de 48 x 48 mm centré sur la face avant du
-flacon, de z = 36 à 84 mm. Blanc + canal alpha : la teinte or est
+flacon (la texture est dessinée pour z = 36 à 84 mm ; geometrie.etiquette
+place le plan 4,5 mm plus haut, de 40,5 à 88,5 mm, calé sur les photos). Blanc + canal alpha : la teinte or est
 donnée par le matériau, pour que toutes les étiquettes partagent le même.
 
     python 3d/scripts/labels.py
@@ -20,7 +21,7 @@ OUT = os.path.join(WEB, "labels")
 
 SIZE = 2048
 MM = SIZE / 48.0          # pixels par millimètre
-TOP = 84.0                # z (mm) du bord haut de la texture
+TOP = 84.0                # z (mm) du bord haut de la texture (maquette de 100,6 mm)
 
 
 def y_of(z_mm):

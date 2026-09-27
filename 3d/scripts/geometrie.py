@@ -31,7 +31,7 @@ P = {
     "G_HAUT": 27.5, "G_POINTE": 19.0, "G_BAS": 11.0, "G_PROF": 5.0,
     # Cavité du jus.
     "CAV_MUR": 5.4, "CAV_Z0": 22.5, "CAV_Z1": 91.5, "CAV_R": 8.0,
-    "REMPLI": 0.9,
+    "REMPLI": 0.97,
     # Virole (bague dorée entre verre et capot).
     "VIR_R": 13.51, "VIR_H": 3.0,
     # Capot.
@@ -239,7 +239,7 @@ def vaporisateur(p):
     return col, act, tige, bpy.context.view_layer.objects.active
 
 
-def etiquette(p, z0=36.0, size=48.0):
+def etiquette(p, z0=40.5, size=48.0):
     bm = bmesh.new()
     uv = bm.loops.layers.uv.new("UVMap")
     y = -(p["B"] + 0.04)
