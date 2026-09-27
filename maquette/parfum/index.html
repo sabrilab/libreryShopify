@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="/parfum/">
 <title>Flacon Librery 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
@@ -26,6 +27,9 @@
   .toggle { margin-left: 8px; height: 30px; padding: 0 14px; border-radius: 15px; background: transparent;
     border: 1px solid var(--ink); color: var(--ink); font: 500 11px/1 "Hanken Grotesk", sans-serif;
     letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+  #version { position: fixed; right: 16px; top: 16px; font-size: 11px; line-height: 1.5;
+    color: var(--muted); text-align: right; letter-spacing: .04em; }
+  @media (max-width: 600px) { #version { top: 88px; right: 0; left: 0; text-align: center; font-size: 10px; } }
   #loading { position: fixed; inset: 0; display: grid; place-items: center; font-size: 12px;
     letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
 </style>
@@ -35,6 +39,7 @@
 <div id="loading">Chargement…</div>
 <header><small>Extrait de parfum · 100 ml</small><h1 id="nom">&nbsp;</h1></header>
 <nav id="nav"></nav>
+<div id="version"></div>
 
 <script type="importmap">
 { "imports": {
@@ -95,10 +100,18 @@ const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.08),
   new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
 shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.0005; scene.add(shadow);
 
+// Le suffixe ?v= évite qu'un ancien modèle reste en cache après une mise à jour.
+const modele = await fetch("modele.json", { cache: "no-store" }).then((r) => r.json()).catch(() => ({}));
+const v = encodeURIComponent(modele.date || Date.now());
 const [gltf, parfums] = await Promise.all([
-  new GLTFLoader().loadAsync("flacon-100ml.glb"),
-  fetch("parfums.json").then((r) => r.json()),
+  new GLTFLoader().loadAsync(`flacon-100ml.glb?v=${v}`),
+  fetch(`parfums.json?v=${v}`).then((r) => r.json()),
 ]);
+if (modele.date) {
+  const fmt = (d) => d.map((x) => String(x).replace(".", ",")).join(" × ");
+  document.getElementById("version").innerHTML =
+    `Modèle du ${modele.date}<br>Verre ${fmt(modele.verre)} mm · capot ${fmt(modele.capot)} mm<br>Hauteur ${String(modele.hauteur).replace(".", ",")} mm`;
+}
 const flacon = gltf.scene;
 scene.add(flacon);
 const parts = {};
@@ -124,7 +137,7 @@ const texLoader = new THREE.TextureLoader();
 const labels = {};
 function labelTexture(handle) {
   if (!labels[handle]) {
-    const t = texLoader.load(`labels/${handle}.png`);
+    const t = texLoader.load(`labels/${handle}.png?v=${v}`);
     t.colorSpace = THREE.SRGBColorSpace;
     t.flipY = false;               // convention glTF
     t.anisotropy = renderer.capabilities.getMaxAnisotropy();

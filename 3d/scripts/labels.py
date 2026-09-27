@@ -15,7 +15,8 @@ from parfums import PARFUMS
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EMBLEM = os.path.join(ROOT, "..", "maquette", "assets", "img", "v2", "emblem-blanc.png")
 FONT = os.path.join(ROOT, "fonts", "Cinzel-Regular.ttf")
-OUT = os.path.join(ROOT, "web", "labels")
+WEB = os.path.join(ROOT, "..", "maquette", "parfum")  # servi sur /parfum
+OUT = os.path.join(WEB, "labels")
 
 SIZE = 2048
 MM = SIZE / 48.0          # pixels par millimètre
@@ -76,5 +77,5 @@ if __name__ == "__main__":
     # Même source pour la visionneuse Three.js.
     data = {h: {"nom": " ".join(l), "verre": g, "jus": j}
             for h, (l, g, j) in PARFUMS.items()}
-    with open(os.path.join(ROOT, "web", "parfums.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(WEB, "parfums.json"), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)

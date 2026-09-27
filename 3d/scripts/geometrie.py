@@ -16,13 +16,15 @@ MM = 0.001
 
 P = {
     # Verre : bloc octogonal (rectangle aux arêtes verticales en pans coupés).
-    "A": 30.0,        # demi-largeur
-    "B": 18.92,        # demi-profondeur
+    # Largeur et profondeur élargies à l'œil (63 × 43 mm) après validation :
+    # l'ajustement photo donnait 60 × 37,8.
+    "A": 31.5,        # demi-largeur
+    "B": 21.5,        # demi-profondeur
     "C": 7.34,         # pan coupé vertical (jambe à 45°)
     "H": 103.46,       # hauteur du verre
     "EP": 11.06,       # hauteur des épaules (taillées à 45° sur les côtés)
-    "TA": 18.65,       # demi-largeur du dessus
-    "TB": 14.0,       # demi-profondeur du dessus (≥ rayon de la virole)
+    "TA": 20.15,       # demi-largeur du dessus
+    "TB": 16.6,       # demi-profondeur du dessus (≥ rayon de la virole)
     "TC": 3.37,        # pan coupé du dessus
     "PIED": 1.2,      # arrondi du pied
     # Rainure en V taillée dans chaque arête verticale, près du socle.

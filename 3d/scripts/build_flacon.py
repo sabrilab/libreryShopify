@@ -27,6 +27,7 @@ from parfums import PARFUMS  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MM = G.MM
 AJUSTEMENT = os.path.join(ROOT, "scripts", "ajustement.json")
+WEB = os.path.join(ROOT, "..", "maquette", "parfum")  # page /parfum du site Vercel
 
 
 def cotes():
@@ -109,7 +110,7 @@ def make_materials(handle):
     # Sérigraphie : or clair, l'alpha de la texture découpe les lettres.
     m, p = principled("Serigraphie")
     tex = m.node_tree.nodes.new("ShaderNodeTexImage")
-    tex.image = bpy.data.images.load(os.path.join(ROOT, "web", "labels", handle + ".png"))
+    tex.image = bpy.data.images.load(os.path.join(WEB, "labels", handle + ".png"))
     m.node_tree.links.new(tex.outputs["Alpha"], p.inputs["Alpha"])
     p.inputs["Base Color"].default_value = (*srgb_to_linear((1.0, 0.96, 0.88)), 1)
     p.inputs["Metallic"].default_value = 0.45
@@ -196,6 +197,21 @@ def add_volume_extension(path):
     struct.pack_into("<I", out, 8, len(out))
     with open(path, "wb") as f:
         f.write(out)
+
+
+def write_version(p):
+    """Date et cotes principales, affichées sur /parfum pour savoir d'un coup
+    d'œil quelle version du modèle est en ligne."""
+    import datetime
+    total = p["H"] + p["VIR_H"] + p["CH"]
+    info = {
+        "date": datetime.datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "verre": [round(2 * p["A"], 1), round(2 * p["B"], 1), round(p["H"], 1)],
+        "capot": [round(2 * p["CA"], 1), round(2 * p["CB"], 1), round(p["CH"], 1)],
+        "hauteur": round(total, 1),
+    }
+    with open(os.path.join(WEB, "modele.json"), "w", encoding="utf-8") as f:
+        json.dump(info, f, ensure_ascii=False, indent=1)
 
 
 # ------------------------------------------------------------------ rendus
@@ -293,9 +309,10 @@ if __name__ == "__main__":
 
     handle = args.render or "tonka-love"
     build(handle)
-    glb = os.path.join(ROOT, "web", "flacon-100ml.glb")
+    glb = os.path.join(WEB, "flacon-100ml.glb")
     export_glb(glb)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, "flacon-100ml.blend"))
     print("export", glb, os.path.getsize(glb) // 1024, "Ko")
+    write_version(cotes())
     if args.render:
         render(handle, os.path.join(ROOT, "renders"), args.size, args.samples)

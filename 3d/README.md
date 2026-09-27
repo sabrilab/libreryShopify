@@ -15,17 +15,24 @@ déclinaison à la volée.
 │   ├── ajuster.py        ajuste les cotes sur les photos → ajustement.json
 │   ├── comparer.py       photo | modèle rendu depuis la même caméra
 │   ├── parfums.py        couleurs verre / jus et nom de chaque parfum
-│   ├── labels.py         génère les étiquettes PNG + web/parfums.json
+│   ├── labels.py         génère les étiquettes PNG + parfums.json
 │   └── build_flacon.py   assemble le flacon, exporte le GLB, rendus Cycles
-├── web/
-│   ├── index.html        visionneuse Three.js (nuancier, capot amovible)
-│   ├── flacon-100ml.glb  le modèle (≈ 430 Ko)
-│   ├── parfums.json      déclinaisons, lu par la visionneuse
-│   └── labels/*.png      sérigraphie de chaque parfum (blanc + alpha)
 ├── renders/              planche de validation, rendus Cycles
 ├── fonts/                Cinzel (OFL) pour le lettrage des étiquettes
 └── flacon-100ml.blend    la scène Blender, à ouvrir pour retoucher
+
+maquette/parfum/          page /parfum du site Vercel, écrite par les scripts
+├── index.html            visionneuse Three.js (nuancier, capot amovible)
+├── flacon-100ml.glb      le modèle
+├── modele.json           date et cotes du modèle, affichées sur la page
+├── parfums.json          déclinaisons, lu par la visionneuse
+└── labels/*.png          sérigraphie de chaque parfum (blanc + alpha)
 ```
+
+**Voir le modèle en ligne** : `build_flacon.py` exporte directement dans
+`maquette/parfum/`. Un commit poussé suffit : Vercel (projet
+`librery-refonte`, relié au dépôt) redéploie et la page `/parfum` affiche
+le nouveau modèle, avec sa date et ses cotes en haut à droite.
 
 ## Le modèle
 
@@ -47,8 +54,8 @@ photo et monte photo | modèle côte à côte : voir
 
 | Pièce | Cotes (mm) |
 |---|---|
-| Verre | 60 × 37,8 × 103,5 ; arêtes verticales en pans coupés de 7,3 ; épaules à 45° sur 11 de haut |
-| Dessus du verre | 37,3 × 28, pans coupés de 3,4 |
+| Verre | 63 × 43 × 103,5 (l'ajustement photo donnait 60 × 37,8 ; élargi et approfondi à l'œil) ; arêtes verticales en pans coupés de 7,3 ; épaules à 45° sur 11 de haut |
+| Dessus du verre | 40,3 × 33,2, pans coupés de 3,4 |
 | Entailles du socle | V dans chaque arête, de 11 à 27,5 de haut, pointe à 19, profondeur 5 |
 | Cavité (jus) | parois de 5,4, fond de verre de 22,5 |
 | Virole | Ø 27 × 3 visibles |
@@ -78,7 +85,7 @@ Ajouter un parfum : une ligne dans `parfums.py`, puis relancer
 ## Visionneuse web
 
 ```sh
-npx http-server 3d/web      # puis http://localhost:8080/#palmeira
+npx http-server maquette    # puis http://localhost:8080/parfum/#palmeira
 ```
 
 `?fixe` coupe la rotation automatique. Three.js 0.170 est chargé depuis
