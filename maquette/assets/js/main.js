@@ -474,6 +474,19 @@
   /* date de livraison estimée : +3 jours ouvrés */
   function eta() { const d = new Date(); let n = 0; while (n < 3) { d.setDate(d.getDate() + 1); if (d.getDay() % 6) n++; } return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }); }
 
+  /* Variantes de galerie produit (ordinateur) à faire valider : ?galerie=a|b|c|d */
+  const GAL = (() => {
+    const q = (new URLSearchParams(location.search).get('galerie') || '').toLowerCase();
+    try { if (/^[abcd]$/.test(q)) localStorage.setItem('librery-gal', q); return /^[abcd]$/.test(q) ? q : (localStorage.getItem('librery-gal') || 'a'); } catch (e) { return /^[abcd]$/.test(q) ? q : 'a'; }
+  })();
+  function galSwitcher() {
+    const names = { a: 'Mosaïque', b: 'Pleine colonne', c: 'Vignettes', d: 'Diaporama' };
+    document.body.insertAdjacentHTML('beforeend', `<div class="gal-switch" role="group" aria-label="Variante de galerie"><span>Galerie</span>${Object.keys(names).map(k => `<button type="button" data-g="${k}" class="${k === GAL ? 'is-on' : ''}"><b>${k.toUpperCase()}</b> ${names[k]}</button>`).join('')}</div>`);
+    $$('.gal-switch button').forEach(b => b.addEventListener('click', () => {
+      const u = new URL(location.href); u.searchParams.set('galerie', b.dataset.g); location.href = u.toString();
+    }));
+  }
+
   function initProduct() {
     const root = $('#product'); if (!root) return;
     const p = byHandle(new URLSearchParams(location.search).get('p')) || PRODUCTS[0];
@@ -492,8 +505,9 @@
     const notes = p.materials ? p.materials.list : p.notes;
 
     root.innerHTML = `
-      <section class="pdp">
+      <section class="pdp gal-${GAL}">
         <div class="pdp__media">
+          <div class="pdp__thumbs">${p.gallery.map((g, i) => `<button type="button" data-i="${i}" aria-label="Image ${i + 1}"${i ? '' : ' class="is-cur"'}><img src="${src(g)}" alt=""></button>`).join('')}</div>
           <div class="pdp__gallery" id="gallery">${p.gallery.map((g, i) => {
             const cap = g === p.pack ? `${esc(p.name)}, 100 ml` : g === p.pack30 ? `${esc(p.name)}, 30 ml` : '';
             // rythme : deux packshots côte à côte, une pleine largeur, deux, une…
@@ -501,6 +515,7 @@
             return `<figure class="${full ? 'is-full' : ''}${g === p.pack || g === p.pack30 ? ' is-pack' : ''}">${pic(g, p.name, full ? '(max-width: 900px) 100vw, 58vw' : '(max-width: 900px) 100vw, 29vw', '', i === 0)}<figcaption class="fig">fig. ${i + 1}${cap ? ' — ' + cap : ''}</figcaption></figure>`;
           }).join('')}</div>
           <span class="pdp__count" id="gcount">1 / ${p.gallery.length}</span>
+          <div class="pdp__nav"><button type="button" data-d="-1">Précédent</button><span id="gnum">1 / ${p.gallery.length}</span><button type="button" data-d="1">Suivant</button></div>
         </div>
         <div class="pdp__info"><div class="pdp__box">
           <div class="pdp__crumbs"><span><a href="/bibliotheque">Bibliothèque</a> / <a href="/collection?c=${p.collection}">${esc(col.title)}</a></span>${p.folio ? `<span class="folio">p. ${p.folio}</span>` : ''}</div>
@@ -560,7 +575,9 @@
       // mobile : la galerie glisse sur le flacon du format choisi
       const gi = p.gallery.indexOf(current.id === '30' ? p.pack30 : p.pack), gal = $('#gallery');
       if (gi > -1 && gal.scrollWidth > gal.clientWidth + 4) gal.scrollTo({ left: gi * gal.clientWidth, behavior: 'smooth' });
+      showFormat(gi);
     };
+    let showFormat = () => {};
     $$('#sizes button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.f)));
     const add = () => {
       if (p.builder) { if (picks.length !== p.builder) { $('.builder').scrollIntoView({ behavior: 'smooth', block: 'center' }); return toast(`Choisissez ${p.builder} parfums`); } return addToCart(p.handle, current.id, [...picks]); }
@@ -583,6 +600,21 @@
     g.addEventListener('scroll', () => { $('#gcount').textContent = `${Math.round(g.scrollLeft / g.clientWidth) + 1} / ${p.gallery.length}`; }, { passive: true });
 
     // barre d'achat collante
+    /* galerie ordinateur : variantes C (vignettes) et D (diaporama) n'affichent qu'une image à la fois */
+    const figs = $$('#gallery figure'); let cur = 0;
+    const show = n => {
+      cur = (n + figs.length) % figs.length;
+      figs.forEach((f, k) => f.classList.toggle('is-cur', k === cur));
+      $$('.pdp__thumbs button').forEach((b, k) => b.classList.toggle('is-cur', k === cur));
+      $('#gnum').textContent = `${cur + 1} / ${figs.length}`;
+    };
+    show(0);
+    $$('.pdp__thumbs button').forEach(b => b.addEventListener('click', () => show(+b.dataset.i)));
+    $$('.pdp__nav button').forEach(b => b.addEventListener('click', () => show(cur + +b.dataset.d)));
+    document.addEventListener('keydown', e => { if (!/gal-[cd]/.test($('.pdp').className) || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; if (e.key === 'ArrowRight') show(cur + 1); if (e.key === 'ArrowLeft') show(cur - 1); });
+    showFormat = gi => { if (gi > -1) show(gi); };
+    galSwitcher();
+
     const st = $('#sticky');
     // (un écouteur de défilement plutôt qu'un IntersectionObserver : un défilement rapide peut sauter le bouton sans le croiser)
     let ticking = false;
