@@ -1,16 +1,32 @@
 <!-- title: LIBRERY — La bibliothèque olfactive | page: home | body: page-home -->
 
-<!-- SECTION : hero — image de campagne (remplaçable par le film de 30 s) -->
-<section class="s-hero" aria-label="LIBRERY">
-  {{pic hero-portrait|Campagne LIBRERY, Hot Sand|100vw|1}}
+<!-- SECTION : hero-slideshow — diaporama de campagne, barre de progression par image
+     (Shopify : section « slideshow », un bloc par image, image mobile distincte) -->
+<section class="s-hero" aria-label="LIBRERY" aria-roledescription="carrousel" data-hero>
+  <div class="s-hero__slides">
+    <div class="s-hero__slide is-on" data-href="/bibliotheque" data-label="Entrer dans la bibliothèque" data-fig="fig. 1 — Hot Sand, Summer Vibes">
+      <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/hero-portrait-m.webp"><img src="/assets/img/v2/hero-portrait.webp" alt="Campagne LIBRERY, Hot Sand" fetchpriority="high" decoding="async"></picture>
+    </div>
+    <div class="s-hero__slide" data-href="/collection?c=skin-obsession" data-label="Découvrir Skin Obsession" data-fig="fig. 2 — Skin Obsession, la nouveauté">
+      <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/skin-femme-flacons-m.webp"><img src="/assets/img/v2/hero-skin.webp" alt="Skin Obsession, la nouvelle collection" loading="lazy" decoding="async"></picture>
+    </div>
+    <div class="s-hero__slide" data-href="/produit?p=coffret-a-composer" data-label="Composer son coffret" data-fig="fig. 3 — Toute la bibliothèque, en 2 ml">
+      <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/cover-pile-m.webp"><img src="/assets/img/v2/hero-collection.webp" alt="La bibliothèque LIBRERY au complet" loading="lazy" decoding="async"></picture>
+    </div>
+  </div>
   <div class="scrim-t"></div><div class="scrim-b"></div>
   <div class="s-hero__content"><div class="wrap">
     <h1 class="s-hero__mark">{{logo}}</h1>
-    <div class="s-hero__side">
-      <a class="tlink" href="/bibliotheque">Entrer dans la bibliothèque</a>
-      <p class="fig">fig. 1 — Hot Sand, Summer Vibes</p>
+    <div class="s-hero__side" aria-live="polite">
+      <a class="tlink" href="/bibliotheque" data-hero-link>Entrer dans la bibliothèque</a>
+      <p class="fig" data-hero-fig>fig. 1 — Hot Sand, Summer Vibes</p>
     </div>
   </div></div>
+  <div class="s-hero__bars wrap" role="tablist" aria-label="Images">
+    <button type="button" role="tab" aria-label="Image 1" aria-selected="true"><span></span></button>
+    <button type="button" role="tab" aria-label="Image 2"><span></span></button>
+    <button type="button" role="tab" aria-label="Image 3"><span></span></button>
+  </div>
 </section>
 
 <!-- SECTION : product-grid — nouveau chapitre -->
@@ -27,7 +43,7 @@
 
 <!-- SECTION : image-mosaic — la campagne Skin Obsession -->
 <section class="block block--tight">
-  <div class="wrap" data-mosaic="skin-obsession" data-fig="2"></div>
+  <div class="wrap" data-mosaic="skin-obsession" data-fig="4"></div>
 </section>
 
 <!-- SECTION : book — le catalogue, présenté comme un livre ouvert (index + couverture) -->
@@ -65,7 +81,7 @@
 <!-- SECTION : image-with-caption — la campagne -->
 <section class="s-figure">
   {{pic hero-emotion|Campagne Skin Obsession|100vw}}
-  <div class="wrap"><p class="fig">fig. 5 — Skin Obsession, la campagne</p><p class="fig">Paris, 2026</p></div>
+  <div class="wrap"><p class="fig">fig. 7 — Skin Obsession, la campagne</p><p class="fig">Paris, 2026</p></div>
 </section>
 
 <!-- SECTION : product-grid — Summer Vibes -->
@@ -82,5 +98,5 @@
 
 <!-- SECTION : image-mosaic — la campagne Summer Vibes -->
 <section class="block block--tight">
-  <div class="wrap" data-mosaic="summer-vibes" data-fig="6"></div>
+  <div class="wrap" data-mosaic="summer-vibes" data-fig="8"></div>
 </section>

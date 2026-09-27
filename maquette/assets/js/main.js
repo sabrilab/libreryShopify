@@ -336,7 +336,7 @@
   /* mosaïque de trois images légendées (bloc « image-mosaic » dans Shopify) */
   const mosaic = (key, n0 = 1) => { const c = COLLECTIONS[key]; return c && c.mosaic ? `<div class="mosaic">${c.mosaic.map(([img, cap], i) =>
       `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}<figcaption class="fig">fig. ${n0 + i} — ${esc(cap)}</figcaption></figure>`).join('')}</div>` : ''; };
-  const builderTile = () => tile('/produit?p=coffret-a-composer', 'hero-collection', 'Coffret <em>à composer</em>', 'Cinq parfums en 2 ml — 30 €');
+  const builderTile = (img = 'hero-collection') => tile('/produit?p=coffret-a-composer', img, 'Coffret <em>à composer</em>', 'Cinq parfums en 2 ml — 30 €');
   const storesTile = () => tile('/points-de-vente', 'camp-mercedes', 'Nos <em>adresses</em>', 'Treize lieux où nos récits prennent vie');
   const quizTile = () => tile('/portrait-olfactif', 'camp-livre', 'Portrait <em>olfactif</em>', 'Quatre questions pour trouver votre parfum');
 
@@ -361,12 +361,42 @@
     const so = $('#so-grid'), sv = $('#sv-grid'); if (!so) return;
     so.innerHTML = PRODUCTS.filter(p => p.collection === 'skin-obsession').map(card).join('');
     const svp = PRODUCTS.filter(p => p.collection === 'summer-vibes').map(card);
-    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + builderTile() + quizTile();
+    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + builderTile('camp-mains') + quizTile();
     $$('[data-mosaic]').forEach(el => { el.innerHTML = mosaic(el.dataset.mosaic, +el.dataset.fig || 1); });
     const sh = $('#shelf');
     if (sh) sh.innerHTML = SHELF.map(m => { const p = byHandle(m.h); return `<a class="shelf__item" href="/produit?p=${m.h}"><figure>${pic(m.img, m.t, '(max-width: 800px) 62vw, 22vw')}</figure>
         <span class="fig">${esc(m.t)}</span><span class="shelf__name">${nm(p.name)}</span></a>`; }).join('');
     $$('[data-shelf]').forEach(b => b.addEventListener('click', () => sh.scrollBy({ left: +b.dataset.shelf * (sh.clientWidth + 20) / 2, behavior: 'smooth' })));
+  }
+
+  /* Diaporama d'ouverture : fondu + lent zoom, une barre de progression par image,
+     glisser au doigt, pause quand l'onglet est caché, aucun défilement automatique si l'utilisateur réduit les animations */
+  function initHero() {
+    const h = $('[data-hero]'); if (!h) return;
+    const slides = $$('.s-hero__slide', h), bars = $$('.s-hero__bars button', h), link = $('[data-hero-link]', h), fig = $('[data-hero-fig]', h);
+    const DUR = 6500, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let i = 0, t0 = performance.now(), paused = false, pauseAt = 0;
+    const go = n => {
+      i = (n + slides.length) % slides.length; t0 = performance.now();
+      slides.forEach((s, k) => s.classList.toggle('is-on', k === i));
+      bars.forEach((b, k) => { b.setAttribute('aria-selected', k === i); b.firstChild.style.width = k < i ? '100%' : '0%'; });
+      const d = slides[i].dataset; h.querySelector('.s-hero__side').classList.add('is-swap');
+      setTimeout(() => { link.href = d.href; link.textContent = d.label; fig.textContent = d.fig; h.querySelector('.s-hero__side').classList.remove('is-swap'); }, 350);
+    };
+    bars.forEach((b, k) => b.addEventListener('click', () => go(k)));
+    const tick = now => {
+      if (!paused && !still) {
+        const p = Math.min(1, (now - t0) / DUR);
+        bars[i].firstChild.style.width = (p * 100) + '%';
+        if (p >= 1) go(i + 1);
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) { paused = true; pauseAt = performance.now(); } else { t0 += performance.now() - pauseAt; paused = false; } });
+    let x0 = null;
+    h.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+    h.addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 45) go(i + (dx < 0 ? 1 : -1)); x0 = null; });
   }
 
   function initLibrary() {
@@ -652,6 +682,6 @@
   initCollection();            // avant l'en-tête : fixe le titre courant
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
-  initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initContact();
+  initHero(); initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initContact();
   renderCart(); bindToasts(); bindCards(); accordions(); newsletters(); balanceGrids();
 })();
