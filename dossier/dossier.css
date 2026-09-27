@@ -166,3 +166,4 @@ figure { margin: 0; }
 .duo .desk .scr { aspect-ratio: 16 / 8.2; }
 .chap__img img.pos-old { object-position: 22% 62%; transform: scale(1.35); transform-origin: 22% 62%; }
 .chap__img img[src*="old-hero"] { object-position: 100% 30%; }
+.phones--small .phone .scr { width: 34mm; }

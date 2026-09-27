@@ -206,12 +206,12 @@ page('III. Direction artistique', f'''
       <ul class="dash">
         <li><b>Titre courant</b> en haut de chaque page : « LIBRERY — Summer Vibes ».</li>
         <li><b>Folios du catalogue</b> : Summer Vibes p. 14, Skin Obsession p. 32, Tonka Love p. 43. Le site et le catalogue se renvoient l’un à l’autre.</li>
-        <li><b>Un vrai sommaire</b> sur l’accueil, avec points de conduite.</li>
+        <li><b>Le catalogue en livre ouvert</b> sur l’accueil : la couverture en objet, un index avec les numéros de page.</li>
         <li><b>Des légendes de figures</b> sous les images : « fig. 2 — Skin Obsession, la campagne ».</li>
         <li><b>Des chapitres</b> : collections, préface, lexique.</li>
       </ul>
     </div>
-    {desk('d-home-toc', 'Le sommaire de l’accueil et la couverture du catalogue.')}
+    {desk('d-home-toc', 'Le catalogue sur l’accueil : couverture, index avec folios et vignettes.')}
   </div>''')
 
 swatches = [('Papier', '#f8f5ef'), ('Studio', '#f0eeef'), ('Filet', '#e2d8c9'), ('Or', '#b7916a'), ('Gris', '#6a6159'), ('Encre', '#2f2b28'), ('Espresso', '#3a2a1e')]
@@ -221,6 +221,7 @@ page('III. Direction artistique', f'''
       <p class="kicker">Typographie</p>
       <div class="spec"><span class="spec__big">Aa</span><div><b>Libre Caslon</b><span>Titres et texte : un caractère de livre, dessiné d’après les fontes de William Caslon (XVIIIᵉ siècle).</span></div></div>
       <div class="spec"><span class="spec__big sans">Aa</span><div><b>Hanken Grotesk</b><span>Interface : boutons, prix, étiquettes. Discrète, à petite taille.</span></div></div>
+      <p class="note" style="margin:3mm 0 0">Interlignage resserré pour un gris typographique plus dense, comme dans un livre : 1,5 pour le texte, 1,42 pour les chapôs.</p>
       <p class="rule">Tonka <em>Love</em> · Vanilla <em>Plum</em> · Summer <em>Vibes</em></p>
       <p>L’italique n’est utilisé que pour le second mot des noms, comme chez Maison Crivelli. C’est la seule fantaisie, et elle devient une signature.</p>
     </div>
@@ -276,21 +277,34 @@ page('IV. Les images', f'''
 # ------------------------------------------------------------------ V. pages
 chapter('V', 'Le site, page par page', 'Ordinateur et mobile, conçus ensemble.', 'a-hero-skin')
 
+page('V. Accueil — l’ouverture', f'''
+  <p class="kicker">L’ouverture</p>
+  <h2 class="h2">Un diaporama, une barre de progression par image</h2>
+  <div class="row3">
+    {desk('d-slide1', '1. La campagne Hot Sand : « Entrer dans la bibliothèque ».')}
+    {desk('d-slide2', '2. Skin Obsession, la nouveauté : « Découvrir Skin Obsession ».')}
+    {desk('d-slide3', '3. Toute la bibliothèque : « Composer son coffret ».')}
+  </div>
+  <div class="cols-img cols-img--r" style="height:auto">
+    <p class="note" style="margin:0">Comme le voulait le Canva de Nolwenn : les images s’enchaînent en fondu avec un lent zoom, un fin segment se remplit sous chacune, et l’on peut cliquer pour passer à la suivante. Sur mobile, on fait glisser du doigt, et chaque image a sa version verticale. Pause automatique quand l’onglet est caché.</p>
+    <div class="phones phones--3 phones--small">{phone('m-slide1', '')}{phone('m-slide2', '')}{phone('m-slide3', '')}</div>
+  </div>''')
+
 page('V. Accueil', f'''
   <div class="row3">
-    {desk('d-home-hero', 'Ouverture : une seule image de campagne, le logo, un lien. Pas de carrousel.')}
+    {desk('d-home-hero', 'Ouverture : un diaporama de campagne, le logo, un lien par image.')}
     {desk('d-home-skin', 'Skin Obsession, la nouveauté, en premier, avec son folio p. 32.')}
     {desk('d-home-shelf', 'L’étagère des matières : une nature morte par parfum.')}
   </div>
   <div class="row3">
-    {desk('d-home-toc', 'Le sommaire, qui renvoie au catalogue en 3D et au PDF.')}
+    {desk('d-home-toc', 'Le catalogue en livre ouvert : couverture, index, « Feuilleter le catalogue ».')}
     {desk('d-home-summer', 'Summer Vibes, avec une grande image de campagne dans la grille.')}
     {desk('d-home-footer', 'Services, lettre de la maison, pied de page espresso.')}
   </div>''')
 
 page('V. Accueil — mobile', f'''
   <div class="phones">
-    {phone('m-home-hero', 'Ouverture')}{phone('m-home-skin', 'Première carte en pleine largeur')}{phone('m-home-toc', 'Le sommaire')}{phone('m-home-shelf', 'L’étagère, à faire glisser')}{phone('m-menu', 'Le menu')}
+    {phone('m-home-hero', 'Ouverture')}{phone('m-home-skin', 'Première carte en pleine largeur')}{phone('m-home-index', 'L’index du catalogue')}{phone('m-home-shelf', 'L’étagère, à faire glisser')}{phone('m-menu', 'Le menu')}
   </div>
   <p class="note center">Sur mobile, rien n’est une version réduite : chaque bloc a sa mise en page propre, pensée pour le pouce.</p>''')
 
@@ -357,6 +371,17 @@ page('V. Panier et menu', f'''
   <div class="cols-img">
     <div class="stack">{desk('d-cart', 'Le panier : 2 ml du parfum acheté ajouté d’office, deux échantillons au choix, écrin offert, seuil de livraison.')}{desk('d-mega', 'Le menu : collections, aides au choix, familles.')}</div>
     <div class="phones phones--2">{phone('m-cart', 'Panier mobile')}{phone('m-carte', 'La Carte sur mobile')}</div>
+  </div>''')
+
+page('V. Pied de page', f'''
+  <div class="cols-img">
+    {desk('d-footer', 'Le pied de page : la phrase de la maison, le plan du site, le logo sur toute la largeur.')}
+    <div>
+      <p class="kicker">Le pied de page</p>
+      <h2 class="h2">Minimaliste, mais monumental</h2>
+      <p>Comme chez les grandes maisons, le pied de page signe chaque page : la phrase de la maison en grand, un plan du site aéré en quatre colonnes, puis le logo LIBRERY sur toute la largeur.</p>
+      <div class="phones phones--2">{phone('m-footer', 'Sur mobile')}{phone('m-home-toc', 'Le catalogue sur mobile')}</div>
+    </div>
   </div>''')
 
 # ------------------------------------------------------------------ VI. qualité
