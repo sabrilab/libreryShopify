@@ -580,7 +580,7 @@ def poire(i, moitie=False, queue=True, pepins=((-3.0, 19.0, 0.25), (2.6, 25.5, -
     modifs(ob, subsurf=1)
     # Même Williams jaune-vert du début à la fin (entière ou coupée).
     peau = mat_texture("poire_williams", (0.78, 0.76, 0.32), (0.64, 0.58, 0.22),
-                       0.45, echelle=700, seuil=(0.64, 0.68))
+                       0.45, echelle=1600, seuil=(0.66, 0.69))
     assign(ob, peau)
     parts = []
     if moitie:

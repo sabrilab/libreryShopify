@@ -110,7 +110,7 @@ FINALE = {
     "tonka-love": [0, 1, 2, 5, 6, 4, 11, 9],          # 3 fèves, 2 amandes, ambre, zeste, copeau
 }
 ARRIVEE = 3.54              # durée de l'attraction (s) : 15 / φ³ ; départ à 15 / φ ≈ 9,27 s moins le recul
-DEBUT_ATTRACTION = 8.6
+DEBUT_ATTRACTION = 9.0
 ECHELLE_INGREDIENTS = 1.15   # un peu plus grands que nature : lisibles à l'écran
 # Fèves et amandes sont minuscules à côté du flacon : on les grossit davantage.
 ECHELLE_PARFUM = {"tonka-love": 1.45}
@@ -164,7 +164,16 @@ class Danseur:
             return Vector((0, 0, 0.03)) + off * 0.4, Vector((0.25 * math.sin(0.5 * t), 0.2 * math.sin(0.4 * t + 1), 0.55 * t))
         return rc + off, self.r0 + self.vr * t
 
+    decalages = None                             # {image: Vector} calculé par eviter_contacts()
+
     def pose(self, t):
+        p, r = self.pose_brute(t)
+        if self.decalages:
+            f = min(max(int(round(t * FPS)) + 1, 1), int(DUREE * FPS))
+            p = p + self.decalages.get(f, Vector())
+        return p, r
+
+    def pose_brute(self, t):
         p_d, r_d = self.danse(t)
         debut = DEBUT_ATTRACTION + (0 if self.flacon else self.retard)
         k = lisse((t - debut) / 2.4)
@@ -213,7 +222,7 @@ VEDETTES = {
     "magnetic-flowers": [(0, 150), (2, 120), (4, 110)],    # demi-poire, jasmin, fleur d'oranger
     "vanilla-plum": [(3, 120), (0, 105), (9, 110)],        # demi-prune, gousse, orchidée
 }
-REVEAL = 8.0      # début du dernier plan : on recule et le flacon se révèle
+REVEAL = 15 / ((1 + 5 ** 0.5) / 2)       # début du dernier plan : on recule et le flacon se révèle
 
 
 def repere_flacon(flacon_d, t):
@@ -259,6 +268,77 @@ def plans(handle, danseurs, flacon_d):
             return m @ cam_loc, m @ c_loc, 22.0, focale
         return f
 
+    def plan_fpv(k, azim, elev_fin, frole=1 / PHI ** 2):
+        """Plan « drone FPV » : départ au ras de la peau de l'ingrédient (à
+        2,5 mm, grand-angle, mise au point à 14 mm : on ne voit que sa
+        texture), glisse le long de la surface, puis remonte en prenant de la
+        hauteur et recule pour le révéler en entier. Frôlement sur 1/φ² du
+        plan, révélation sur le reste ; l'orbite tourne de 137,5°/φ² (angle
+        d'or) et l'ouverture passe de f/2,8 à f/2,8·φ²."""
+        i, dist = VEDETTES[handle][k]
+        d = ing[i % len(ing)]
+        memo = {}
+
+        def maille(t):
+            p, r = d.pose(t)
+            M = Matrix.Translation(p) @ Euler(tuple(r)).to_matrix().to_4x4() @ Matrix.Diagonal((*d.ob.scale, 1.0))
+            ob = d.ob
+            if ob.type == "EMPTY":                     # poire fendue : la moitié A
+                ob = next(c for c in ob.children if c.name.endswith("_A"))
+                M = M @ ob.matrix_basis
+            return ob, M, p
+
+        def peau(t):
+            ob, M, centre = maille(t)
+            if "v" not in memo:
+                a = math.radians(azim)
+                vers_cam = Vector((math.sin(a), -math.cos(a), 0.15)).normalized()
+                dl = (M.to_3x3().inverted() @ vers_cam).normalized()
+                # Seulement la « peau » : pétales, écorce, chair… jamais une
+                # tige, une feuille, une étamine ou un pédoncule.
+                exclus = ("tige", "queue", "feuille", "filet", "pistil", "calice", "anthere",
+                          "pedoncule", "coeur", "trait", "pepin", "sauge")
+                mats = ob.data.materials
+                ok = set()
+                for poly in ob.data.polygons:
+                    nom = mats[poly.material_index].name if poly.material_index < len(mats) else ""
+                    if not nom.startswith(exclus) and "chair" not in nom:
+                        ok.update(poly.vertices)
+                cands = [ob.data.vertices[k] for k in ok] or list(ob.data.vertices)
+                memo["v"] = max(cands, key=lambda v: v.co.dot(dl)).index
+            v = ob.data.vertices[memo["v"]]
+            S = M @ v.co
+            n = (M.to_3x3().inverted().transposed() @ v.normal).normalized()
+            tan = n.cross(Vector((0, 0, 1)))
+            if tan.length < 0.2:
+                tan = n.cross(Vector((1, 0, 0)))
+            return S, n, tan.normalized(), centre
+
+        course = 18 * MM
+
+        def f(t, t0, t1):
+            u = (t - t0) / (t1 - t0)
+            S, n, tan, centre = peau(t)
+            # Au ras de la peau (5 → 8 mm), regard plongeant ≈ 40° : la
+            # texture remplit l'image, la netteté court sur la surface.
+            haut = lambda x: (9.0 + 4.0 * x) * MM
+            vise = lambda x: S + tan * (course * (x - 0.5) + 5 * MM) - n * 0.5 * MM
+            if u <= frole:
+                x = u / frole
+                cam = S + n * haut(x) + tan * course * (x - 0.5)
+                return cam, vise(x), 11.0, 40.0
+            x = (u - frole) / (1 - frole)
+            e = lisse(x)
+            cam0 = S + n * haut(1) + tan * course * 0.5
+            cib0 = vise(1)
+            dS = S - centre
+            a_s = math.degrees(math.atan2(dS.x, -dS.y))
+            cam1 = orbite(centre, dist, a_s + 137.5 / PHI ** 2, elev_fin)
+            cam = cam0.lerp(cam1, e) + Vector((0, 0, 1)) * math.sin(math.pi * e) * 0.35 * dist * MM   # reprend de la hauteur
+            cib = cib0.lerp(centre, e ** (1 / PHI))
+            return cam, cib, 11.0 - 6.0 * e, 40.0 + 10.0 * e
+        return f
+
     capot = plan_flacon((0, 0, 128), 62, -55, -20, 38, 28)
     verre = plan_flacon((-27, -18, 18), 58, -30, -62, -14, -4)
     etiquette = plan_flacon((14, -24, 104), 60, -35, -5, 12, 4, cible_fin=(4, -24, 58))
@@ -276,13 +356,15 @@ def plans(handle, danseurs, flacon_d):
         cib1 = Vector((0, 0.0, 0.0676))
         return cam0.lerp(cam1, k), cib0.lerp(cib1, k), 22.0 - 15.7 * k, 60.0 + 25.0 * k
 
+    # Découpage en nombre d'or : reveal à 15/φ = 9,27 s ; plans FPV de
+    # 2,19 s (15/φ⁴·…), détails du flacon de 1,35 s, dernier plan de 0,84 s.
     return [
-        (0.00, 1.50, plan_ingredient(0, -30, 18)),
-        (1.50, 2.75, capot),
-        (2.75, 4.25, plan_ingredient(1, 25, 10)),
-        (4.25, 5.50, verre),
-        (5.50, 6.90, plan_ingredient(2, -15, 25)),
-        (6.90, REVEAL, etiquette),
+        (0.00, 2.19, plan_fpv(0, -30, 26)),
+        (2.19, 3.54, capot),
+        (3.54, 5.73, plan_fpv(1, 25, 21)),
+        (5.73, 7.08, verre),
+        (7.08, 8.43, plan_fpv(2, -15, 30, frole=1 / PHI)),
+        (8.43, REVEAL, etiquette),
         (REVEAL, DUREE + 1, reveal),
     ]
 
@@ -397,11 +479,108 @@ def resserrer(danseurs):
             d.fp.y = max(d.fp.y, 0.045)
 
 
+def capsule_locale(ob):
+    """Volume de collision d'un ingrédient : une capsule (segment + rayon)
+    le long de son axe le plus long, en coordonnées locales (mm → m déjà)."""
+    if ob.type == "EMPTY":
+        pts = [c.matrix_basis @ Vector(b) for c in ob.children for b in c.bound_box]
+        marge = 7 * MM                           # la poire s'ouvre : un peu plus large
+    else:
+        pts = [Vector(b) for b in ob.bound_box]
+        marge = 0.0
+    lo = Vector(tuple(min(q[k] for q in pts) for k in range(3)))
+    hi = Vector(tuple(max(q[k] for q in pts) for k in range(3)))
+    dims = hi - lo
+    ordre = sorted(range(3), key=lambda k: dims[k])
+    grand, moyen = ordre[2], ordre[1]
+    r = 0.5 * dims[moyen] * 0.8 + marge
+    demi = max(0.0, 0.5 * dims[grand] - r)
+    c = (lo + hi) / 2
+    axe = Vector((0, 0, 0))
+    axe[grand] = 1.0
+    return c - axe * demi, c + axe * demi, r
+
+
+def segments_proches(p1, q1, p2, q2):
+    """Points les plus proches entre deux segments [p1,q1] et [p2,q2]."""
+    d1, d2, r = q1 - p1, q2 - p2, p1 - p2
+    a, e, f = d1.dot(d1), d2.dot(d2), d2.dot(r)
+    if a < 1e-12 and e < 1e-12:
+        return p1, p2
+    if a < 1e-12:
+        s, t = 0.0, max(0.0, min(1.0, f / e))
+    else:
+        c = d1.dot(r)
+        if e < 1e-12:
+            t, s = 0.0, max(0.0, min(1.0, -c / a))
+        else:
+            b = d1.dot(d2)
+            den = a * e - b * b
+            s = max(0.0, min(1.0, (b * f - c * e) / den)) if den > 1e-12 else 0.0
+            t = (b * s + f) / e
+            if t < 0:
+                t, s = 0.0, max(0.0, min(1.0, -c / a))
+            elif t > 1:
+                t, s = 1.0, max(0.0, min(1.0, (b - c) / a))
+    return p1 + d1 * s, p2 + d2 * t
+
+
+def eviter_contacts(danseurs, flacon_d):
+    """Les ingrédients ne se traversent jamais, ni le flacon : image par
+    image, quand deux capsules s'interpénètrent, on écarte les objets le
+    long de la ligne de contact. Le décalage est gardé d'une image à l'autre
+    et se relâche doucement (×1/φ^(1/8) par image) : ils s'effleurent, se
+    poussent, puis reprennent leur trajectoire, sans à-coups."""
+    ing = [d for d in danseurs if not d.flacon]
+    caps = []
+    for d in ing:
+        a, b, r = capsule_locale(d.ob)
+        caps.append((a, b, r * d.ob.scale.x))
+    relache = PHI ** (-1 / 8)
+    dec = [Vector() for _ in ing]
+    for d in ing:
+        d.decalages = {}
+    for f in range(1, int(DUREE * FPS) + 1):
+        t = (f - 1) / FPS
+        poses = []
+        for d, (a, b, r) in zip(ing, caps):
+            p, rot = d.pose_brute(t)
+            M = Matrix.Translation(p) @ Euler(tuple(rot)).to_matrix().to_4x4() @ Matrix.Diagonal((*d.ob.scale, 1.0))
+            poses.append((M @ a, M @ b, r))
+        mf = repere_flacon(flacon_d, t)
+        fa, fb, fr = mf @ Vector((0, 0, 0.012)), mf @ Vector((0, 0, 0.128)), 0.030
+        dec = [v * relache for v in dec]
+        for _ in range(4):
+            for i in range(len(ing)):
+                ai, bi, ri = poses[i]
+                ai, bi = ai + dec[i], bi + dec[i]
+                # contre le flacon (immobile)
+                pi, pf = segments_proches(ai, bi, fa, fb)
+                v = pi - pf
+                if v.length < ri + fr:
+                    n = v.normalized() if v.length > 1e-6 else Vector((0, 1, 0))
+                    dec[i] += n * (ri + fr - v.length)
+                for j in range(i + 1, len(ing)):
+                    aj, bj, rj = poses[j]
+                    aj, bj = aj + dec[j], bj + dec[j]
+                    pi, pj = segments_proches(ai, bi, aj, bj)
+                    v = pi - pj
+                    if v.length < ri + rj:
+                        n = v.normalized() if v.length > 1e-6 else Vector((0, 1, 0))
+                        pousse = n * (ri + rj - v.length) * 0.5
+                        dec[i] += pousse
+                        dec[j] -= pousse
+        for d, v in zip(ing, dec):
+            d.decalages[f] = v.copy()
+
+
 def ouvrir_poire(vide, t, f):
     """La poire se fissure (léger entrebâillement à 0,38 s), puis s'ouvre
     en deux comme un livre et montre sa chair blanche (de 0,62 à 1,62 s :
     temps et angles en proportions φ)."""
-    u = 0.146 * lisse((t - 0.382) / 0.236) + 0.854 * lisse((t - 0.618) / 1.0)
+    # Plan de 2,19 s : la caméra frôle la peau jusqu'à 0,84 s (2,19/φ²),
+    # la fissure s'ouvre à 0,84 s, la poire s'ouvre de 1,1 à 2,0 s.
+    u = 0.146 * lisse((t - 0.84) / 0.236) + 0.854 * lisse((t - 1.1) / 0.9)
     for enfant in vide.children:
         cote = -1 if enfant.name.endswith("_A") else 1
         enfant.location = (cote * 7.0 * MM * u, -3.0 * MM * u, 0)
@@ -429,6 +608,7 @@ def construire(handle):
     resserrer([d for d in danseurs if not d.part])
     fl = Danseur(racine, (0, 0, 0), (0, 0, 0), 99, 1, flacon=True)
     danseurs.append(fl)
+    eviter_contacts(danseurs, fl)
     plateau()
 
     s = bpy.context.scene
