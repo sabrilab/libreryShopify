@@ -135,6 +135,9 @@ shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.0005; scene.add(shadow);
 // Le suffixe ?v= évite qu'un ancien modèle reste en cache après une mise à jour.
 const modele = await fetch("modele.json", { cache: "no-store" }).then((r) => r.json()).catch(() => ({}));
 const v = encodeURIComponent(modele.date || Date.now());
+// La vue 360° se charge en même temps que le modèle 3D, sans l'attendre.
+const handleInitial = location.hash.slice(1) || "tonka-love";
+const premier360 = charger360(handleInitial);
 const [gltf, parfums] = await Promise.all([
   new GLTFLoader().loadAsync(`flacon-100ml.glb?v=${v}`),
   fetch(`parfums.json?v=${v}`).then((r) => r.json()),
@@ -274,7 +277,7 @@ async function charger360(handle) {
   let info = null;
   for (let essai = 0; essai < 3 && !info; essai++) {
     const r = await fetch(`360/${handle}/info.json?v=${v}`,
-      { cache: "no-store", signal: AbortSignal.timeout(4000) }).catch(() => null);
+      { cache: "no-store", signal: AbortSignal.timeout(8000) }).catch(() => null);
     if (r && r.status === 404) return null;          // pas de 360 pour ce parfum
     info = r && r.ok ? await r.json().catch(() => null) : null;
     if (!info) await new Promise((ok) => setTimeout(ok, 400 * (essai + 1)));
@@ -315,8 +318,8 @@ function afficher(pos) {
   if (im.complete && im.naturalWidth) tourImg.src = im.src;
 }
 
-async function mode360(handle) {
-  const images = await charger360(handle);
+async function mode360(handle, deja) {
+  const images = await (deja || charger360(handle));
   if (!images) return false;
   vue.images = images; vue.handle = handle;
   accorderFond(images[0]);
@@ -373,8 +376,9 @@ for (const b of nav.querySelectorAll(".swatch")) b.onclick = () => select(b.data
 
 // Au chargement : 360° par défaut si disponible (sauf ?fixe, gardé pour les captures 3D).
 appliquerMode("3d");
-if (!new URLSearchParams(location.search).has("fixe") && await mode360(currentHandle())) appliquerMode("360");
-else modeBtn.hidden = !(await charger360(currentHandle()));
+const deja = currentHandle() === handleInitial ? premier360 : null;
+if (!new URLSearchParams(location.search).has("fixe") && await mode360(currentHandle(), deja)) appliquerMode("360");
+else modeBtn.hidden = !(await (deja || charger360(currentHandle())));
 
 const capHome = parts.Capot.position.clone();
 const CAP_BASE = new THREE.Box3().setFromObject(parts.Capot).min.y;   // hauteur du bas du capot
