@@ -172,7 +172,9 @@ const or = parts.Capot.material;
 Object.assign(or, { metalness: 1, roughness: 0.08, envMapIntensity: 1.1 });
 or.color.setRGB(0.95, 0.83, 0.70, THREE.SRGBColorSpace);   // or champagne, légèrement rosé
 for (const n of ["Virole", "Col", "Poussoir"]) if (parts[n]) parts[n].material = or;
-const plastique = new THREE.MeshStandardMaterial({ color: 0xf4f1ec, roughness: 0.25, transparent: true, opacity: 0.55 });
+// Tube plongeur : opaque, sinon Three.js ne le dessine pas au travers du
+// verre et du jus (les objets transparents sont exclus de la transmission).
+const plastique = new THREE.MeshStandardMaterial({ color: 0xe9e3d8, roughness: 0.3, metalness: 0 });
 for (const n of ["TubePlongeur", "Tige"]) if (parts[n]) parts[n].material = plastique;
 const label = parts.Etiquette.material;
 Object.assign(label, { transparent: true, depthWrite: false, alphaTest: 0.02,
