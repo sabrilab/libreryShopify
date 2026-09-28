@@ -270,8 +270,10 @@ def plans(handle, danseurs, flacon_d):
         m = repere_flacon(flacon_d, t)
         c0 = Vector((0, 0, 124)) * MM
         cam0, cib0 = m @ orbite(c0, 70, -12, 10), m @ c0
-        cam1 = Vector((0.0, -0.49, 0.124)).lerp(Vector((0.0, -0.47, 0.122)), lisse((t - t0 - 3.8) / 3.2))
-        cib1 = Vector((0, 0.03, 0.112))
+        # Plan final : flacon centré dans le 9:16 (visée à mi-hauteur,
+        # 67,6 mm) et plus serré (≈ 45 % de la hauteur du cadre à 85 mm).
+        cam1 = Vector((0.0, -0.425, 0.074)).lerp(Vector((0.0, -0.40, 0.072)), lisse((t - t0 - 3.8) / 3.2))
+        cib1 = Vector((0, 0.0, 0.0676))
         return cam0.lerp(cam1, k), cib0.lerp(cib1, k), 22.0 - 15.7 * k, 60.0 + 25.0 * k
 
     return [
