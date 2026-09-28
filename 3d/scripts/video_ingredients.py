@@ -6,12 +6,12 @@ vrai modèle (geometrie.py) ; les ingrédients sont des formes procédurales
 simples mais lisibles (couleur, taille, silhouette).
 
 Déroulé (15 s, 24 i/s), d'après les vidéos de référence :
-  0 – 1 s     plan large, ombre qui balaie le fond beige, constellation au loin
-  1 – 2,2 s   plongée rapide du « drone » vers les ingrédients
-  2,2 – 8,6 s traversée en macro : la caméra se faufile entre les ingrédients
-              qui dansent, et frôle le flacon (capot, arêtes du verre, étiquette)
-  8,6 – 11 s  recul ; les ingrédients rejoignent leur place, derrière le flacon
-  11 – 15 s   plan final : flacon de face au centre, ingrédients rangés derrière
+  0 – 8 s     six plans macro en cuts francs, alternant les ingrédients
+              vedettes (VEDETTES) et des détails du flacon : capot et logo,
+              arêtes et entailles du verre, étiquette. Jamais le flacon entier.
+  8 – 11,8 s  reveal : départ serré sur le capot, long recul pendant que les
+              ingrédients rejoignent leur place, derrière le flacon
+  11,8 – 15 s plan final : flacon de face au centre, ingrédients rangés derrière
 
     python 3d/scripts/video_ingredients.py tonka-love --apercu     # 360 × 640, rapide
     python 3d/scripts/video_ingredients.py tonka-love              # 720 × 1280
@@ -25,7 +25,7 @@ import sys
 
 import bpy
 import bmesh
-from mathutils import Euler, Vector
+from mathutils import Euler, Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import geometrie as G  # noqa: E402
@@ -532,46 +532,91 @@ def catmull(p0, p1, p2, p3, u):
                   + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u)
 
 
-def trajectoire(danseurs, flacon_d):
-    """Points clés (temps, position caméra, cible, ouverture) ; les cibles
-    macro suivent des ingrédients en mouvement."""
+# Ingrédients vedettes de chaque parfum : (indice dans la recette, distance
+# caméra en mm). Ce sont eux qu'on voit en gros plan avant le reveal.
+VEDETTES = {
+    "tonka-love": [(0, 95), (11, 120), (8, 105)],          # fève, zeste, ambre
+    "magnetic-flowers": [(0, 150), (2, 120), (4, 110)],    # demi-poire, jasmin, fleur d'oranger
+    "vanilla-plum": [(3, 120), (0, 105), (9, 110)],        # demi-prune, gousse, orchidée
+}
+REVEAL = 8.0      # début du dernier plan : on recule et le flacon se révèle
+
+
+def repere_flacon(flacon_d, t):
+    """Matrice monde du flacon (origine sous le socle) à l'instant t."""
+    p, r = flacon_d.pose(t)
+    return Matrix.Translation(p) @ Euler(tuple(r)).to_matrix().to_4x4()
+
+
+def orbite(cible, dist_mm, azim, elev):
+    """Point à dist_mm de la cible ; azim 0 = de face (−y), en degrés."""
+    a, e = math.radians(azim), math.radians(elev)
+    d = Vector((math.sin(a) * math.cos(e), -math.cos(a) * math.cos(e), math.sin(e)))
+    return cible + d * dist_mm * MM
+
+
+def plans(handle, danseurs, flacon_d):
+    """Découpage en plans (cuts francs). Chaque plan : (début, fin, fonction
+    t → (position caméra, cible, ouverture, focale)).
+
+    Avant le reveal, que du macro : ingrédients vedettes et détails du
+    flacon (capot et logo, arêtes et entailles du verre, étiquette), jamais
+    le flacon entier."""
     ing = [d for d in danseurs if not d.flacon]
-    choix = [ing[k % len(ing)] for k in (0, 3, 7, 1)]
 
-    def pres(d, t, dx, dy, dz):
-        p, _ = d.pose(t)
-        return p + Vector((dx, dy, dz)) * MM, p
+    def plan_ingredient(k, azim, elev):
+        i, dist = VEDETTES[handle][k]
+        d = ing[i % len(ing)]
 
-    cles = []
-    cles.append((0.0, Vector((0.12, -2.2, 0.55)), Vector((0, 0.05, 0.1)), 8.0))
-    cles.append((1.0, Vector((0.10, -1.7, 0.45)), Vector((0, 0.05, 0.1)), 8.0))
-    for t, d, off in ((2.2, choix[0], (-40, -70, 25)), (3.6, choix[1], (45, -65, 10)),
-                      (5.0, None, (-60, -80, 150)), (6.3, choix[2], (30, -60, -15)),
-                      (7.6, None, (70, -75, 60))):
-        if d is None:        # passage au ras du flacon : capot puis arête du verre
-            p, _ = flacon_d.pose(t)
-            cible = p + Vector((0, 0, off[2] * MM * 0.8))
-            cles.append((t, cible + Vector((off[0], off[1], 10)) * MM, cible, 2.2))
-        else:
-            cam, cible = pres(d, t, *off)
-            cles.append((t, cam, cible, 2.0))
-    cles.append((8.6, Vector((0.10, -0.34, 0.17)), Vector((0, 0.03, 0.11)), 3.5))
-    cles.append((11.0, Vector((0.0, -0.50, 0.125)), Vector((0, 0.03, 0.112)), 6.3))
-    cles.append((15.0, Vector((0.0, -0.47, 0.122)), Vector((0, 0.03, 0.112)), 6.3))
-    return cles
+        def f(t, t0, t1):
+            u = (t - t0) / (t1 - t0)
+            p, _ = d.pose(t)
+            cam = orbite(p, dist * (1.12 - 0.22 * u), azim + 22 * u, elev - 6 * u)
+            return cam, p, 22.0, 50.0
+        return f
+
+    def plan_flacon(cible_mm, dist, az0, az1, el0, el1, focale=55.0, cible_fin=None):
+        def f(t, t0, t1):
+            u = lisse((t - t0) / (t1 - t0)) * 0.5 + (t - t0) / (t1 - t0) * 0.5
+            m = repere_flacon(flacon_d, t)
+            c_loc = Vector(cible_mm) if cible_fin is None else Vector(cible_mm).lerp(Vector(cible_fin), u)
+            c_loc = c_loc * MM
+            cam_loc = orbite(c_loc, dist, az0 + (az1 - az0) * u, el0 + (el1 - el0) * u)
+            return m @ cam_loc, m @ c_loc, 22.0, focale
+        return f
+
+    capot = plan_flacon((0, 0, 128), 62, -55, -20, 38, 28)
+    verre = plan_flacon((-27, -18, 18), 58, -30, -62, -14, -4)
+    etiquette = plan_flacon((14, -24, 104), 60, -35, -5, 12, 4, cible_fin=(4, -24, 58))
+
+    def reveal(t, t0, t1):
+        # Départ serré sur le capot (qui suit encore la danse), recul jusqu'au
+        # plan final : flacon de face au centre, ingrédients derrière.
+        k = lisse((t - t0) / 3.8)
+        m = repere_flacon(flacon_d, t)
+        c0 = Vector((0, 0, 124)) * MM
+        cam0, cib0 = m @ orbite(c0, 70, -12, 10), m @ c0
+        cam1 = Vector((0.0, -0.49, 0.124)).lerp(Vector((0.0, -0.47, 0.122)), lisse((t - t0 - 3.8) / 3.2))
+        cib1 = Vector((0, 0.03, 0.112))
+        return cam0.lerp(cam1, k), cib0.lerp(cib1, k), 22.0 - 15.7 * k, 60.0 + 25.0 * k
+
+    return [
+        (0.00, 1.50, plan_ingredient(0, -30, 18)),
+        (1.50, 2.75, capot),
+        (2.75, 4.25, plan_ingredient(1, 25, 10)),
+        (4.25, 5.50, verre),
+        (5.50, 6.90, plan_ingredient(2, -15, 25)),
+        (6.90, REVEAL, etiquette),
+        (REVEAL, DUREE + 1, reveal),
+    ]
 
 
-def camera_a(cles, t):
-    ts = [c[0] for c in cles]
-    i = max(0, min(len(cles) - 2, max(k for k in range(len(ts)) if ts[k] <= t)))
-    u = (t - ts[i]) / (ts[i + 1] - ts[i])
-    # Plongée (1 → 2,2 s) accélérée ; le reste en douceur.
-    u = u * u if cles[i][0] == 1.0 else lisse(u) * 0.35 + u * 0.65
-    a, b = cles[max(0, i - 1)], cles[min(len(cles) - 1, i + 2)]
-    pos = catmull(a[1], cles[i][1], cles[i + 1][1], b[1], u)
-    cib = catmull(a[2], cles[i][2], cles[i + 1][2], b[2], u)
-    f = cles[i][3] + (cles[i + 1][3] - cles[i][3]) * u
-    return pos, cib, f
+def camera_a(decoupage, t):
+    for t0, t1, f in decoupage:
+        if t0 <= t < t1:
+            return f(t, t0, t1)
+    t0, t1, f = decoupage[-1]
+    return f(t, t0, t1)
 
 
 # ------------------------------------------------------------------ scène
@@ -659,7 +704,11 @@ def construire(handle):
     cam_data.clip_start = 0.005
     cam = link(bpy.data.objects.new("Drone", cam_data))
     s.camera = cam
-    cles = trajectoire(danseurs, fl)
+    decoupage = plans(handle, danseurs, fl)
+    # Dernière image de chaque plan : l'interpolation y sera constante, pour
+    # que le flou de mouvement (obturateur ouvert après l'image) ne traverse
+    # pas le cut.
+    fins_de_plan = {math.ceil(t1 * FPS) for _, t1, _ in decoupage[:-1]}
 
     for f in range(s.frame_start, s.frame_end + 1):
         t = (f - 1) / FPS
@@ -669,24 +718,25 @@ def construire(handle):
             d.ob.rotation_euler = Euler(tuple(r))
             d.ob.keyframe_insert("location", frame=f)
             d.ob.keyframe_insert("rotation_euler", frame=f)
-        pos, cib, fstop = camera_a(cles, t)
+        pos, cib, fstop, focale = camera_a(decoupage, t)
         cam.location = pos
         cam.rotation_euler = (cib - pos).to_track_quat("-Z", "Y").to_euler()
         cam_data.dof.focus_distance = (cib - pos).length
         cam_data.dof.aperture_fstop = fstop
-        # Focale : plus longue au plan final (moins de déformation).
-        cam_data.lens = 28 if t < 8.6 else 28 + (85 - 28) * lisse((t - 8.6) / 2.4)
+        cam_data.lens = focale
         cam.keyframe_insert("location", frame=f)
         cam.keyframe_insert("rotation_euler", frame=f)
         cam_data.dof.keyframe_insert("focus_distance", frame=f)
         cam_data.dof.keyframe_insert("aperture_fstop", frame=f)
         cam_data.keyframe_insert("lens", frame=f)
+    s.render.motion_blur_position = "START"
     for ob in list(bpy.data.objects) + [cam_data]:
         ad = getattr(ob, "animation_data", None)
         if ad and ad.action:
             for fc in getattr(ad.action, "fcurves", []):
                 for kp in fc.keyframe_points:
-                    kp.interpolation = "LINEAR"
+                    kp.interpolation = ("CONSTANT" if ob in (cam, cam_data)
+                                        and int(kp.co.x) in fins_de_plan else "LINEAR")
     return s
 
 
