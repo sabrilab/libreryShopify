@@ -32,8 +32,21 @@ def y_of(z_mm):
     return (TOP - z_mm) * MM
 
 
-def text_line(draw, text, cap_mm, z_baseline, tracking=0.06, max_w=40):
-    """Centre une ligne dont la hauteur des capitales vaut cap_mm."""
+# Hauteurs réelles (mm depuis le dessous du flacon), relevées sur les photos
+# studio de face (contenu-actuel/images/detoures, échelle : hauteur du
+# flacon = 135,2 mm). La texture est dessinée 4,5 mm plus bas que le plan
+# d'étiquette (voir l'en-tête) : on retranche DECALAGE.
+DECALAGE = 4.5
+EMBLEME_CENTRE, EMBLEME_H = 75.0, 19.0     # clé comprise, cercle ≈ 16 mm de large
+NOM_BASE, NOM_CAP, NOM_LARGEUR = 52.9, 5.8, 35.5   # PALMEIRA 5,6 × 33 ; AMBERT SUNSET 4,0 × 36,5
+INTERLIGNE = 6.0                           # MAGNETIC / FLOWERS
+EXTRAIT_ECART, EXTRAIT_CAP, EXTRAIT_LARGEUR = 2.9, 2.2, 26.5
+
+
+def text_line(draw, text, cap_mm, z_baseline, tracking=0.02, max_w=40.0, largeur=None, espace=1.0):
+    """Centre une ligne dont la hauteur des capitales vaut cap_mm, réduite
+    si elle dépasse max_w ; `largeur` impose la largeur exacte (en jouant
+    sur l'interlettrage)."""
     text = text.upper()
     probe = ImageFont.truetype(FONT, 400)
     cap = probe.getbbox("H")[3] - probe.getbbox("H")[1]
@@ -41,35 +54,39 @@ def text_line(draw, text, cap_mm, z_baseline, tracking=0.06, max_w=40):
     while True:
         font = ImageFont.truetype(FONT, size)
         track = tracking * size
-        widths = [font.getlength(ch) for ch in text]
+        widths = [font.getlength(ch) * (espace if ch == " " else 1) for ch in text]
         total = sum(widths) + track * (len(text) - 1)
         if total <= max_w * MM:
             break
         size -= 4
+    if largeur:
+        track = (largeur * MM - sum(widths)) / (len(text) - 1)
+        total = largeur * MM
     x = (SIZE - total) / 2
-    y = y_of(z_baseline)
+    y = y_of(z_baseline - DECALAGE)
     for ch, w in zip(text, widths):
         draw.text((x, y), ch, font=font, fill=(255, 255, 255, 255), anchor="ls")
         x += w + track
+    return total / MM, size
 
 
 def build(handle, lines):
     img = Image.new("RGBA", (SIZE, SIZE), (255, 255, 255, 0))
 
     emblem = Image.open(EMBLEM).convert("RGBA")
-    h = int(16.5 * MM)
+    h = int(EMBLEME_H * MM)
     w = int(emblem.width * h / emblem.height)
     emblem = emblem.resize((w, h), Image.LANCZOS)
-    img.alpha_composite(emblem, ((SIZE - w) // 2, int(y_of(72.0) - h / 2)))
+    img.alpha_composite(emblem, ((SIZE - w) // 2, int(y_of(EMBLEME_CENTRE - DECALAGE) - h / 2)))
 
     draw = ImageDraw.Draw(img)
-    if len(lines) == 1:
-        text_line(draw, lines[0], 3.0, 50.8)
-        text_line(draw, "EXTRAIT DE PARFUM", 1.55, 47.6, tracking=0.04)
-    else:
-        text_line(draw, lines[0], 3.0, 53.6)
-        text_line(draw, lines[1], 3.0, 49.4)
-        text_line(draw, "EXTRAIT DE PARFUM", 1.55, 46.2, tracking=0.04)
+    base = NOM_BASE
+    for k, ligne in enumerate(lines):
+        largeur, _ = text_line(draw, ligne, NOM_CAP if len(lines) == 1 else 5.0, base, max_w=NOM_LARGEUR)
+        print(f"  {ligne!r} : {largeur:.1f} mm de large")
+        if k < len(lines) - 1:
+            base -= INTERLIGNE
+    text_line(draw, "EXTRAIT DE PARFUM", EXTRAIT_CAP, base - EXTRAIT_ECART, max_w=40, largeur=EXTRAIT_LARGEUR, espace=2.2)
 
     img.save(os.path.join(OUT, handle + ".png"), optimize=True)
 

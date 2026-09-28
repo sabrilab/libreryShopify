@@ -132,6 +132,31 @@ const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.08),
   new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
 shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.0005; scene.add(shadow);
 
+// Caustique : la lumière de la boîte à lumière gauche traverse le jus et
+// projette au sol, derrière le flacon, une tache colorée plus vive au cœur
+// (comme sur les photos de campagne). Additive : elle éclaircit le sol.
+const causticTex = (() => {
+  const c = document.createElement("canvas"); c.width = 128; c.height = 256;
+  const g = c.getContext("2d");
+  const halo = g.createRadialGradient(64, 150, 4, 64, 150, 64);
+  halo.addColorStop(0, "rgba(255,255,255,.55)"); halo.addColorStop(1, "rgba(255,255,255,0)");
+  g.save(); g.scale(1, 1.8); g.translate(0, -66); g.fillStyle = halo; g.fillRect(0, 0, 128, 256); g.restore();
+  const coeur = g.createRadialGradient(64, 170, 1, 64, 170, 18);
+  coeur.addColorStop(0, "rgba(255,255,255,1)"); coeur.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = coeur; g.fillRect(0, 0, 128, 256);
+  for (let k = 0; k < 5; k++) {           // filets lumineux des arêtes du verre
+    g.strokeStyle = `rgba(255,255,255,${0.18 + 0.1 * (k % 2)})`; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(40 + k * 12, 60); g.quadraticCurveTo(44 + k * 10, 150, 52 + k * 6, 230); g.stroke();
+  }
+  return new THREE.CanvasTexture(c);
+})();
+const caustic = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.1),
+  new THREE.MeshBasicMaterial({ map: causticTex, transparent: true, depthWrite: false,
+    blending: THREE.AdditiveBlending, toneMapped: false }));
+caustic.rotation.set(-Math.PI / 2, 0, 0.55);
+caustic.position.set(0.028, 0.0007, -0.05);
+scene.add(caustic);
+
 // Le suffixe ?v= évite qu'un ancien modèle reste en cache après une mise à jour.
 const modele = await fetch("modele.json", { cache: "no-store" }).then((r) => r.json()).catch(() => ({}));
 const v = encodeURIComponent(modele.date || Date.now());
@@ -164,10 +189,11 @@ flacon.traverse((o) => { if (o.isMesh) parts[o.name] = o; });
 const glass = parts.Verre.material;
 Object.assign(glass, { roughness: 0, metalness: 0, transmission: 1, ior: 1.5,
   thickness: 0.02, attenuationDistance: 0.1, specularIntensity: 1,
+  dispersion: 0.35,          // irisations aux arêtes, comme un vrai verre épais
   side: THREE.FrontSide, envMapIntensity: 1 });
 const juice = parts.Jus.material;
 Object.assign(juice, { roughness: 0, metalness: 0, transmission: 1, ior: 1.36,
-  thickness: 0.03, attenuationDistance: 0.028, side: THREE.DoubleSide, envMapIntensity: 0.6 });
+  thickness: 0.03, attenuationDistance: 0.042, side: THREE.DoubleSide, envMapIntensity: 0.6 });
 const or = parts.Capot.material;
 Object.assign(or, { metalness: 1, roughness: 0.08, envMapIntensity: 1.1 });
 or.color.setRGB(0.95, 0.83, 0.70, THREE.SRGBColorSpace);   // or champagne, légèrement rosé
@@ -230,10 +256,18 @@ let select = function (handle) {
   glass.attenuationDistance = teinte ? 0.035 : 0.06;
   // Teinte de surface en plus : sur un fond clair, l'atténuation seule laisse
   // le socle presque blanc, alors qu'en vrai il renvoie la couleur du jus.
-  glass.color.set(1, 1, 1).lerp(glass.attenuationColor, teinte ? 0.55 : 0.4);
+  // Verre teinté : sa couleur propre est saturée, proche du jus (socle
+  // magenta de Palmeira, violet de Mango Wave…).
+  if (teinte) glass.color.copy(jus).lerp(new THREE.Color().setRGB(...p.verre, THREE.SRGBColorSpace), 0.35)
+    .lerp(new THREE.Color(1, 1, 1), 0.3);
+  else glass.color.set(1, 1, 1).lerp(glass.attenuationColor, 0.4);
   // Le jus se colore dans sa masse (atténuation), pas en surface.
   juice.attenuationColor.copy(jus);
+  juice.attenuationDistance = teinte ? 0.07 : 0.042;   // le verre teinté assombrit déjà
   juice.color.set(1, 1, 1);
+  // Caustique et ombre prennent la couleur du jus.
+  caustic.material.color.copy(jus).multiply(jus).multiplyScalar(0.42);   // couleur saturée, lumière douce
+  shadow.material.color.set(1, 1, 1).lerp(jus, 0.35);
   label.map = labelTexture(handle);
   label.emissiveMap = label.map;
   label.needsUpdate = true;
