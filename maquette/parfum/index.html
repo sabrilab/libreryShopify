@@ -273,7 +273,8 @@ async function charger360(handle) {
   // que le modèle 3D et les polices se téléchargent.
   let info = null;
   for (let essai = 0; essai < 3 && !info; essai++) {
-    const r = await fetch(`360/${handle}/info.json?v=${v}`, { cache: "no-store" }).catch(() => null);
+    const r = await fetch(`360/${handle}/info.json?v=${v}`,
+      { cache: "no-store", signal: AbortSignal.timeout(4000) }).catch(() => null);
     if (r && r.status === 404) return null;          // pas de 360 pour ce parfum
     info = r && r.ok ? await r.json().catch(() => null) : null;
     if (!info) await new Promise((ok) => setTimeout(ok, 400 * (essai + 1)));
@@ -285,7 +286,8 @@ async function charger360(handle) {
     im.src = `360/${handle}/${String(k).padStart(2, "0")}.webp?v=${v}`;
     return im;
   });
-  await images[0].decode().catch(() => {});
+  // Première vue décodée avant l'affichage (4 s au plus).
+  await Promise.race([images[0].decode().catch(() => {}), new Promise((ok) => setTimeout(ok, 4000))]);
   return images;
 }
 
