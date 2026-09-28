@@ -5,7 +5,7 @@ import { BEAT, Browser, C, Cursor, Dark, Fade, Hud, Kick, Paper, Phone, Rule, Wo
 
 // découpage : chaque scène commence sur un temps de la musique
 export const SCENES = [
-  ['intro', 150], ['promesse', 108], ['accueil', 324], ['ecran', 180], ['survol', 306], ['flacon', 180],
+  ['intro', 150], ['promesse', 108], ['accueil', 324], ['ecran', 180], ['survol', 306],
   ['fiche', 252], ['sillage', 180], ['mobile', 234], ['mur', 216], ['montage', 108], ['fin', 198],
 ];
 export const TOTAL = SCENES.reduce((s, [, d]) => s + d, 0);
@@ -145,39 +145,6 @@ const Survol = () => {
   );
 };
 
-// ---------------------------------------------------------------- 6. le flacon en 360°
-const Spin = ({ k, f0 = 0, w, style }) => {
-  const f = useCurrentFrame();
-  const i = Math.floor(Math.max(0, f - f0) / 2) % 36;
-  return (
-    <div style={{ position: 'absolute', width: w, height: w * 1.25, borderRadius: 6, overflow: 'hidden', boxShadow: '0 40px 80px -40px rgba(0,0,0,.8)', ...style }}>
-      <Img src={staticFile(`360/${k}/${String(i).padStart(2, '0')}.webp`)} style={{ width: '100%', height: '100%', display: 'block' }} />
-    </div>
-  );
-};
-const Flacon = () => {
-  const f = useCurrentFrame();
-  const split = 90;
-  const a = 1 - ramp(f, split - 8, split + 6, io);
-  const row = ['hot-sand', 'palmeira', 'sun-ice', 'ambert-sunset', 'mango-wave'];
-  return (
-    <Dark>
-      <div style={{ opacity: a }}>
-        <Spin k="tonka-love" w={540} style={{ left: 1100, top: 202, transform: `scale(${0.96 + ramp(f, 0, 90, io) * 0.04})` }} />
-        <div style={{ position: 'absolute', left: 120, top: 330 }}>
-          <Kick at={4}>Flacon 3D</Kick>
-          <Words lines={['Chaque flacon,', 'en *360°.*']} at={10} size={96} color={C.cream} style={{ marginTop: 26 }} />
-        </div>
-      </div>
-      {f >= split - 8 && row.map((k, i) => {
-        const p = ramp(f, split - 4 + i * 4, split + 22 + i * 4);
-        return <Spin key={k} k={k} f0={split + i * 6} w={324} style={{ left: 80 + i * 360, top: 300, opacity: p, transform: `translateY(${(1 - p) * 80}px)` }} />;
-      })}
-      {f >= split && <Hud n="03" label="Huit parfums, rendus en 3D" dark at={split + 10} />}
-    </Dark>
-  );
-};
-
 // ---------------------------------------------------------------- 7. la fiche produit, ordinateur et mobile
 const PDP_D = [[0, 0], [56, 0], [96, 1960], [134, 1960], [176, 3860], [210, 3860], [252, 7380]];
 const PDP_M = [[0, 0], [70, 0], [104, 760], [140, 760], [176, 1650], [212, 1650], [252, 2350]];
@@ -216,7 +183,7 @@ const Sillage = () => {
       <div style={{ position: 'absolute', left: 80, top: 590, width: 1760, opacity: ramp(f, 20, 40), transform: `scale(${1 + ramp(f, 30, 180, io) * 0.02})`, transformOrigin: 'left center' }}>
         <Img src={staticFile(`cap/clock/${String(i).padStart(2, '0')}.jpg`)} style={{ width: '100%', display: 'block', mixBlendMode: 'multiply' }} />
       </div>
-      <Hud n="04" label="L’horloge du sillage" at={20} />
+      <Hud n="03" label="L’horloge du sillage" at={20} />
     </Paper>
   );
 };
@@ -247,7 +214,7 @@ const Mobile = ({ dur }) => {
           </div>
         ))}
       </AbsoluteFill>
-      <Hud n="05" label="Chaque écran a sa mise en page" dark at={20} />
+      <Hud n="04" label="Chaque écran a sa mise en page" dark at={20} />
     </Dark>
   );
 };
@@ -328,7 +295,7 @@ const Fin = ({ dur }) => {
   );
 };
 
-const PARTS = { intro: Intro, promesse: Promesse, accueil: Accueil, ecran: Ecran, survol: Survol, flacon: Flacon, fiche: Fiche, sillage: Sillage, mobile: Mobile, mur: Mur, montage: Montage, fin: Fin };
+const PARTS = { intro: Intro, promesse: Promesse, accueil: Accueil, ecran: Ecran, survol: Survol, fiche: Fiche, sillage: Sillage, mobile: Mobile, mur: Mur, montage: Montage, fin: Fin };
 const FADES = { intro: [0, 8], ecran: [0, 0], montage: [0, 0], mur: [8, 0], fin: [0, 0] };
 
 export const Film = () => {
