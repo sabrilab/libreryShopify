@@ -1,0 +1,106 @@
+{
+  "ambert-sunset": {
+    "nom": "Ambert Sunset",
+    "verre": [
+      0.8,
+      0.6,
+      0.56
+    ],
+    "jus": [
+      0.77,
+      0.44,
+      0.35
+    ]
+  },
+  "hot-sand": {
+    "nom": "Hot Sand",
+    "verre": [
+      0.77,
+      0.67,
+      0.55
+    ],
+    "jus": [
+      0.67,
+      0.5,
+      0.32
+    ]
+  },
+  "magnetic-flowers": {
+    "nom": "Magnetic Flowers",
+    "verre": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "jus": [
+      0.83,
+      0.71,
+      0.42
+    ]
+  },
+  "mango-wave": {
+    "nom": "Mango Wave",
+    "verre": [
+      0.56,
+      0.54,
+      0.72
+    ],
+    "jus": [
+      0.38,
+      0.31,
+      0.56
+    ]
+  },
+  "palmeira": {
+    "nom": "Palmeira",
+    "verre": [
+      0.72,
+      0.54,
+      0.7
+    ],
+    "jus": [
+      0.58,
+      0.17,
+      0.4
+    ]
+  },
+  "sun-ice": {
+    "nom": "Sun Ice",
+    "verre": [
+      0.87,
+      0.84,
+      0.59
+    ],
+    "jus": [
+      0.8,
+      0.73,
+      0.4
+    ]
+  },
+  "tonka-love": {
+    "nom": "Tonka Love",
+    "verre": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "jus": [
+      0.89,
+      0.69,
+      0.43
+    ]
+  },
+  "vanilla-plum": {
+    "nom": "Vanilla Plum",
+    "verre": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "jus": [
+      0.8,
+      0.55,
+      0.3
+    ]
+  }
+}
