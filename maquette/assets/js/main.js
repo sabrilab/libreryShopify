@@ -474,6 +474,64 @@
   /* date de livraison estimée : +3 jours ouvrés */
   function eta() { const d = new Date(); let n = 0; while (n < 3) { d.setDate(d.getDate() + 1); if (d.getDay() % 6) n++; } return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }); }
 
+  /* ------------------------------------------------------------------ */
+  /* L'horloge du sillage : la vaporisation, heure par heure            */
+  /* (Shopify : snippet sillage.liquid, notes lues dans les métachamps)  */
+  /* ------------------------------------------------------------------ */
+  const cleanNote = n => n.replace(/\s+(STT|SFE|Ess|NP|Abs)\b/g, '').replace(/®/g, '').replace(/\s*\([^)]*\)/g, '').trim();
+  const notesOf = p => p.materials ? p.materials.list : p.notes;
+  // intensité perçue (0 → 1) de la tête, du cœur et du fond selon les minutes écoulées
+  const lerp = (t, a, b, va, vb) => va + (vb - va) * Math.min(1, Math.max(0, (t - a) / (b - a)));
+  const CURVES = [
+    t => t < 15 ? 1 : lerp(t, 15, 60, 1, 0),
+    t => t < 30 ? lerp(t, 0, 30, .2, 1) : t < 240 ? 1 : lerp(t, 240, 360, 1, .1),
+    t => t < 120 ? lerp(t, 20, 120, .15, 1) : lerp(t, 360, 480, 1, .8)
+  ];
+  const clockTime = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ' ' + String(m % 60).padStart(2, '0') : ''}`;
+  function clockRows(p) {
+    const n = notesOf(p);
+    return [['Tête', n.tete, 'Les premières minutes'], ['Cœur', n.coeur, 'De trente minutes à quatre heures'], ['Fond', n.fond, 'Jusqu’au lendemain']].map(([k, v, d]) =>
+      `<div class="clock__row"><div class="clock__k"><span>${k}</span><small>${d}</small></div><div><div class="clock__notes">${v.split(/,\s*/).map(x => `<i>${esc(cleanNote(x))}</i>`).join('')}</div><div class="clock__bar"><span></span></div></div></div>`).join('');
+  }
+  const clockHTML = (p, head = '') => `
+    <div class="clock" data-clock="${p.handle}">
+      <div class="clock__rows">${clockRows(p)}</div>
+      <div class="clock__ctl">
+        ${head}
+        <p class="clock__t">Sur la peau depuis <b>0 min</b></p>
+        <input type="range" min="0" max="480" step="5" value="0" aria-label="Temps écoulé depuis la vaporisation">
+        <div class="clock__scale"><span>Vaporisation</span><span>1 h</span><span>2 h</span><span>4 h</span><span>8 h</span></div>
+        <button class="tlink" type="button" data-clock-play>Laisser le temps passer</button>
+      </div>
+    </div>`;
+  function bindClock(el) {
+    const range = $('input', el), label = $('.clock__t b', el);
+    let raf = 0, touched = false;
+    const render = () => {
+      const m = +range.value; label.textContent = clockTime(m);
+      $$('.clock__row', el).forEach((r, i) => {
+        const v = CURVES[i](m);
+        $$('i', r).forEach(n => { n.style.opacity = (.1 + .9 * v).toFixed(2); n.style.filter = `blur(${((1 - v) * 1.4).toFixed(2)}px)`; });
+        $('.clock__bar span', r).style.width = (v * 100).toFixed(1) + '%';
+        r.classList.toggle('is-faded', v < .25);
+      });
+    };
+    const play = () => {
+      cancelAnimationFrame(raf); const t0 = performance.now(), D = 7000;
+      const step = now => { const k = Math.min(1, (now - t0) / D); range.value = Math.round(k * 480 / 5) * 5; render(); if (k < 1) raf = requestAnimationFrame(step); };
+      raf = requestAnimationFrame(step);
+    };
+    range.addEventListener('input', () => { touched = true; cancelAnimationFrame(raf); render(); });
+    $('[data-clock-play]', el).addEventListener('click', () => { touched = true; play(); });
+    render();
+    // lecture automatique une fois, quand l'horloge apparaît à l'écran
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); if (!touched) play(); } }, { threshold: .45 });
+      io.observe(el);
+    }
+    el.rerender = render;
+  }
+
   function initProduct() {
     const root = $('#product'); if (!root) return;
     const p = byHandle(new URLSearchParams(location.search).get('p')) || PRODUCTS[0];
@@ -539,6 +597,11 @@
         <div class="prose">${p.materials.text.map(t => `<p>${t}</p>`).join('')}</div>
       </div></section>` : ''}
 
+      ${isPerfume && notesOf(p) ? `<section class="block" id="sillage"><div class="wrap">
+        <div class="row-head"><div><h2 class="h2">Le sillage, <em>heure par heure</em></h2><p>Un extrait se lit dans le temps. Les notes de tête s’évaporent, le cœur s’ouvre, le fond demeure : faites passer les heures.</p></div></div>
+        ${clockHTML(p)}
+      </div></section>` : ''}
+
       ${perf ? `<section class="block" id="parfumeur"><div class="wrap perfumer">
         <figure>${pic(perf.image, perf.name, '(max-width: 800px) 60vw, 25vw')}</figure>
         <div><span class="ui muted">Le parfumeur</span><h2 class="h2" style="margin:10px 0 18px">${esc(perf.name)}</h2>
@@ -590,6 +653,7 @@
     addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(syncSticky); } }, { passive: true });
     syncSticky();
     accordions(root);
+    $$('[data-clock]', root).forEach(bindClock);
   }
 
   function initStores() {
@@ -673,6 +737,18 @@
     }).join('');
   }
 
+  function initLexClock() {
+    const host = $('#lex-clock'); if (!host) return;
+    const perfumes = PRODUCTS.filter(p => !p.type);
+    const pick = h => {
+      const p = byHandle(h);
+      host.innerHTML = clockHTML(p, `<label class="clock__pick"><span>Parfum</span><select>${perfumes.map(x => `<option value="${x.handle}" ${x.handle === h ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>`);
+      $('select', host).addEventListener('change', e => pick(e.target.value));
+      bindClock($('[data-clock]', host));
+    };
+    pick('hot-sand');
+  }
+
   function initContact() {
     const f = $('#contact-form'); if (!f) return;
     f.addEventListener('submit', e => { e.preventDefault(); f.outerHTML = '<p class="lede">Merci. Nous vous répondons sous deux jours ouvrés.</p>'; });
@@ -682,6 +758,6 @@
   initCollection();            // avant l'en-tête : fixe le titre courant
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
-  initHero(); initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initContact();
+  initHero(); initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
   renderCart(); bindToasts(); bindCards(); accordions(); newsletters(); balanceGrids();
 })();
