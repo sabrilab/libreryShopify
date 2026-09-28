@@ -97,6 +97,10 @@ RECETTES = {
         (lambda: graines(0), (-80, 70, 140), (0, 0, 0)),
     ],
 }
+# Point d'attraction au dos du flacon, à mi-hauteur : à la fin, les
+# ingrédients s'y resserrent comme si le parfum les attirait.
+ATTRACTEUR = (0.0, 78.0, 72.0)
+RESSERREMENT = 0.7          # les positions finales se rapprochent du point de ce facteur
 ECHELLE_INGREDIENTS = 1.15   # un peu plus grands que nature : lisibles à l'écran
 # Fèves et amandes sont minuscules à côté du flacon : on les grossit davantage.
 ECHELLE_PARFUM = {"tonka-love": 1.45}
@@ -144,9 +148,23 @@ class Danseur:
         p_d, r_d = self.danse(t)
         debut = 8.6 + (0 if self.flacon else self.retard)
         k = lisse((t - debut) / 2.4)
-        # Après l'arrivée : léger flottement.
-        flot = Vector((0, 0, 1.5 * MM * math.sin(1.2 * t + self.ph.x)))
+        # Après l'arrivée : léger flottement, qui respire vers le point d'attraction.
+        A = Vector(ATTRACTEUR) * MM
+        vers_a = (A - self.fp).normalized() if (A - self.fp).length > 1e-6 else Vector()
+        flot = Vector((0, 0, 1.2 * MM * math.sin(1.2 * t + self.ph.x))) \
+            + vers_a * 1.5 * MM * (0.5 + 0.5 * math.sin(0.9 * t + self.ph.z))
         p_f = self.fp + flot
+        if not self.flacon:
+            # Attraction : l'ingrédient s'enroule vers le point au dos du
+            # flacon en accélérant (spirale qui se referme), puis se pose.
+            ka = lisse((t - debut) / 2.4) ** 1.6
+            p = p_d.lerp(p_f, ka)
+            rel = p - A
+            th = 1.8 * (1 - ka) ** 2 * (1 if self.ph.y > 3.14 else -1) * (ka > 0)
+            c, s_ = math.cos(th), math.sin(th)
+            rel = Vector((rel.x * c - rel.z * s_, rel.y, rel.x * s_ + rel.z * c))
+            r_f = self.fr + Vector((0.02 * math.sin(0.9 * t + self.ph.y), 0, 0.03 * math.sin(0.7 * t)))
+            return A + rel, r_d.lerp(r_f, k)
         r_f = self.fr + Vector((0.02 * math.sin(0.9 * t + self.ph.y), 0, 0.03 * math.sin(0.7 * t)))
         if self.flacon:
             # Le flacon finit de face : on ramène son angle au tour entier le plus proche.
@@ -309,6 +327,39 @@ def plateau():
     return so
 
 
+def resserrer(danseurs):
+    """Rapproche les positions finales du point d'attraction, puis écarte
+    les ingrédients qui se chevaucheraient (surtout en profondeur, pour
+    garder une grappe dense vue de face)."""
+    A = Vector(ATTRACTEUR) * MM
+    bpy.context.view_layer.update()
+    rayons = []
+    # La grappe est d'abord recentrée sur le point d'attraction (en largeur
+    # et en hauteur) : certaines recettes plaçaient tout au-dessus du flacon.
+    moy = sum((d.fp - A for d in danseurs), Vector()) / len(danseurs)
+    moy.y = 0.0
+    for d in danseurs:
+        dims = sorted(d.ob.dimensions)
+        rayons.append(0.32 * dims[2] + 0.25 * dims[1])
+        rel = d.fp - A - moy
+        d.fp = A + Vector((rel.x * RESSERREMENT, rel.y * 0.8, rel.z * RESSERREMENT))
+    for _ in range(60):
+        for i, a in enumerate(danseurs):
+            for j in range(i + 1, len(danseurs)):
+                b = danseurs[j]
+                v = b.fp - a.fp
+                mini = 0.8 * (rayons[i] + rayons[j])
+                if v.length < mini:
+                    if v.length < 1e-6:
+                        v = Vector((0.001, 0.001, 0.0))
+                    pousse = v.normalized() * (mini - v.length) * 0.5
+                    pousse.y *= 1.6                      # s'étager en profondeur plutôt que s'étaler
+                    a.fp -= pousse
+                    b.fp += pousse
+        for d in danseurs:                               # jamais devant le dos du flacon
+            d.fp.y = max(d.fp.y, 0.045)
+
+
 def construire(handle):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     R.flacon(handle)
@@ -320,6 +371,7 @@ def construire(handle):
         ob = fab()
         ob.scale = (ECHELLE_INGREDIENTS * ECHELLE_PARFUM.get(handle, 1.0),) * 3
         danseurs.append(Danseur(ob, pos, rot, i, len(recette)))
+    resserrer(danseurs)
     fl = Danseur(racine, (0, 0, 0), (0, 0, 0), 99, 1, flacon=True)
     danseurs.append(fl)
     plateau()
