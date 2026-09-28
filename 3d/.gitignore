@@ -3,3 +3,4 @@ scripts/__pycache__/
 renders/_tmp-*
 *.blend1
 renders/_*
+videos/*/

@@ -2,7 +2,7 @@
 
 La texture couvre un carré de 48 x 48 mm centré sur la face avant du
 flacon (la texture est dessinée pour z = 36 à 84 mm ; geometrie.etiquette
-place le plan 4,5 mm plus haut, de 40,5 à 88,5 mm, calé sur les photos). Blanc + canal alpha : la teinte or est
+place le plan 4,5 mm plus haut, de 40,5 à 88,5 mm, calé sur les photos). Noms en OPTIDelphian, la typo du catalogue. Blanc + canal alpha : la teinte or est
 donnée par le matériau, pour que toutes les étiquettes partagent le même.
 
     python 3d/scripts/labels.py
@@ -15,7 +15,11 @@ from parfums import PARFUMS
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EMBLEM = os.path.join(ROOT, "..", "maquette", "assets", "img", "v2", "emblem-blanc.png")
-FONT = os.path.join(ROOT, "fonts", "Cinzel-Regular.ttf")
+# Typo des noms de parfum du catalogue (titres des fiches) : OPTIDelphian,
+# capitales incises. Sous-ensemble extrait du PDF du catalogue
+# (librery-catalogue-3d) : contient les lettres des huit noms et de
+# « EXTRAIT DE PARFUM ».
+FONT = os.path.join(ROOT, "fonts", "OPTIDelphian-sous-ensemble.cff")
 WEB = os.path.join(ROOT, "..", "maquette", "parfum")  # servi sur /parfum
 OUT = os.path.join(WEB, "labels")
 
@@ -30,6 +34,7 @@ def y_of(z_mm):
 
 def text_line(draw, text, cap_mm, z_baseline, tracking=0.06, max_w=40):
     """Centre une ligne dont la hauteur des capitales vaut cap_mm."""
+    text = text.upper()
     probe = ImageFont.truetype(FONT, 400)
     cap = probe.getbbox("H")[3] - probe.getbbox("H")[1]
     size = int(400 * cap_mm * MM / cap)

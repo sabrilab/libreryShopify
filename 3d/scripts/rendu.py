@@ -347,7 +347,55 @@ def cartes_noires():
         ob.visible_shadow = False
 
 
-def scene(handle, tau=None):
+def logo_capot(p, m):
+    """Emblème LIBRERY en relief sur le dessus du capot : grille déplacée
+    par l'alpha de l'emblème (0,5 mm de relief), même or que le capot."""
+    emb = os.path.join(ROOT, "..", "maquette", "assets", "img", "v2", "emblem-blanc.png")
+    img = bpy.data.images.load(emb)
+    haut = (p["H"] + p["VIR_H"] + p["CH"]) * MM
+    taille = 20.0 * MM                      # hauteur de l'emblème sur le capot
+    bm = bmesh.new()
+    bmesh.ops.create_grid(bm, x_segments=220, y_segments=248, size=0.5)
+    ob = G.mesh_object("LogoCapot", bm)
+    ratio = img.size[0] / img.size[1]
+    ob.scale = (taille * ratio, taille, 1)
+    ob.location = (0, 0, haut - 0.05 * MM)
+    # Sans rotation : lisible depuis l'avant du flacon (clé vers soi).
+    tex = bpy.data.textures.new("emblemeRelief", "IMAGE")
+    tex.image = img
+    tex.use_alpha = True
+    tex.extension = "CLIP"
+    mod = ob.modifiers.new("relief", "DISPLACE")
+    mod.texture = tex
+    mod.texture_coords = "UV"
+    mod.direction = "Z"
+    mod.strength = 0.55 * MM
+    mod.mid_level = 0.0
+    bm2 = bmesh.new()
+    bm2.from_mesh(ob.data)
+    uv = bm2.loops.layers.uv.new("UVMap")
+    for f in bm2.faces:
+        for loop in f.loops:
+            loop[uv].uv = (loop.vert.co.x + 0.5, loop.vert.co.y + 0.5)
+    bm2.to_mesh(ob.data)
+    bm2.free()
+    G.apply_all(ob)
+    # Ne garder que le relief (les zones à plat restent sous la surface du capot).
+    bm3 = bmesh.new()
+    bm3.from_mesh(ob.data)
+    bas = [v for v in bm3.verts if v.co.z < 0.02 * MM]
+    bmesh.ops.delete(bm3, geom=bas, context="VERTS")
+    bm3.to_mesh(ob.data)
+    bm3.free()
+    for poly in ob.data.polygons:
+        poly.use_smooth = True
+    ob.parent = bpy.data.objects["Capot"].parent
+    BF.assign(ob, m["Or"])
+    return ob
+
+
+def flacon(handle, tau=None):
+    """Le flacon seul, matières Cycles comprises (sans studio)."""
     BF.build(handle)
     p = BF.cotes()
     glass = bpy.data.objects["Verre"]
@@ -360,6 +408,12 @@ def scene(handle, tau=None):
         if name in m:
             BF.assign(ob, m[name])
     contact_jus(p, m)
+    logo_capot(p, m)
+    return p
+
+
+def scene(handle, tau=None):
+    p = flacon(handle, tau)
     studio()
     cartes_noires()
     return p
