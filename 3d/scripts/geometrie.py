@@ -30,8 +30,10 @@ P = {
     # Rainure en V taillée dans chaque arête verticale, près du socle.
     "G_HAUT": 27.5, "G_POINTE": 19.0, "G_BAS": 11.0, "G_PROF": 5.0,
     # Cavité du jus.
-    "CAV_MUR": 5.4, "CAV_Z0": 22.5, "CAV_Z1": 91.5, "CAV_R": 8.0,
-    "REMPLI": 0.97,
+    # La cavité suit la forme extérieure (épaules comprises) à épaisseur de
+    # paroi constante : sur les photos, le jus monte jusque sous le col.
+    "CAV_MUR": 5.4, "CAV_Z0": 22.5, "CAV_HAUT": 3.5, "CAV_R": 3.0,
+    "REMPLI": 0.995,
     # Virole (bague dorée entre verre et capot).
     "VIR_R": 13.51, "VIR_H": 3.0,
     # Capot.
@@ -149,6 +151,35 @@ def corner_grooves(target, a, b, c, z_top, z_tip, z_bot, depth, z0=0.0):
 
 
 # --------------------------------------------------------------- les pièces
+def cavite(p, grow=0.0, name="cavite"):
+    """Volume intérieur : décalage vers l'intérieur de la forme du verre,
+    parois de CAV_MUR (plus épaisses sur les épaules inclinées, comme un
+    verre moulé), dessus plat à CAV_HAUT sous le haut du flacon."""
+    A, B, H, EP, w = p["A"], p["B"], p["H"], p["EP"], p["CAV_MUR"]
+    zs = H - EP
+    zt = H - p["CAV_HAUT"]
+    t = (zt - zs) / EP
+    ox = A - (A - p["TA"]) * t          # demi-largeur extérieure à zt
+    oy = B - (B - p["TB"]) * t
+    c = max(p["C"] - 0.4 * w, 1.0)
+    rings = [
+        octagon(A - w + grow, B - w + grow, c, p["CAV_Z0"] - grow),
+        octagon(A - w + grow, B - w + grow, c, zs - 0.41 * w),
+        octagon(ox - 1.41 * w + grow, oy - 1.1 * w + grow, max(p["TC"], 1.0), zt + grow),
+    ]
+    ob = loft(name, rings)
+    mod = ob.modifiers.new("arrondi", "BEVEL")
+    mod.width, mod.segments, mod.limit_method = (p["CAV_R"] + grow) * MM, 6, "NONE"
+    apply_all(ob)
+    return ob
+
+
+def niveau(p):
+    """Hauteur de la surface libre du jus."""
+    zt = p["H"] - p["CAV_HAUT"]
+    return p["CAV_Z0"] + (zt - p["CAV_Z0"]) * p["REMPLI"]
+
+
 def verre(p, detail=True):
     A, B, C, H = p["A"], p["B"], p["C"], p["H"]
     f = p["PIED"]
@@ -162,26 +193,27 @@ def verre(p, detail=True):
     corner_grooves(ob, A, B, C, p["G_HAUT"], p["G_POINTE"], p["G_BAS"], p["G_PROF"])
     if detail:
         m = p["CAV_MUR"]
-        boolean(ob, rounded_box("cavite", A - m, B - m, p["CAV_Z0"], p["CAV_Z1"], p["CAV_R"]))
-        boolean(ob, cylinder("goulot", 4.6, p["CAV_Z1"] - 3, H + 1, 48))
+        boolean(ob, cavite(p))
+        boolean(ob, cylinder("goulot", 4.6, H - p["CAV_HAUT"] - 1, H + 1, 48))
         soften_edges(ob, 0.4)
     return ob
 
 
-def jus(p):
-    m, inset = p["CAV_MUR"], 0.12
-    z0, z1 = p["CAV_Z0"], p["CAV_Z1"]
-    ob = rounded_box("Jus", p["A"] - m - inset, p["B"] - m - inset,
-                     z0 + inset, z1 - inset, p["CAV_R"] - inset)
-    fill = z0 + (z1 - z0) * p["REMPLI"]
+def jus(p, grow=-0.12):
+    """Jus : la cavité (réduite de 0,12 mm pour le web, élargie pour Cycles
+    qui gère le contact verre / jus) coupée à son niveau."""
+    ob = cavite(p, grow, "Jus")
+    fill = niveau(p)
     bm = bmesh.new()
     bm.from_mesh(ob.data)
     res = bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
                                  plane_co=(0, 0, fill * MM), plane_no=(0, 0, 1),
                                  clear_outer=True)
     edges = [e for e in res["geom_cut"] if isinstance(e, bmesh.types.BMEdge)]
-    bmesh.ops.edgenet_fill(bm, edges=edges)
+    top = bmesh.ops.edgenet_fill(bm, edges=edges)["faces"]
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    for f in bm.faces:
+        f.material_index = 1 if f in top else 0
     bm.to_mesh(ob.data)
     bm.free()
     return ob

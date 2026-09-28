@@ -27,9 +27,23 @@
   .toggle { margin-left: 8px; height: 30px; padding: 0 14px; border-radius: 15px; background: transparent;
     border: 1px solid var(--ink); color: var(--ink); font: 500 11px/1 "Hanken Grotesk", sans-serif;
     letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
-  #version { position: fixed; right: 16px; top: 16px; font-size: 11px; line-height: 1.5;
-    color: var(--muted); text-align: right; letter-spacing: .04em; }
-  @media (max-width: 600px) { #version { top: 88px; right: 0; left: 0; text-align: center; font-size: 10px; } }
+  #version { position: fixed; left: 16px; bottom: 16px; font-size: 11px; line-height: 1.5;
+    color: var(--muted); text-align: left; letter-spacing: .04em; }
+  @media (max-width: 900px) { #version { top: 88px; bottom: auto; right: 0; left: 0; text-align: center; font-size: 10px; } }
+  #tour { position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+    cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  #tour.actif { display: flex; }
+  #tour.glisse { cursor: grabbing; }
+  #tour img { height: min(78vh, 125vw); width: auto; max-width: 100%; object-fit: contain;
+    pointer-events: none; margin-top: 3vh;
+    /* Fondu des bords : le plateau du rendu se perd dans le fond de la page. */
+    -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%);
+            mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); }
+  body { transition: background-color .6s; }
+  #tour-aide { position: fixed; left: 0; right: 0; bottom: 78px; text-align: center; font-size: 11px;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--muted); pointer-events: none;
+    transition: opacity .6s; }
+  .toggle.secondaire { border-color: var(--line); color: var(--muted); }
   body.capture header, body.capture nav, body.capture #version { display: none; }
   #loading { position: fixed; inset: 0; display: grid; place-items: center; font-size: 12px;
     letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
@@ -37,6 +51,8 @@
 </head>
 <body>
 <canvas id="scene"></canvas>
+<div id="tour" aria-label="Flacon en rotation, glisser pour tourner"><img id="tour-img" alt=""></div>
+<div id="tour-aide" hidden>Glisser pour tourner</div>
 <div id="loading">Chargement…</div>
 <header><small>Extrait de parfum · 100 ml</small><h1 id="nom">&nbsp;</h1></header>
 <nav id="nav"></nav>
@@ -174,7 +190,7 @@ function labelTexture(handle) {
   return labels[handle];
 }
 
-function select(handle) {
+let select = function (handle) {
   const p = parfums[handle];
   document.getElementById("nom").textContent = p.nom;
   // Même un verre clair prend la couleur du jus dans ses parties épaisses
@@ -198,7 +214,7 @@ function select(handle) {
   for (const b of nav.querySelectorAll(".swatch"))
     b.setAttribute("aria-pressed", b.dataset.handle === handle);
   history.replaceState(null, "", `#${handle}`);
-}
+};
 
 // Nuancier + capot.
 const nav = document.getElementById("nav");
@@ -243,6 +259,110 @@ let photoMode = false;
 select(location.hash.slice(1) in parfums ? location.hash.slice(1) : "tonka-love");
 document.getElementById("loading").remove();
 
+// ---- Vue 360° photoréaliste : images calculées dans Blender Cycles
+// (3d/scripts/rendu.py --tour), une tous les 10°. Si un parfum n'en a
+// pas encore, la page reste sur la 3D temps réel.
+const tour = document.getElementById("tour");
+const tourImg = document.getElementById("tour-img");
+const aide = document.getElementById("tour-aide");
+const vue = { mode: "3d", handle: null, images: [], i: 0, pos: 0, auto: true };
+const modeBtn = document.createElement("button");
+modeBtn.className = "toggle secondaire";
+nav.append(modeBtn);
+
+async function charger360(handle) {
+  const info = await fetch(`360/${handle}/info.json?v=${v}`, { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  if (!info) return null;
+  const images = Array.from({ length: info.vues }, (_, k) => {
+    const im = new Image();
+    im.decoding = "async";
+    im.src = `360/${handle}/${String(k).padStart(2, "0")}.webp?v=${v}`;
+    return im;
+  });
+  await images[0].decode().catch(() => {});
+  return images;
+}
+
+// La page prend la couleur du plateau (coin haut de la première image).
+function accorderFond(im) {
+  try {
+    const c = document.createElement("canvas"); c.width = c.height = 4;
+    const g = c.getContext("2d"); g.drawImage(im, 0, 0, 4, 4, 0, 0, 4, 4);
+    const [r, gg, b] = g.getImageData(1, 1, 1, 1).data;
+    document.body.style.backgroundColor = `rgb(${r},${gg},${b})`;
+  } catch { /* image pas encore décodée : on garde le fond par défaut */ }
+}
+
+function afficher(pos) {
+  const n = vue.images.length;
+  vue.pos = ((pos % n) + n) % n;              // position fractionnaire (rotation lente)
+  vue.i = Math.round(vue.pos) % n;
+  const im = vue.images[vue.i];
+  if (im.complete && im.naturalWidth) tourImg.src = im.src;
+}
+
+async function mode360(handle) {
+  const images = await charger360(handle);
+  if (!images) return false;
+  vue.images = images; vue.handle = handle;
+  accorderFond(images[0]);
+  afficher(vue.pos);
+  return true;
+}
+
+function appliquerMode(m) {
+  vue.mode = m;
+  const photo = m === "360";
+  tour.classList.toggle("actif", photo);
+  canvas.style.visibility = photo ? "hidden" : "visible";
+  aide.hidden = !photo;
+  capBtn.hidden = photo;
+  if (!photo) document.body.style.backgroundColor = "";
+  modeBtn.textContent = photo ? "3D temps réel" : "Vue photo 360°";
+}
+
+modeBtn.onclick = async () => {
+  if (vue.mode === "360") appliquerMode("3d");
+  else if (await mode360(currentHandle())) appliquerMode("360");
+};
+function currentHandle() { return location.hash.slice(1) in parfums ? location.hash.slice(1) : "tonka-love"; }
+
+// Glisser pour tourner (souris et doigt), avec un peu d'inertie.
+let glisse = null, vitesse = 0;
+tour.addEventListener("pointerdown", (e) => {
+  glisse = { x: e.clientX, i: vue.pos, t: performance.now() };
+  vue.auto = false; vitesse = 0;
+  tour.setPointerCapture(e.pointerId); tour.classList.add("glisse");
+  aide.style.opacity = 0;
+});
+tour.addEventListener("pointermove", (e) => {
+  if (!glisse) return;
+  const pas = tour.clientWidth / (vue.images.length * 1.2);   // ≈ un tour sur la largeur
+  const i = glisse.i - (e.clientX - glisse.x) / pas;
+  const now = performance.now();
+  vitesse = (i - vue.pos) / Math.max(1, now - glisse.t) * 16;
+  glisse.t = now;
+  afficher(i);
+});
+const lacher = () => { glisse = null; tour.classList.remove("glisse"); };
+tour.addEventListener("pointerup", lacher);
+tour.addEventListener("pointercancel", lacher);
+
+// Au changement de parfum : on reste en 360° si ce parfum a ses images.
+const selectOrig = select;
+select = async (handle) => {
+  selectOrig(handle);
+  if (vue.mode === "360" && !(await mode360(handle))) appliquerMode("3d");
+  modeBtn.hidden = !(await fetch(`360/${handle}/info.json?v=${v}`, { cache: "no-store" }).then((r) => r.ok).catch(() => false));
+};
+for (const b of nav.querySelectorAll(".swatch")) b.onclick = () => select(b.dataset.handle);
+
+// Au chargement : 360° par défaut si disponible (sauf ?fixe, gardé pour les captures 3D).
+appliquerMode("3d");
+if (!new URLSearchParams(location.search).has("fixe") && await mode360(currentHandle())) appliquerMode("360");
+else modeBtn.hidden = !(await charger360(currentHandle()));
+
 const capHome = parts.Capot.position.clone();
 const CAP_BASE = new THREE.Box3().setFromObject(parts.Capot).min.y;   // hauteur du bas du capot
 function resize() {
@@ -268,6 +388,13 @@ renderer.setAnimationLoop(() => {
   // Le capot se soulève puis se pose sur la table, à droite du flacon.
   parts.Capot.position.set(capHome.x + e * 0.068,
     capHome.y - e * CAP_BASE + Math.sin(Math.PI * e) * 0.035, capHome.z + e * 0.01);
+  if (vue.mode === "360") {
+    if (!glisse) {
+      if (vue.auto) afficher(vue.pos + dt * 4);               // rotation lente au repos
+      else if (Math.abs(vitesse) > 0.01) { afficher(vue.pos + vitesse); vitesse *= 0.92; }
+    }
+    return;                                                    // la 3D n'est pas dessinée
+  }
   if (!photoMode) controls.update();
   renderer.render(scene, camera);
 });
