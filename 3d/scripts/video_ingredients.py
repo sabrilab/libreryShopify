@@ -30,6 +30,7 @@ from mathutils import Euler, Matrix, Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import geometrie as G  # noqa: E402
 import rendu as R  # noqa: E402
+from ingredients import *  # noqa: E402,F401,F403  (ingrédients, mat, assign)
 
 MM = G.MM
 FPS = 24
@@ -39,382 +40,10 @@ lin = R.lin
 
 
 # ------------------------------------------------------------------ outils
-def mat(name, color, rough=0.5, metal=0.0, trans=0.0, ior=1.45, sss=0.0):
-    m = bpy.data.materials.get(name)
-    if m:
-        return m
-    m = bpy.data.materials.new(name)
-    m.use_nodes = True
-    b = m.node_tree.nodes["Principled BSDF"]
-    b.inputs["Base Color"].default_value = (*lin(color), 1)
-    b.inputs["Roughness"].default_value = rough
-    b.inputs["Metallic"].default_value = metal
-    b.inputs["Transmission Weight"].default_value = trans
-    b.inputs["IOR"].default_value = ior
-    if sss:
-        b.inputs["Subsurface Weight"].default_value = sss
-        b.inputs["Subsurface Radius"].default_value = (1.0, 0.6, 0.4)
-        b.inputs["Subsurface Scale"].default_value = 2 * MM
-    return m
-
-
-def assign(ob, m):
-    ob.data.materials.clear()
-    ob.data.materials.append(m)
-
-
 def link(ob):
     if ob.name not in bpy.context.collection.objects:
         bpy.context.collection.objects.link(ob)
     return ob
-
-
-def smooth(ob):
-    for p in ob.data.polygons:
-        p.use_smooth = True
-
-
-def ellipsoide(name, rx, ry, rz, seg=32):
-    bm = bmesh.new()
-    bmesh.ops.create_uvsphere(bm, u_segments=seg, v_segments=seg // 2, radius=1.0)
-    bmesh.ops.scale(bm, vec=(rx * MM, ry * MM, rz * MM), verts=bm.verts)
-    ob = G.mesh_object(name, bm)
-    smooth(ob)
-    return ob
-
-
-def rides(ob, force_mm, echelle=0.004, graine=0):
-    """Rides / irrégularités par une texture de nuages."""
-    tex = bpy.data.textures.new(ob.name + "_rides", "CLOUDS")
-    tex.noise_scale = echelle
-    tex.noise_depth = 2
-    mod = ob.modifiers.new("rides", "DISPLACE")
-    mod.texture = tex
-    mod.strength = force_mm * MM
-    mod.mid_level = 0.5
-    mod.texture_coords = "OBJECT"
-    G.apply_all(ob)
-
-
-def plier(ob, angle, axe="Z", methode="BEND"):
-    mod = ob.modifiers.new("pli", "SIMPLE_DEFORM")
-    mod.deform_method = methode
-    mod.angle = angle
-    mod.deform_axis = axe
-    G.apply_all(ob)
-
-
-def courbe(name, pts, rayon_mm, profil=None, rayons=None, resol=12):
-    cu = bpy.data.curves.new(name, "CURVE")
-    cu.dimensions = "3D"
-    cu.bevel_depth = rayon_mm * MM
-    cu.bevel_resolution = 4
-    cu.resolution_u = resol
-    if profil is not None:
-        cu.bevel_mode = "OBJECT"
-        cu.bevel_object = profil
-    cu.use_fill_caps = True
-    sp = cu.splines.new("BEZIER")
-    sp.bezier_points.add(len(pts) - 1)
-    for i, (bp, q) in enumerate(zip(sp.bezier_points, pts)):
-        bp.co = Vector(q) * MM
-        bp.handle_left_type = bp.handle_right_type = "AUTO"
-        if rayons:
-            bp.radius = rayons[i]
-    ob = link(bpy.data.objects.new(name, cu))
-    bpy.ops.object.select_all(action="DESELECT")
-    bpy.context.view_layer.objects.active = ob
-    ob.select_set(True)
-    bpy.ops.object.convert(target="MESH")
-    ob = bpy.context.view_layer.objects.active
-    smooth(ob)
-    return ob
-
-
-def profil_ellipse(name, rx, ry):
-    cu = bpy.data.curves.new(name, "CURVE")
-    sp = cu.splines.new("NURBS")
-    n = 16
-    sp.points.add(n - 1)
-    for i, pt in enumerate(sp.points):
-        a = 2 * math.pi * i / n
-        pt.co = (rx * MM * math.cos(a), ry * MM * math.sin(a), 0, 1)
-    sp.use_cyclic_u = True
-    ob = link(bpy.data.objects.new(name, cu))
-    ob.hide_render = True
-    ob.hide_viewport = True
-    return ob
-
-
-def joindre(name, obs):
-    bpy.ops.object.select_all(action="DESELECT")
-    for o in obs:
-        o.select_set(True)
-    bpy.context.view_layer.objects.active = obs[0]
-    bpy.ops.object.join()
-    ob = bpy.context.view_layer.objects.active
-    ob.name = name
-    return ob
-
-
-def recentrer(ob):
-    bpy.ops.object.select_all(action="DESELECT")
-    ob.select_set(True)
-    bpy.context.view_layer.objects.active = ob
-    bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY", center="BOUNDS")
-    ob.location = (0, 0, 0)
-    return ob
-
-
-def petale(name, long_mm, larg_mm, creux_mm=1.5, m=None):
-    """Pétale : ellipse plate, bombée."""
-    bm = bmesh.new()
-    bmesh.ops.create_circle(bm, cap_ends=True, segments=24, radius=0.5)
-    for v in bm.verts:
-        x, y = v.co.x, v.co.y
-        v.co = Vector(((x + 0.5) * long_mm * MM, y * larg_mm * MM,
-                       -creux_mm * MM * (1 - (2 * y) ** 2) * math.sin(math.pi * (x + 0.5))))
-    ob = G.mesh_object(name, bm)
-    mod = ob.modifiers.new("ep", "SOLIDIFY")
-    mod.thickness = 0.4 * MM
-    sub = ob.modifiers.new("sub", "SUBSURF")
-    sub.levels = 1
-    G.apply_all(ob)
-    smooth(ob)
-    if m:
-        assign(ob, m)
-    return ob
-
-
-def fleur(name, n, long_mm, larg_mm, m, coeur=None, ouverture=0.35):
-    parts = []
-    for i in range(n):
-        pe = petale(f"{name}_p{i}", long_mm, larg_mm, m=m)
-        pe.rotation_euler = (0, -ouverture, 2 * math.pi * i / n)
-        parts.append(pe)
-    c = ellipsoide(name + "_c", long_mm * 0.12, long_mm * 0.12, long_mm * 0.1, 12)
-    assign(c, coeur or m)
-    parts.append(c)
-    for o in parts:
-        bpy.context.view_layer.objects.active = o
-        o.select_set(True)
-        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-    return joindre(name, parts)
-
-
-# -------------------------------------------------------- les ingrédients
-def feve_tonka(i):
-    ob = ellipsoide(f"tonka{i}", 13, 5.2, 4.2)
-    plier(ob, math.radians(35), "Y")
-    rides(ob, 0.9, 0.0025)
-    assign(ob, mat("feve", (0.10, 0.06, 0.05), 0.55))
-    return ob
-
-
-def amande(i):
-    ob = ellipsoide(f"amande{i}", 11, 7, 4.2)
-    plier(ob, 0.6, "X", "TAPER")
-    rides(ob, 0.25, 0.006)
-    assign(ob, mat("amande", (0.93, 0.85, 0.72), 0.45, sss=0.2))
-    return ob
-
-
-def caramel(i):
-    pts = [(0, 0, 0), (14, 4, 6), (22, -6, 16), (12, -14, 24), (2, -6, 28), (6, 2, 32)]
-    ob = courbe(f"caramel{i}", pts, 3.0, rayons=[1.2, 1.1, 1.0, 0.8, 0.6, 0.35])
-    assign(ob, mat("caramel", (0.85, 0.42, 0.06), 0.08, trans=0.7, ior=1.5))
-    return recentrer(ob)
-
-
-def copeau(i):
-    bm = bmesh.new()
-    bmesh.ops.create_cube(bm, size=1.0)
-    bmesh.ops.scale(bm, vec=(46 * MM, 5 * MM, 1.8 * MM), verts=bm.verts)
-    ob = G.mesh_object(f"copeau{i}", bm)
-    sub = ob.modifiers.new("sub", "SUBDIVIDE" if False else "SUBSURF")
-    sub.levels = 2
-    sub.subdivision_type = "SIMPLE"
-    G.apply_all(ob)
-    rides(ob, 0.8, 0.003)
-    assign(ob, mat("bois", (0.86, 0.72, 0.54), 0.7))
-    return ob
-
-
-def zeste(i):
-    pts = []
-    for k in range(40):
-        a = k * 0.42
-        r = 9 + k * 0.35
-        pts.append((r * math.cos(a), r * math.sin(a), k * 1.1))
-    prof = profil_ellipse(f"zeste_prof{i}", 5.5, 0.9)
-    ob = courbe(f"zeste{i}", pts, 0, profil=prof, resol=3)
-    assign(ob, mat("zeste", (0.96, 0.76, 0.22), 0.45, sss=0.15))
-    return recentrer(ob)
-
-
-def poire(i, moitie=False):
-    prof = [(0, 0), (14, 1), (26, 8), (30, 20), (26, 34), (17, 46), (12, 58), (9, 68), (4, 76), (0, 78)]
-    bm = bmesh.new()
-    vs = [bm.verts.new((r * MM, 0, z * MM)) for r, z in prof]
-    for a, b in zip(vs, vs[1:]):
-        bm.edges.new((a, b))
-    bmesh.ops.spin(bm, geom=bm.verts[:] + bm.edges[:], cent=(0, 0, 0), axis=(0, 0, 1),
-                   steps=32, angle=2 * math.pi, use_duplicate=False)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-6)
-    ob = G.mesh_object(f"poire{i}", bm)
-    smooth(ob)
-    if moitie:
-        s = 1.0
-    else:
-        s = 0.62
-    ob.scale = (s, s, s)
-    bpy.context.view_layer.objects.active = ob
-    bpy.ops.object.transform_apply(scale=True)
-    peau = mat("poire_peau", (0.80, 0.70, 0.30), 0.5) if moitie else mat("poire_verte", (0.60, 0.66, 0.28), 0.5)
-    assign(ob, peau)
-    if moitie:
-        bm = bmesh.new()
-        bm.from_mesh(ob.data)
-        res = bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
-                                     plane_co=(0, 0, 0), plane_no=(0, 1, 0), clear_outer=True)
-        edges = [e for e in res["geom_cut"] if isinstance(e, bmesh.types.BMEdge)]
-        faces = bmesh.ops.edgenet_fill(bm, edges=edges)["faces"]
-        for f in faces:
-            f.material_index = 1
-        bm.to_mesh(ob.data)
-        bm.free()
-        ob.data.materials.append(mat("poire_chair", (0.96, 0.91, 0.72), 0.25, sss=0.3))
-    tige = courbe(f"tige_poire{i}", [(0, 0, 76 * s), (2, 0, 86 * s), (5, 1, 94 * s)], 1.3)
-    assign(tige, mat("tige", (0.35, 0.24, 0.12), 0.7))
-    ob = joindre(f"poire{i}", [ob, tige])
-    return recentrer(ob)
-
-
-def brin_fleurs(i, nom, n_fleurs, taille, couleur, bouton=None, longueur=70):
-    m = mat(nom, couleur, 0.45, sss=0.25)
-    pts = [(0, 0, 0), (3, 2, longueur * 0.35), (-2, 4, longueur * 0.7), (1, 2, longueur)]
-    tige = courbe(f"{nom}_tige{i}", pts, 1.0)
-    assign(tige, mat("tige_verte", (0.35, 0.45, 0.22), 0.6))
-    parts = [tige]
-    rnd = random.Random(i * 13 + len(nom))
-    for k in range(n_fleurs):
-        f = fleur(f"{nom}{i}_{k}", 5 if nom != "tubereuse" else 6, taille, taille * 0.45, m,
-                  coeur=mat("coeur_jaune", (0.95, 0.80, 0.35), 0.5))
-        t = 0.55 + 0.45 * k / max(1, n_fleurs - 1)
-        f.location = (rnd.uniform(-9, 9) * MM, rnd.uniform(-6, 6) * MM, longueur * t * MM + rnd.uniform(-4, 6) * MM)
-        f.rotation_euler = (rnd.uniform(-0.8, 0.8), rnd.uniform(-0.8, 0.8), rnd.uniform(0, 6.28))
-        bpy.context.view_layer.objects.active = f
-        bpy.ops.object.transform_apply(location=True, rotation=True)
-        parts.append(f)
-    if bouton:
-        for k in range(3):
-            b = ellipsoide(f"{nom}_bouton{i}_{k}", 2.6, 2.6, 4.2, 12)
-            assign(b, mat(nom + "_bouton", bouton, 0.5))
-            b.location = (rnd.uniform(-8, 8) * MM, rnd.uniform(-5, 5) * MM, longueur * rnd.uniform(0.75, 1.02) * MM)
-            bpy.context.view_layer.objects.active = b
-            bpy.ops.object.transform_apply(location=True)
-            parts.append(b)
-    return recentrer(joindre(f"{nom}{i}", parts))
-
-
-def feuille(i, long_mm=60, larg_mm=16, couleur=(0.44, 0.52, 0.38)):
-    ob = petale(f"feuille{i}", long_mm, larg_mm, creux_mm=3, m=mat("feuille", couleur, 0.6))
-    plier(ob, math.radians(25), "Y")
-    return recentrer(ob)
-
-
-def petale_libre(i):
-    ob = petale(f"petale{i}", 16, 11, creux_mm=3, m=mat("petale_blanc", (0.97, 0.95, 0.90), 0.4, sss=0.3))
-    return recentrer(ob)
-
-
-def prune(i, moitie=False):
-    ob = ellipsoide(f"prune{i}", 22, 21, 24, 40)
-    rides(ob, 0.25, 0.01)
-    assign(ob, mat("prune_peau", (0.13, 0.04, 0.09), 0.3))
-    if moitie:
-        bm = bmesh.new()
-        bm.from_mesh(ob.data)
-        res = bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:],
-                                     plane_co=(0, 0, 0), plane_no=(0, 1, 0), clear_outer=True)
-        edges = [e for e in res["geom_cut"] if isinstance(e, bmesh.types.BMEdge)]
-        faces = bmesh.ops.edgenet_fill(bm, edges=edges)["faces"]
-        for f in faces:
-            f.material_index = 1
-        bm.to_mesh(ob.data)
-        bm.free()
-        ob.data.materials.append(mat("prune_chair", (0.62, 0.05, 0.09), 0.18, sss=0.3))
-        noyau = ellipsoide(f"noyau{i}", 9, 3, 12, 20)
-        noyau.location = (0, 1.2 * MM, 0)
-        assign(noyau, mat("noyau", (0.35, 0.05, 0.06), 0.3))
-        ob = joindre(f"prune{i}", [ob, noyau])
-    return ob
-
-
-def gousse(i, longueur=185):
-    rnd = random.Random(i)
-    pts = [(0, 0, 0), (longueur * 0.3, rnd.uniform(-8, 8), rnd.uniform(-6, 6)),
-           (longueur * 0.65, rnd.uniform(-10, 10), rnd.uniform(-8, 8)), (longueur * 0.92, 4, 6),
-           (longueur, 12, 16), (longueur * 0.97, 16, 22)]
-    prof = profil_ellipse(f"gousse_prof{i}", 6.0, 2.6)
-    ob = courbe(f"gousse{i}", pts, 0, profil=prof, rayons=[0.4, 1, 1, 0.9, 0.6, 0.3], resol=16)
-    rides(ob, 0.6, 0.003)
-    assign(ob, mat("vanille", (0.12, 0.07, 0.04), 0.4))
-    return recentrer(ob)
-
-
-def cannelle(i, longueur=85):
-    cu = bpy.data.curves.new(f"cannelle{i}", "CURVE")
-    cu.dimensions = "2D"
-    cu.extrude = longueur / 2 * MM
-    cu.bevel_depth = 0.35 * MM
-    sp = cu.splines.new("POLY")
-    pts = []
-    for k in range(60):
-        a = k * 0.28
-        r = 6.5 - k * 0.07
-        pts.append((r * math.cos(a) * MM, r * math.sin(a) * MM, 0, 1))
-    sp.points.add(len(pts) - 1)
-    for p, q in zip(sp.points, pts):
-        p.co = q
-    ob = link(bpy.data.objects.new(f"cannelle{i}", cu))
-    bpy.ops.object.select_all(action="DESELECT")
-    bpy.context.view_layer.objects.active = ob
-    ob.select_set(True)
-    bpy.ops.object.convert(target="MESH")
-    ob = bpy.context.view_layer.objects.active
-    assign(ob, mat("cannelle", (0.55, 0.30, 0.16), 0.75))
-    return recentrer(ob)
-
-
-def orchidee(i):
-    creme = mat("orchidee", (0.96, 0.92, 0.82), 0.4, sss=0.3)
-    parts = []
-    for k, (L, W, a) in enumerate([(34, 14, 0), (34, 14, 2.1), (34, 14, 4.2), (30, 20, 1.05), (30, 20, 5.25)]):
-        pe = petale(f"orch{i}_{k}", L, W, 2.5, creme)
-        pe.rotation_euler = (0, -0.25, a)
-        parts.append(pe)
-    levre = ellipsoide(f"levre{i}", 7, 6, 5, 16)
-    assign(levre, mat("orchidee_coeur", (0.92, 0.55, 0.45), 0.4))
-    parts.append(levre)
-    for o in parts:
-        bpy.context.view_layer.objects.active = o
-        bpy.ops.object.transform_apply(location=True, rotation=True)
-    return recentrer(joindre(f"orchidee{i}", parts))
-
-
-def graines(i, n=60):
-    rnd = random.Random(99 + i)
-    parts = []
-    for k in range(n):
-        g = ellipsoide(f"graine{i}_{k}", 0.6, 0.6, 0.6, 6)
-        g.location = (rnd.gauss(0, 7) * MM, rnd.gauss(0, 3) * MM, rnd.gauss(0, 7) * MM)
-        bpy.context.view_layer.objects.active = g
-        bpy.ops.object.transform_apply(location=True)
-        parts.append(g)
-    ob = joindre(f"graines{i}", parts)
-    assign(ob, mat("graine", (0.05, 0.04, 0.03), 0.6))
-    return recentrer(ob)
 
 
 # Chaque recette : (fabrique, position finale derrière le flacon en mm (x, y, z),
@@ -431,7 +60,7 @@ RECETTES = {
         (lambda: feve_tonka(1), (52, 84, 168), (-10, 35, -20)),
         (lambda: feve_tonka(2), (-62, 84, 58), (0, -20, 70)),
         (lambda: feve_tonka(3), (64, 79, 88), (40, 10, 10)),
-        (lambda: feve_tonka(4), (22, 93, 218), (10, -60, 0)),
+        (lambda: ambre_pepite(0), (22, 93, 218), (10, -60, 0)),
         (lambda: amande(0), (-72, 75, 108), (90, 40, 0)),
         (lambda: amande(1), (72, 80, 132), (90, -30, 0)),
         (lambda: amande(2), (-30, 88, 205), (90, 70, 0)),
@@ -443,10 +72,10 @@ RECETTES = {
     "magnetic-flowers": [
         (lambda: poire(0, moitie=True), (-50, 75, 78), (0, 10, 180)),
         (lambda: poire(1), (56, 82, 38), (0, -15, 0)),
-        (lambda: brin_fleurs(0, "jasmin", 8, 11, (0.98, 0.97, 0.93)), (56, 84, 150), (0, 20, 0)),
-        (lambda: brin_fleurs(1, "tubereuse", 5, 15, (0.97, 0.95, 0.88)), (-34, 93, 172), (0, -18, 0)),
-        (lambda: brin_fleurs(2, "fleur_oranger", 5, 9, (0.96, 0.60, 0.22), bouton=(0.95, 0.72, 0.40)), (-70, 80, 138), (0, -35, 0)),
-        (lambda: brin_fleurs(3, "fleur_oranger", 4, 9, (0.96, 0.60, 0.22)), (70, 80, 92), (0, 40, 0)),
+        (lambda: jasmin(0), (56, 84, 150), (0, 20, 0)),
+        (lambda: tubereuse(0), (-34, 93, 172), (0, -18, 0)),
+        (lambda: fleur_oranger(0), (-70, 80, 138), (0, -35, 0)),
+        (lambda: fleur_oranger(1), (70, 80, 92), (0, 40, 0)),
         (lambda: feuille(0), (18, 98, 206), (90, 0, 40)),
         (lambda: feuille(1), (-60, 88, 30), (90, 0, -30)),
         (lambda: petale_libre(0), (-78, 66, 205), (90, 20, 10)),
@@ -470,7 +99,7 @@ RECETTES = {
 }
 ECHELLE_INGREDIENTS = 1.15   # un peu plus grands que nature : lisibles à l'écran
 # Fèves et amandes sont minuscules à côté du flacon : on les grossit davantage.
-ECHELLE_PARFUM = {"tonka-love": 1.75}
+ECHELLE_PARFUM = {"tonka-love": 1.45}
 
 
 # ------------------------------------------------------------- chorégraphie

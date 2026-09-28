@@ -347,30 +347,28 @@ def cartes_noires():
         ob.visible_shadow = False
 
 
-def logo_capot(p, m):
-    """Emblème LIBRERY en relief sur le dessus du capot : grille déplacée
-    par l'alpha de l'emblème (0,5 mm de relief), même or que le capot."""
+def logo_capot(p, m, profondeur=0.5):
+    """Emblème LIBRERY gravé en creux dans le dessus du capot (0,5 mm).
+
+    Un « tampon » est soustrait du capot : une grille posée juste au-dessus
+    du capot, creusée vers le bas par l'alpha de l'emblème, puis épaissie
+    vers le haut. Là où l'alpha est nul le tampon reste au-dessus du capot et
+    ne coupe rien ; le fondu des bords de l'image donne des flancs biseautés."""
     emb = os.path.join(ROOT, "..", "maquette", "assets", "img", "v2", "emblem-blanc.png")
     img = bpy.data.images.load(emb)
     haut = (p["H"] + p["VIR_H"] + p["CH"]) * MM
     taille = 26.0 * MM                      # hauteur de l'emblème : il occupe presque tout le dessus du capot (31,3 de profondeur)
     bm = bmesh.new()
-    bmesh.ops.create_grid(bm, x_segments=220, y_segments=248, size=0.5)
-    ob = G.mesh_object("LogoCapot", bm)
+    bmesh.ops.create_grid(bm, x_segments=200, y_segments=226, size=0.5)
+    ob = G.mesh_object("TamponLogo", bm)
     ratio = img.size[0] / img.size[1]
     ob.scale = (taille * ratio, taille, 1)
-    ob.location = (0, 0, haut - 0.05 * MM)
+    ob.location = (0, 0, haut + 0.1 * MM)
     # Sans rotation : lisible depuis l'avant du flacon (clé vers soi).
     tex = bpy.data.textures.new("emblemeRelief", "IMAGE")
     tex.image = img
     tex.use_alpha = True
     tex.extension = "CLIP"
-    mod = ob.modifiers.new("relief", "DISPLACE")
-    mod.texture = tex
-    mod.texture_coords = "UV"
-    mod.direction = "Z"
-    mod.strength = 0.55 * MM
-    mod.mid_level = 0.0
     bm2 = bmesh.new()
     bm2.from_mesh(ob.data)
     uv = bm2.loops.layers.uv.new("UVMap")
@@ -379,19 +377,24 @@ def logo_capot(p, m):
             loop[uv].uv = (loop.vert.co.x + 0.5, loop.vert.co.y + 0.5)
     bm2.to_mesh(ob.data)
     bm2.free()
+    mod = ob.modifiers.new("creux", "DISPLACE")
+    mod.texture = tex
+    mod.texture_coords = "UV"
+    mod.direction = "Z"
+    mod.strength = -(profondeur + 0.1) * MM
+    mod.mid_level = 0.0
+    sol = ob.modifiers.new("epaisseur", "SOLIDIFY")
+    sol.thickness = 0.4 * MM
+    sol.offset = 1.0
     G.apply_all(ob)
-    # Ne garder que le relief (les zones à plat restent sous la surface du capot).
     bm3 = bmesh.new()
     bm3.from_mesh(ob.data)
-    bas = [v for v in bm3.verts if v.co.z < 0.02 * MM]
-    bmesh.ops.delete(bm3, geom=bas, context="VERTS")
+    bmesh.ops.recalc_face_normals(bm3, faces=bm3.faces)   # le solidify vers le haut les laisse inversées
     bm3.to_mesh(ob.data)
     bm3.free()
-    for poly in ob.data.polygons:
-        poly.use_smooth = True
-    ob.parent = bpy.data.objects["Capot"].parent
-    BF.assign(ob, m["Or"])
-    return ob
+    capot = bpy.data.objects["Capot"]
+    G.boolean(capot, ob)
+    return capot
 
 
 def flacon(handle, tau=None):
