@@ -407,14 +407,23 @@ def argile():
             bpy.data.objects[nom].hide_render = True
 
 
-def rendre(handle, apercu, debut=1, fin=None, echantillons=None, gris=False):
+def rendre(handle, apercu, debut=1, fin=None, echantillons=None, gris=False, rapide=False):
     s = construire(handle)
     if gris:
         argile()
-    w, h = (360, 640) if apercu else (720, 1280)
+    s.render.use_persistent_data = True          # garde la scène entre deux images
+    if rapide:
+        # ≈ 5 s par image au lieu de 13 : 540 × 960, 6 échantillons, rebonds
+        # réduits, une image sur deux (12 i/s, interpolées à 24 au montage).
+        c = s.cycles
+        c.max_bounces, c.transmission_bounces, c.glossy_bounces, c.diffuse_bounces = 6, 6, 2, 1
+        c.use_adaptive_sampling = True
+        c.adaptive_threshold = 0.1
+        s.frame_step = 2
+    w, h = (360, 640) if apercu else (540, 960) if rapide else (720, 1280)
     s.render.resolution_x, s.render.resolution_y = w, h
-    s.cycles.samples = echantillons or (3 if gris else 6 if apercu else 24)
-    s.render.use_motion_blur = not (apercu or gris)
+    s.cycles.samples = echantillons or (3 if gris else 6 if apercu or rapide else 24)
+    s.render.use_motion_blur = not (apercu or gris or rapide)
     out = os.path.join(R.ROOT, "videos", handle + suffixe_video(apercu, gris))
     os.makedirs(out, exist_ok=True)
     s.render.filepath = os.path.join(out, "img_")
@@ -432,12 +441,25 @@ def suffixe_video(apercu, gris):
 
 
 def monter(dossier, sortie):
-    """Assemble les images en MP4 (H.264, 24 i/s) avec l'ffmpeg d'imageio."""
+    """Assemble les images en MP4 (H.264, 24 i/s) avec l'ffmpeg d'imageio.
+    Si une image sur deux seulement a été rendue (mode rapide), les images
+    intermédiaires sont interpolées par compensation de mouvement ; les cuts
+    sont détectés et laissés francs."""
+    import glob
+    import tempfile
     import imageio_ffmpeg
     ff = imageio_ffmpeg.get_ffmpeg_exe()
-    subprocess.run([ff, "-y", "-loglevel", "error", "-framerate", str(FPS),
-                    "-i", os.path.join(dossier, "img_%04d.jpg"),
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", sortie], check=True)
+    imgs = sorted(glob.glob(os.path.join(dossier, "img_*.jpg")))
+    nums = [int(os.path.basename(f)[4:8]) for f in imgs]
+    pas = (nums[1] - nums[0]) if len(nums) > 1 else 1
+    with tempfile.TemporaryDirectory() as tmp:
+        for k, f in enumerate(imgs):
+            os.symlink(os.path.abspath(f), os.path.join(tmp, f"i_{k:04d}.jpg"))
+        cmd = [ff, "-y", "-loglevel", "error", "-framerate", str(FPS / pas), "-i", os.path.join(tmp, "i_%04d.jpg")]
+        if pas > 1:
+            cmd += ["-vf", f"minterpolate=fps={FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:scd=fdiff:scd_threshold=8"]
+        cmd += ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-r", str(FPS), sortie]
+        subprocess.run(cmd, check=True)
 
 
 if __name__ == "__main__":
@@ -446,6 +468,7 @@ if __name__ == "__main__":
     ap.add_argument("parfum", choices=list(RECETTES))
     ap.add_argument("--apercu", action="store_true")
     ap.add_argument("--gris", action="store_true", help="rendu argile en niveaux de gris, rapide")
+    ap.add_argument("--rapide", action="store_true", help="540 × 960, 12 i/s interpolées à 24 : ≈ 15 min par vidéo")
     ap.add_argument("--debut", type=int, default=1)
     ap.add_argument("--fin", type=int)
     ap.add_argument("--echantillons", type=int)
@@ -455,7 +478,7 @@ if __name__ == "__main__":
         construire(a.parfum)
         bpy.ops.wm.save_as_mainfile(filepath=os.path.join(R.ROOT, "videos", a.parfum + ".blend"))
     else:
-        d = rendre(a.parfum, a.apercu, a.debut, a.fin, a.echantillons, a.gris)
+        d = rendre(a.parfum, a.apercu, a.debut, a.fin, a.echantillons, a.gris, a.rapide)
         suffixe = suffixe_video(a.apercu, a.gris)
         monter(d, os.path.join(R.ROOT, "videos", f"{a.parfum}{suffixe}.mp4"))
         print("video", os.path.join(R.ROOT, "videos", f"{a.parfum}{suffixe}.mp4"))
