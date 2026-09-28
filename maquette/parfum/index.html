@@ -137,7 +137,11 @@ const modele = await fetch("modele.json", { cache: "no-store" }).then((r) => r.j
 const v = encodeURIComponent(modele.date || Date.now());
 // La vue 360° se charge en même temps que le modèle 3D, sans l'attendre.
 const handleInitial = location.hash.slice(1) || "tonka-love";
-const premier360 = charger360(handleInitial);
+// Vue photo 360° (images Cycles) désactivée : ces images ne suivent plus le
+// modèle (typo des étiquettes, logo du capot). La page reste sur la 3D temps
+// réel, qui charge toujours le dernier modèle. Passer à true pour la rétablir.
+const AVEC_360 = false;
+const premier360 = AVEC_360 ? charger360(handleInitial) : Promise.resolve(null);
 const [gltf, parfums] = await Promise.all([
   new GLTFLoader().loadAsync(`flacon-100ml.glb?v=${v}`),
   fetch(`parfums.json?v=${v}`).then((r) => r.json()),
@@ -370,14 +374,15 @@ const selectOrig = select;
 select = async (handle) => {
   selectOrig(handle);
   if (vue.mode === "360" && !(await mode360(handle))) appliquerMode("3d");
-  modeBtn.hidden = !(await fetch(`360/${handle}/info.json?v=${v}`, { cache: "no-store" }).then((r) => r.ok).catch(() => false));
+  modeBtn.hidden = !AVEC_360 || !(await fetch(`360/${handle}/info.json?v=${v}`, { cache: "no-store" }).then((r) => r.ok).catch(() => false));
 };
 for (const b of nav.querySelectorAll(".swatch")) b.onclick = () => select(b.dataset.handle);
 
 // Au chargement : 360° par défaut si disponible (sauf ?fixe, gardé pour les captures 3D).
 appliquerMode("3d");
 const deja = currentHandle() === handleInitial ? premier360 : null;
-if (!new URLSearchParams(location.search).has("fixe") && await mode360(currentHandle(), deja)) appliquerMode("360");
+if (!AVEC_360) modeBtn.hidden = true;
+else if (!new URLSearchParams(location.search).has("fixe") && await mode360(currentHandle(), deja)) appliquerMode("360");
 else modeBtn.hidden = !(await (deja || charger360(currentHandle())));
 
 const capHome = parts.Capot.position.clone();
