@@ -70,7 +70,7 @@ RECETTES = {
         (lambda: zeste(0), (-46, 84, 205), (20, 0, 0)),
     ],
     "magnetic-flowers": [
-        (lambda: poire(0, moitie=True), (-50, 75, 78), (0, 10, 180)),
+        (lambda: poire_fendue(0), (-50, 75, 78), (0, 0, 0)),
         (lambda: poire(1), (56, 82, 38), (0, -15, 0)),
         (lambda: jasmin(0), (56, 84, 150), (0, 20, 0)),
         (lambda: tubereuse(0), (-34, 93, 172), (0, -18, 0)),
@@ -100,7 +100,17 @@ RECETTES = {
 # Point d'attraction au dos du flacon, à mi-hauteur : à la fin, les
 # ingrédients s'y resserrent comme si le parfum les attirait.
 ATTRACTEUR = (0.0, 78.0, 72.0)
-RESSERREMENT = 0.7          # les positions finales se rapprochent du point de ce facteur
+RESSERREMENT = 0.8          # les positions finales se rapprochent du point de ce facteur
+PHI = (1 + 5 ** 0.5) / 2
+# Grappe finale : 8 ingrédients (Fibonacci) seulement, les plus évocateurs ;
+# les autres s'éloignent doucement hors du cadre pendant le recul.
+FINALE = {
+    "vanilla-plum": [3, 4, 5, 0, 1, 7, 9, 11],        # demi-prune, 2 prunes, 2 gousses, cannelle, orchidée, graines
+    "magnetic-flowers": [0, 1, 2, 3, 4, 6, 8, 9],     # poire fendue, poire, jasmin, tubéreuse, oranger, sauge, pétales
+    "tonka-love": [0, 1, 2, 5, 6, 4, 11, 9],          # 3 fèves, 2 amandes, ambre, zeste, copeau
+}
+ARRIVEE = 3.54              # durée de l'attraction (s) : 15 / φ³ ; départ à 15 / φ ≈ 9,27 s moins le recul
+DEBUT_ATTRACTION = 8.6
 ECHELLE_INGREDIENTS = 1.15   # un peu plus grands que nature : lisibles à l'écran
 # Fèves et amandes sont minuscules à côté du flacon : on les grossit davantage.
 ECHELLE_PARFUM = {"tonka-love": 1.45}
@@ -132,7 +142,17 @@ class Danseur:
         self.ph = Vector((rnd.uniform(0, 6.3), rnd.uniform(0, 6.3), rnd.uniform(0, 6.3)))
         self.r0 = Vector((rnd.uniform(0, 6.3), rnd.uniform(0, 6.3), rnd.uniform(0, 6.3)))
         self.vr = Vector((rnd.uniform(-0.6, 0.6), rnd.uniform(-0.6, 0.6), rnd.uniform(-0.8, 0.8)))
-        self.retard = rnd.uniform(0.0, 0.8)     # les ingrédients arrivent en cascade
+        # Cascade d'arrivée en suite de Weyl du nombre d'or : délais bien
+        # répartis, jamais groupés.
+        self.retard = ((i * PHI) % 1.0) * 0.9
+        self.vr = self.vr / PHI                  # tournoiement plus calme
+        self.part = False                        # quitte le cadre à la fin
+        if ob.get("fendue"):
+            # Poire qui se fend : on la garde de face pour que la caméra voie
+            # la chair quand elle s'ouvre.
+            self.r0 = Vector((0.0, 0.0, 0.0))
+            self.vr = Vector((0.0, 0.0, 0.10))
+            self.amp *= 0.5
 
     def danse(self, t):
         tour = 0.22 * t                          # la constellation tourne lentement
@@ -146,31 +166,38 @@ class Danseur:
 
     def pose(self, t):
         p_d, r_d = self.danse(t)
-        debut = 8.6 + (0 if self.flacon else self.retard)
+        debut = DEBUT_ATTRACTION + (0 if self.flacon else self.retard)
         k = lisse((t - debut) / 2.4)
-        # Après l'arrivée : léger flottement, qui respire vers le point d'attraction.
         A = Vector(ATTRACTEUR) * MM
-        vers_a = (A - self.fp).normalized() if (A - self.fp).length > 1e-6 else Vector()
-        flot = Vector((0, 0, 1.2 * MM * math.sin(1.2 * t + self.ph.x))) \
-            + vers_a * 1.5 * MM * (0.5 + 0.5 * math.sin(0.9 * t + self.ph.z))
-        p_f = self.fp + flot
-        if not self.flacon:
-            # Attraction : l'ingrédient s'enroule vers le point au dos du
-            # flacon en accélérant (spirale qui se referme), puis se pose.
-            ka = lisse((t - debut) / 2.4) ** 1.6
-            p = p_d.lerp(p_f, ka)
-            rel = p - A
-            th = 1.8 * (1 - ka) ** 2 * (1 if self.ph.y > 3.14 else -1) * (ka > 0)
-            c, s_ = math.cos(th), math.sin(th)
-            rel = Vector((rel.x * c - rel.z * s_, rel.y, rel.x * s_ + rel.z * c))
-            r_f = self.fr + Vector((0.02 * math.sin(0.9 * t + self.ph.y), 0, 0.03 * math.sin(0.7 * t)))
-            return A + rel, r_d.lerp(r_f, k)
-        r_f = self.fr + Vector((0.02 * math.sin(0.9 * t + self.ph.y), 0, 0.03 * math.sin(0.7 * t)))
         if self.flacon:
-            # Le flacon finit de face : on ramène son angle au tour entier le plus proche.
-            tours = round(r_d.z / (2 * math.pi)) * 2 * math.pi
-            r_f = Vector((0, 0, tours))
-        return p_d.lerp(p_f, k), r_d.lerp(r_f, k)
+            flot = Vector((0, 0, 1.2 * MM * math.sin(1.2 * t + self.ph.x)))
+            tours = round(r_d.z / (2 * math.pi)) * 2 * math.pi     # finit de face
+            return p_d.lerp(self.fp + flot, k), r_d.lerp(Vector((0, 0, tours)), k)
+        u = max(0.0, min(1.0, (t - debut) / ARRIVEE))
+        if self.part:
+            # Les ingrédients en trop s'éloignent en glissant hors du cadre,
+            # sans hâte (accélération douce), en continuant leur danse.
+            dehors = p_d - A
+            dehors.y = 0.0
+            if dehors.length < 1e-6:
+                dehors = Vector((1, 0, 0))
+            return p_d + dehors.normalized() * 0.45 * u ** PHI, r_d
+        # Attraction : départ vif puis longue décélération (courbe en φ²),
+        # léger enroulement autour du point d'attraction, pose sans secousse.
+        ka = 1 - (1 - u) ** (PHI * PHI)
+        vers_a = (A - self.fp).normalized() if (A - self.fp).length > 1e-6 else Vector()
+        flot = Vector((0, 0, 0.8 * MM * math.sin(1.2 * t / PHI + self.ph.x))) \
+            + vers_a * 1.0 * MM * (0.5 + 0.5 * math.sin(t / PHI + self.ph.z))
+        p = p_d.lerp(self.fp + flot, ka)
+        rel = p - A
+        th = (1 / PHI) * (1 - ka) ** 2 * (1 if self.ph.y > 3.14 else -1) * (u > 0)
+        c, s_ = math.cos(th), math.sin(th)
+        rel = Vector((rel.x * c - rel.z * s_, rel.y, rel.x * s_ + rel.z * c))
+        # Rotation : on ramène l'angle dansé au plus près de l'angle final
+        # (au plus un demi-tour par axe), pour qu'il se pose sans pirouettes.
+        r_f = self.fr + Vector((0.015 * math.sin(0.9 * t / PHI + self.ph.y), 0, 0.02 * math.sin(0.7 * t / PHI)))
+        r_proche = Vector(tuple(r_f[j] + ((r_d[j] - r_f[j] + math.pi) % (2 * math.pi) - math.pi) for j in range(3)))
+        return A + rel, r_proche.lerp(r_f, ka)
 
 
 # ---------------------------------------------------------------- caméra
@@ -327,6 +354,14 @@ def plateau():
     return so
 
 
+def taille(ob):
+    """Dimensions d'un objet, ou de ses enfants pour un vide (poire fendue)."""
+    if ob.type == "EMPTY":
+        dims = [Vector(c.dimensions) for c in ob.children]
+        return Vector(tuple(max(d[k] for d in dims) for k in range(3))) * ob.scale.x if dims else Vector((0.01,) * 3)
+    return Vector(ob.dimensions)
+
+
 def resserrer(danseurs):
     """Rapproche les positions finales du point d'attraction, puis écarte
     les ingrédients qui se chevaucheraient (surtout en profondeur, pour
@@ -339,7 +374,7 @@ def resserrer(danseurs):
     moy = sum((d.fp - A for d in danseurs), Vector()) / len(danseurs)
     moy.y = 0.0
     for d in danseurs:
-        dims = sorted(d.ob.dimensions)
+        dims = sorted(taille(d.ob))
         rayons.append(0.32 * dims[2] + 0.25 * dims[1])
         rel = d.fp - A - moy
         d.fp = A + Vector((rel.x * RESSERREMENT, rel.y * 0.8, rel.z * RESSERREMENT))
@@ -360,6 +395,21 @@ def resserrer(danseurs):
             d.fp.y = max(d.fp.y, 0.045)
 
 
+def ouvrir_poire(vide, t, f):
+    """La poire se fissure (léger entrebâillement à 0,38 s), puis s'ouvre
+    en deux comme un livre et montre sa chair blanche (de 0,62 à 1,62 s :
+    temps et angles en proportions φ)."""
+    u = 0.146 * lisse((t - 0.382) / 0.236) + 0.854 * lisse((t - 0.618) / 1.0)
+    for enfant in vide.children:
+        cote = -1 if enfant.name.endswith("_A") else 1
+        enfant.location = (cote * 7.0 * MM * u, -3.0 * MM * u, 0)
+        # Chaque moitié pivote vers la caméra (−Y) de 34° (Fibonacci), et
+        # s'écarte un peu en haut.
+        enfant.rotation_euler = (0, cote * -0.06 * u, cote * math.radians(34) * u)
+        enfant.keyframe_insert("location", frame=f)
+        enfant.keyframe_insert("rotation_euler", frame=f)
+
+
 def construire(handle):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     R.flacon(handle)
@@ -371,7 +421,10 @@ def construire(handle):
         ob = fab()
         ob.scale = (ECHELLE_INGREDIENTS * ECHELLE_PARFUM.get(handle, 1.0),) * 3
         danseurs.append(Danseur(ob, pos, rot, i, len(recette)))
-    resserrer(danseurs)
+    garde = FINALE.get(handle, range(len(danseurs)))
+    for i, d in enumerate(danseurs):
+        d.part = i not in garde
+    resserrer([d for d in danseurs if not d.part])
     fl = Danseur(racine, (0, 0, 0), (0, 0, 0), 99, 1, flacon=True)
     danseurs.append(fl)
     plateau()
@@ -399,6 +452,9 @@ def construire(handle):
             d.ob.rotation_euler = Euler(tuple(r))
             d.ob.keyframe_insert("location", frame=f)
             d.ob.keyframe_insert("rotation_euler", frame=f)
+        for d in danseurs:
+            if d.ob.get("fendue"):
+                ouvrir_poire(d.ob, t, f)
         pos, cib, fstop, focale = camera_a(decoupage, t)
         cam.location = pos
         cam.rotation_euler = (cib - pos).to_track_quat("-Z", "Y").to_euler()

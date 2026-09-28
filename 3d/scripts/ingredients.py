@@ -173,6 +173,19 @@ def bruit(x, y, z, graine=0.0):
     return noise.noise(Vector((x + graine * 17.3, y - graine * 5.1, z + graine * 3.7)))
 
 
+def organique(ob, amp_mm, periode_mm, graine=0.0):
+    """Déforme l'objet par un champ de bruit lent (courbures, torsions,
+    irrégularités de nature) : rien n'est parfaitement droit ni symétrique."""
+    me = ob.data
+    f = 1.0 / (periode_mm * MM)
+    off = Vector((graine * 3.1, graine * 7.7, graine * 1.3))
+    for v in me.vertices:
+        d = noise.noise_vector(v.co * f + off)
+        v.co += d * amp_mm * MM
+    me.update()
+    return ob
+
+
 def sillon(v, largeur):
     """1 au fond d'un sillon (v ≈ 0), 0 ailleurs."""
     return math.exp(-(v * v) / (largeur * largeur))
@@ -463,7 +476,7 @@ def caramel(i):
     modifs(ob, subsurf=1)
     m = mat("ambre", (0.86, 0.44, 0.07), 0.04, trans=0.75, ior=1.54)
     assign(ob, m)
-    return recentrer(ob)
+    return recentrer(organique(ob, 1.0, 18, graine=i + 10.6))
 
 
 def ambre_pepite(i):
@@ -506,7 +519,7 @@ def copeau(i):
     ob.data.materials.append(mat_texture("bois", (0.74, 0.55, 0.36), (0.64, 0.46, 0.29), 0.7,
                                          echelle=160, seuil=(0.25, 0.75), type_tex="WAVE", ondes=1.2, sens="Z"))
     modifs(ob, 0.7, 1, offset=0.0)
-    return recentrer(ob)
+    return recentrer(organique(ob, 0.8, 25, graine=i + 7.3))
 
 
 def zeste(i):
@@ -544,11 +557,11 @@ def zeste(i):
                                          echelle=1400, seuil=(0.4, 0.6), sss=0.1))
     ob.data.materials.append(mat("ziste", (0.97, 0.94, 0.84), 0.6, sss=0.2))
     modifs(ob, 2.2, 1, offset=-1, mat_coque=1, mat_bord=1)
-    return recentrer(ob)
+    return recentrer(organique(ob, 1.2, 30, graine=i + 6.1))
 
 
 # ------------------------------------------------- Magnetic Flowers
-def poire(i, moitie=False):
+def poire(i, moitie=False, queue=True, pepins=((-3.0, 19.0, 0.25), (2.6, 25.5, -0.35)), recentre=True):
     """Poire Williams : ventre rond, col élancé légèrement penché, œil (calice)
     en creux sous le fruit, queue ligneuse. La demi-poire montre sa chair,
     le cœur et deux pépins."""
@@ -565,9 +578,8 @@ def poire(i, moitie=False):
 
     ob = tour(f"poire{i}", prof, 56, rayon=bosses, centre=lambda z: (3.5 * s * (z / H) ** 2.2, 0))
     modifs(ob, subsurf=1)
-    peau = mat_texture("poire_doree" if moitie else "poire_verte",
-                       (0.86, 0.72, 0.26) if moitie else (0.63, 0.70, 0.26),
-                       (0.74, 0.58, 0.22) if moitie else (0.55, 0.60, 0.22),
+    # Même Williams jaune-vert du début à la fin (entière ou coupée).
+    peau = mat_texture("poire_williams", (0.78, 0.76, 0.32), (0.64, 0.58, 0.22),
                        0.45, echelle=700, seuil=(0.64, 0.68))
     assign(ob, peau)
     parts = []
@@ -594,14 +606,17 @@ def poire(i, moitie=False):
         assign(trait, mat("poire_coeur", (0.93, 0.86, 0.62), 0.25))
         placer(trait, (1.5, 0.07, 36), (-math.pi / 2, -math.pi / 2 + 0.05, 0))
         parts.append(trait)
-        for k, sx in enumerate((-3.2, 3.2)):
+        # Pépins décalés et inclinés différemment (deux pépins alignés
+        # dessinaient un visage).
+        for k, (sx, sz, inc) in enumerate(pepins):
             p = bouton(f"pepin{i}_{k}", 8.5, 2.3, mat("pepin", (0.28, 0.15, 0.07), 0.3))
             p.scale = (1, 0.55, 1)
-            placer(p, (sx, 0.3, 21), (0, sx * 0.07, 0))
+            placer(p, (sx, 0.3, sz), (0, inc, 0))
             parts.append(p)
-    q = tige(f"queue{i}", [(3.5 * s, 0, H - 1), (4.2 * s, 0, H + 8 * s), (6.5 * s, 0.5, H + 18 * s),
+    q = None if not queue else tige(f"queue{i}", [(3.5 * s, 0, H - 1), (4.2 * s, 0, H + 8 * s), (6.5 * s, 0.5, H + 18 * s),
                            (10 * s, 1, H + 25 * s)], 1.7 * s, 1.0 * s, mat("queue", (0.36, 0.25, 0.13), 0.75))
-    parts.append(q)
+    if q:
+        parts.append(q)
     if not moitie:
         f = lame(f"poire_feuille{i}", 52, 24, contour_ovale(0.8, 0.45), creux=2.4, courbe=-0.45, pli=0.12,
                  torsion=0.3, relief=lambda u, v: -0.4 * sillon(v, 0.07) + 0.15 * bruit(u * 5, v * 3, g))
@@ -618,7 +633,39 @@ def poire(i, moitie=False):
         else:
             bpy.data.objects.remove(c)
     ob = joindre(f"poire{i}", [ob] + parts)
-    return recentrer(ob)
+    organique(ob, 0.8 * s, 40, graine=i + 0.5)
+    return recentrer(ob) if recentre else ob
+
+
+def poire_fendue(i):
+    """Poire entière faite de deux moitiés jointives : dans la vidéo, elle se
+    fend puis s'ouvre et montre sa chair blanche. Renvoie un vide parent
+    (à animer comme un ingrédient) et ses deux moitiés, plan de coupe
+    vertical face à ±X (moitié A à gauche, B à droite)."""
+    a = poire(i, moitie=True, recentre=False)
+    b = poire(i + 50, moitie=True, queue=False, pepins=((-2.6, 21.5, -0.2),), recentre=False)
+    # B : miroir de A par le plan de coupe (y → −y).
+    b.scale = (1, -1, 1)
+    appliquer(b)
+    b.data.flip_normals()
+    for m, nom in ((a, "A"), (b, "B")):
+        m.name = f"poire_fendue{i}_{nom}"
+        m.rotation_euler = (0, 0, -math.pi / 2)          # coupe face à ±X
+        appliquer(m)
+    # Centre de l'ensemble à l'origine.
+    bpy.context.view_layer.update()
+    pts = [m.matrix_world @ Vector(c) for m in (a, b) for c in m.bound_box]
+    ctr = sum(pts, Vector()) / len(pts)
+    for m in (a, b):
+        m.location -= ctr
+        appliquer(m)
+    vide = bpy.data.objects.new(f"poire_fendue{i}", None)
+    vide.empty_display_size = 0.02
+    bpy.context.collection.objects.link(vide)
+    for m in (a, b):
+        m.parent = vide
+    vide["fendue"] = 1
+    return vide
 
 
 def jasmin(i):
@@ -652,7 +699,7 @@ def jasmin(i):
         b = bouton(f"jasmin_b{i}_{k}", 15, 1.9, rose)
         placer(b, (4 * math.cos(a), 4 * math.sin(a), L - 4), (0.35 * math.sin(a), -0.35 * math.cos(a), 0))
         parts.append(b)
-    return recentrer(joindre(f"jasmin{i}", parts))
+    return recentrer(organique(joindre(f"jasmin{i}", parts), 3.0, 55, graine=i + 1.3))
 
 
 def tubereuse(i):
@@ -679,7 +726,7 @@ def tubereuse(i):
         placer(b, (2.0 * math.cos(a), 2.0 * math.sin(a), L - 6 + k * 2.5),
                (0.4 * math.sin(a), -0.4 * math.cos(a), 0))
         parts.append(b)
-    return recentrer(joindre(f"tubereuse{i}", parts))
+    return recentrer(organique(joindre(f"tubereuse{i}", parts), 4.5, 70, graine=i + 2.1))
 
 
 def fleur_oranger(i):
@@ -715,7 +762,7 @@ def fleur_oranger(i):
         assign(f, vert_fonce)
         placer(f, (0, 0, z), (0.2, -0.9, k * math.pi + 0.4))
         parts.append(f)
-    return recentrer(joindre(f"fleur_oranger{i}", parts))
+    return recentrer(organique(joindre(f"fleur_oranger{i}", parts), 3.0, 45, graine=i + 3.7))
 
 
 def feuille(i, long_mm=62, larg_mm=22):
@@ -735,7 +782,7 @@ def feuille(i, long_mm=62, larg_mm=22):
     m = mat("sauge", (0.52, 0.58, 0.47), 0.85, sheen=0.8)
     assign(f, m)
     p = tige(f"petiole{i}", [(0, 0, 0.3), (-6, 0, -0.5), (-12, 0, -2)], 1.1, 0.8, m)
-    return recentrer(joindre(f"feuille{i}", [f, p]))
+    return recentrer(organique(joindre(f"feuille{i}", [f, p]), 1.4, 28, graine=i + 8.2))
 
 
 def petale_libre(i):
@@ -745,7 +792,7 @@ def petale_libre(i):
               relief=lambda u, v: 0.3 * bruit(u * 3, v * 3, i) * u)
     modifs(ob, 0.35, 1)
     assign(ob, mat("petale_blanc", (0.98, 0.96, 0.92), 0.4, sss=0.35))
-    return recentrer(ob)
+    return recentrer(organique(ob, 0.9, 12, graine=i + 9.4))
 
 
 # ---------------------------------------------------- Vanilla Plum
@@ -811,18 +858,28 @@ def prune(i, moitie=False):
 
 
 def gousse(i, longueur=185):
-    """Gousse de vanille : longue lanière plate (≈ 8 mm), noire et huileuse,
-    ridée en long, légèrement tordue, bout recourbé en crochet."""
+    """Gousse de vanille : longue lanière souple (≈ 9 mm), brun-noir huileux,
+    ridée en long. Jamais droite : elle ondule en S dans l'espace, se vrille,
+    s'élargit et se pince par endroits, et finit en petite crosse côté tige."""
     rnd = random.Random(i)
-    g = 4.1 * i
-    n = 200
-    kappa = [0.0015 * math.sin(6 * k / n + rnd.uniform(0, 6)) + (0.05 if k > 0.9 * n else 0.0) for k in range(n)]
-    pts, ang, p = [], 0.0, Vector((0, 0, 0))
-    for k in range(n + 1):
-        pts.append(p.copy())
-        if k < n:
-            ang += kappa[k] * longueur / n * 2.2
-            p = p + Vector((math.cos(ang), math.sin(ang), 0.05 * math.sin(k * 0.05))) * (longueur / n)
+    g = 4.1 * i + 0.3
+    longueur = longueur * rnd.uniform(0.86, 1.0)
+    n = 240
+    pas = longueur / n
+    pts, T = [Vector((0, 0, 0))], Vector((1, 0, 0))
+    N = Vector((0, 1, 0))
+    for k in range(n):
+        s_ = k / n
+        # Courbure en deux composantes (plan et hors plan) : bruit lent,
+        # une grande courbe d'ensemble, et la crosse des derniers 8 %.
+        k1 = 0.010 * bruit(s_ * 2.2, 0.3, 0, g) + 0.0045 * math.sin(math.pi * s_ + rnd.uniform(-1, 1))
+        k2 = 0.007 * bruit(s_ * 1.7, 5.1, 0, g + 2)
+        if s_ > 0.92:
+            k1 += 0.07 * ((s_ - 0.92) / 0.08)
+        B = T.cross(N).normalized()
+        T = (T + N * (k1 * pas) + B * (k2 * pas)).normalized()          # courbures en 1/mm
+        N = (N - T * N.dot(T)).normalized()
+        pts.append(pts[-1] + T * pas)
 
     def chemin(t):
         k = t * n
@@ -830,19 +887,20 @@ def gousse(i, longueur=185):
         return pts[a].lerp(pts[a + 1], k - a)
 
     def larg(t):
-        return 5.0 * min(1.0, 18 * t) ** 0.4 * min(1.0, 7 * (1 - t)) ** 0.8 + 0.2
+        base = 4.6 * min(1.0, 16 * t) ** 0.45 * min(1.0, 6 * (1 - t)) ** 0.8 + 0.25
+        return base * (1 + 0.16 * bruit(t * 7, 1.1, 0, g + 5))           # pincements, renflements
 
     def ep(t):
-        return larg(t) * 0.42 + 0.1
+        return larg(t) * (0.40 + 0.08 * bruit(t * 5, 2.3, 0, g + 7)) + 0.1
 
     def rides(t, a):
         n1 = bruit(math.cos(a) * 2.2, math.sin(a) * 2.2, t * 9, g)
         n2 = bruit(math.cos(a) * 6, math.sin(a) * 6, t * 30, g + 3)
-        return 1 - 0.12 * sillon(n1, 0.13) - 0.04 * sillon(n2, 0.1)
-    ob = balayage(f"gousse{i}", chemin, larg, ep, nt=160, na=32, rayon=rides,
-                  torsion=lambda t: 1.6 * t + 0.4 * math.sin(4 * t))
+        return 1 - 0.13 * sillon(n1, 0.13) - 0.05 * sillon(n2, 0.1)
+    ob = balayage(f"gousse{i}", chemin, larg, ep, nt=200, na=32, rayon=rides,
+                  torsion=lambda t: 2.4 * t + 0.6 * bruit(t * 3, 0, 0, g + 9))
     modifs(ob, subsurf=1)
-    assign(ob, mat("vanille", (0.10, 0.06, 0.035), 0.3, coat=0.25))
+    assign(ob, mat("vanille", (0.13, 0.075, 0.042), 0.28, coat=0.45))
     return recentrer(ob)
 
 
@@ -903,6 +961,7 @@ def cannelle(i, longueur=85):
     ob.data.materials.append(mat("cannelle_coupe", (0.68, 0.42, 0.25), 0.85))
     ob.rotation_euler = (0, math.pi / 2, 0)                # axe long en X, comme les autres
     appliquer(ob)
+    organique(ob, 1.6, 70, graine=i + 5.3)                # l'écorce n'est jamais un tube droit
     return recentrer(ob)
 
 
@@ -942,7 +1001,7 @@ def orchidee(i):
     colonne = tige(f"colonne{i}", [(0, 0, 0), (0.5, 0, 12), (1, 0, 22)], 1.3, 1.0, creme)
     ovaire = tige(f"ovaire{i}", [(0, 0, 0), (0, 0, -18), (3, 0, -34)], 2.0, 1.6, vert)
     parts += [lab, colonne, ovaire]
-    return recentrer(joindre(f"orchidee{i}", parts))
+    return recentrer(organique(joindre(f"orchidee{i}", parts), 2.2, 35, graine=i + 4.9))
 
 
 def graines(i, n=90):
