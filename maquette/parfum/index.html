@@ -200,7 +200,7 @@ or.color.setRGB(0.95, 0.83, 0.70, THREE.SRGBColorSpace);   // or champagne, lég
 for (const n of ["Virole", "Col", "Poussoir"]) if (parts[n]) parts[n].material = or;
 // Tube plongeur : opaque, sinon Three.js ne le dessine pas au travers du
 // verre et du jus (les objets transparents sont exclus de la transmission).
-const plastique = new THREE.MeshStandardMaterial({ color: 0xe9e3d8, roughness: 0.3, metalness: 0 });
+const plastique = new THREE.MeshStandardMaterial({ color: 0xe9e3d8, roughness: 0.25, metalness: 0 });
 for (const n of ["TubePlongeur", "Tige"]) if (parts[n]) parts[n].material = plastique;
 const label = parts.Etiquette.material;
 Object.assign(label, { transparent: true, depthWrite: false, alphaTest: 0.02,
@@ -263,6 +263,9 @@ let select = function (handle) {
   else glass.color.set(1, 1, 1).lerp(glass.attenuationColor, 0.4);
   // Le jus se colore dans sa masse (atténuation), pas en surface.
   juice.attenuationColor.copy(jus);
+  // Tube plongeur : plastique translucide, il prend la couleur du jus et ne
+  // se détache qu'à peine (un filet discret, comme sur les photos).
+  plastique.color.copy(jus).lerp(new THREE.Color(1, 1, 1), 0.3);
   juice.attenuationDistance = teinte ? 0.07 : 0.042;   // le verre teinté assombrit déjà
   juice.color.set(1, 1, 1);
   // Caustique et ombre prennent la couleur du jus.
