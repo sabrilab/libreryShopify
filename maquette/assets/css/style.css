@@ -653,3 +653,30 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
 @media (max-width: 800px) { .fam-list { grid-template-columns: 1fr; } .fam-row { grid-template-columns: 86px 1fr; gap: 16px; } }
 .toc__links { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; }
 
+
+/* ---------- L'horloge du sillage ---------- */
+.clock { display: grid; grid-template-columns: 1.25fr 1fr; gap: 32px 72px; align-items: center; }
+.clock__rows { border-top: 1px solid var(--ink); }
+.clock__row { display: grid; grid-template-columns: 150px 1fr; gap: 20px; padding: 20px 0 14px; align-items: start; }
+.clock__k span { display: block; font-family: var(--sans); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--gold); }
+.clock__k small { display: block; font-family: var(--sans); font-size: 11.5px; color: var(--grey); margin-top: 3px; line-height: 1.35; }
+.clock__notes { display: flex; flex-wrap: wrap; gap: 2px 16px; }
+.clock__notes i { font-style: normal; font-size: 19px; line-height: 1.35; transition: opacity .35s ease, filter .35s ease; }
+.clock__bar { height: 1px; background: var(--line); margin-top: 12px; position: relative; }
+.clock__bar span { position: absolute; left: 0; top: -.5px; height: 2px; background: var(--gold); width: 0; transition: width .35s ease; }
+.clock__t { font-family: var(--serif-d); font-size: clamp(22px, 2.2vw, 30px); margin: 0 0 18px; }
+.clock__t b { font-weight: 400; }
+.clock__ctl input[type=range] { width: 100%; accent-color: var(--ink); }
+.clock__scale { display: flex; justify-content: space-between; font-family: var(--sans); font-size: 11px; color: var(--grey); margin: 6px 0 18px; }
+.clock__pick { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; font-family: var(--sans); font-size: 12px; color: var(--grey); }
+.clock__pick select { font-family: var(--serif); font-size: 17px; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--ink); padding: 4px 22px 4px 0; cursor: pointer; }
+.lex-clock { margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--line); }
+.lex-clock > p { margin: 8px 0 28px; }
+@media (max-width: 800px) {
+  .clock { grid-template-columns: 1fr; gap: 28px; }
+  .clock__row { grid-template-columns: 1fr; gap: 8px; padding: 16px 0; }
+  .clock__k { display: flex; gap: 10px; align-items: baseline; }
+  .clock__k small { margin: 0; }
+  .clock__notes i { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) { .clock__notes i, .clock__bar span { transition: none; } }
