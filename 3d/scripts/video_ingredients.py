@@ -740,13 +740,53 @@ def construire(handle):
     return s
 
 
-def rendre(handle, apercu, debut=1, fin=None, echantillons=None):
+def argile():
+    """Rendu « pâte à modeler » en niveaux de gris : chaque matière devient
+    un diffus gris de même luminance (les objets restent distincts), le verre
+    un gris clair opaque. Quelques rebonds suffisent : 5 à 10 fois plus
+    rapide. Pour Seedance, seuls comptent le rythme et les mouvements."""
+    s = bpy.context.scene
+    s.cycles.max_bounces = 2
+    s.cycles.diffuse_bounces = 1
+    s.cycles.glossy_bounces = 1
+    s.cycles.transmission_bounces = 0
+    s.view_settings.view_transform = "Standard"
+    s.view_settings.look = "None"
+    for m in bpy.data.materials:
+        if not m.use_nodes:
+            continue
+        bsdf = next((n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+        gris = 0.55
+        if bsdf is not None:
+            c = bsdf.inputs["Base Color"].default_value
+            gris = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+            if bsdf.inputs["Transmission Weight"].default_value > 0.5 or bsdf.inputs["Metallic"].default_value > 0.5:
+                gris = 0.7
+            gris = min(0.8, max(0.06, gris))
+        if m.name.startswith("mur"):
+            gris = 0.6
+        nt = m.node_tree
+        nt.nodes.clear()
+        d = nt.nodes.new("ShaderNodeBsdfDiffuse")
+        d.inputs["Color"].default_value = (gris, gris, gris, 1)
+        out = nt.nodes.new("ShaderNodeOutputMaterial")
+        nt.links.new(d.outputs[0], out.inputs["Surface"])
+    s.world.node_tree.nodes["Background"].inputs["Color"].default_value = (0.6, 0.6, 0.6, 1)
+    # Étiquette (plan à alpha) et gravure n'ont plus de sens en argile.
+    for nom in ("Etiquette", "Gravure"):
+        if nom in bpy.data.objects:
+            bpy.data.objects[nom].hide_render = True
+
+
+def rendre(handle, apercu, debut=1, fin=None, echantillons=None, gris=False):
     s = construire(handle)
+    if gris:
+        argile()
     w, h = (360, 640) if apercu else (720, 1280)
     s.render.resolution_x, s.render.resolution_y = w, h
-    s.cycles.samples = echantillons or (6 if apercu else 24)
-    s.render.use_motion_blur = not apercu
-    out = os.path.join(R.ROOT, "videos", handle + ("-apercu" if apercu else ""))
+    s.cycles.samples = echantillons or (3 if gris else 6 if apercu else 24)
+    s.render.use_motion_blur = not (apercu or gris)
+    out = os.path.join(R.ROOT, "videos", handle + suffixe_video(apercu, gris))
     os.makedirs(out, exist_ok=True)
     s.render.filepath = os.path.join(out, "img_")
     s.render.image_settings.file_format = "JPEG"
@@ -756,6 +796,10 @@ def rendre(handle, apercu, debut=1, fin=None, echantillons=None):
         s.frame_end = fin
     bpy.ops.render.render(animation=True)
     return out
+
+
+def suffixe_video(apercu, gris):
+    return ("-gris" if gris else "") + ("-apercu" if apercu else "")
 
 
 def monter(dossier, sortie):
@@ -772,6 +816,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("parfum", choices=list(RECETTES))
     ap.add_argument("--apercu", action="store_true")
+    ap.add_argument("--gris", action="store_true", help="rendu argile en niveaux de gris, rapide")
     ap.add_argument("--debut", type=int, default=1)
     ap.add_argument("--fin", type=int)
     ap.add_argument("--echantillons", type=int)
@@ -781,7 +826,7 @@ if __name__ == "__main__":
         construire(a.parfum)
         bpy.ops.wm.save_as_mainfile(filepath=os.path.join(R.ROOT, "videos", a.parfum + ".blend"))
     else:
-        d = rendre(a.parfum, a.apercu, a.debut, a.fin, a.echantillons)
-        suffixe = "-apercu" if a.apercu else ""
+        d = rendre(a.parfum, a.apercu, a.debut, a.fin, a.echantillons, a.gris)
+        suffixe = suffixe_video(a.apercu, a.gris)
         monter(d, os.path.join(R.ROOT, "videos", f"{a.parfum}{suffixe}.mp4"))
         print("video", os.path.join(R.ROOT, "videos", f"{a.parfum}{suffixe}.mp4"))
