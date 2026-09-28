@@ -66,6 +66,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
 const canvas = document.getElementById("scene");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -109,6 +110,16 @@ function studio() {
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(studio(), 0.01).texture;
 scene.environmentIntensity = 1.0;
+// Vrai studio photo (HDRI Poly Haven « studio_small_09 », CC0) : boîtes à
+// lumière octogonales, cyclo blanc et plafond noir. Ses reflets donnent au
+// verre et à l'or le rendu d'une photo produit. Le studio dessiné ci-dessus
+// sert en attendant le téléchargement.
+new RGBELoader().loadAsync("studio.hdr").then((hdr) => {
+  scene.environment = pmrem.fromEquirectangular(hdr).texture;
+  hdr.dispose();
+  scene.environmentIntensity = 0.85;
+  scene.environmentRotation.set(0, -0.9, 0);   // boîtes à lumière à gauche et à droite, un peu devant
+}).catch(() => {});
 
 const camera = new THREE.PerspectiveCamera(26, 1, 0.01, 5);
 camera.position.set(0.16, 0.10, 0.36);
@@ -179,16 +190,19 @@ if (modele.date) {
 const flacon = gltf.scene;
 scene.add(flacon);
 const parts = {};
-flacon.traverse((o) => { if (o.isMesh) parts[o.name] = o; });
+const matieres = {};
+flacon.traverse((o) => { if (o.isMesh) { parts[o.name] = o; matieres[o.material.name] = o.material; } });
 
 // Matières. Three.js ne montre pas un objet transmissif à travers un autre,
 // sauf la face arrière des objets double face : le jus est donc transmissif
 // et double face (sa paroi du fond entre dans l'image que le verre réfracte),
 // le verre transmissif en simple face. Le tube plongeur est opaque, pour
 // rester visible au travers du jus et du verre.
-const glass = parts.Verre.material;
+const glass = matieres.Verre;
+// Socle massif (≈ 22 mm de verre plein) : matière à part, plus épaisse.
+const socle = matieres.VerreSocle || glass;
 Object.assign(glass, { roughness: 0, metalness: 0, transmission: 1, ior: 1.5,
-  thickness: 0.02, attenuationDistance: 0.1, specularIntensity: 1,
+  thickness: 0.017, attenuationDistance: 0.1, specularIntensity: 1,   // parois de 8,5 mm, réfraction forcée : elles renvoient le jus
   dispersion: 0.35,          // irisations aux arêtes, comme un vrai verre épais
   side: THREE.FrontSide, envMapIntensity: 1 });
 const juice = parts.Jus.material;
@@ -262,6 +276,12 @@ let select = function (handle) {
     .lerp(new THREE.Color(1, 1, 1), 0.3);
   else glass.color.set(1, 1, 1).lerp(glass.attenuationColor, 0.4);
   // Le jus se colore dans sa masse (atténuation), pas en surface.
+  if (socle !== glass) {
+    const nom = socle.name;
+    socle.copy(glass); socle.name = nom;
+    socle.thickness = 0.024;                                    // verre plein du socle
+    socle.attenuationDistance = glass.attenuationDistance * 1.6;
+  }
   juice.attenuationColor.copy(jus);
   // Tube plongeur : plastique translucide, il prend la couleur du jus et ne
   // se détache qu'à peine (un filet discret, comme sur les photos).

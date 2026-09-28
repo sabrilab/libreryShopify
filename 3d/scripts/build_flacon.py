@@ -299,6 +299,22 @@ def render(handle, out_dir, size=1200, samples=256):
         print("rendu", s.render.filepath)
 
 
+def socle_separe(verre, p):
+    """Pour le web seulement : le socle massif (sous la cavité, ≈ 22 mm de
+    verre plein) reçoit sa propre matière « VerreSocle ». Three.js n'applique
+    qu'une épaisseur par matière ; parois fines et socle épais peuvent ainsi
+    réfracter et se teinter chacun comme il faut."""
+    socle = bpy.data.materials["Verre"].copy()
+    socle.name = "VerreSocle"
+    verre.data.materials.append(socle)
+    k = len(verre.data.materials) - 1
+    z_max = (p["CAV_Z0"] - 0.5) * G.MM
+    for poly in verre.data.polygons:
+        if (verre.matrix_world @ poly.center).z < z_max and abs(poly.normal.z) < 0.999 or \
+                (verre.matrix_world @ poly.center).z < 0.5 * G.MM:
+            poly.material_index = k
+
+
 if __name__ == "__main__":
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
     ap = argparse.ArgumentParser()
@@ -309,6 +325,7 @@ if __name__ == "__main__":
 
     handle = args.render or "tonka-love"
     build(handle)
+    socle_separe(bpy.data.objects["Verre"], cotes())
     # L'emblème gravé du capot n'est pas dans le GLB : la visionneuse le pose
     # en décalque (emblem-gravure.png), plus net qu'une gravure maillée.
     glb = os.path.join(WEB, "flacon-100ml.glb")
