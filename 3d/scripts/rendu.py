@@ -347,8 +347,8 @@ def cartes_noires():
         ob.visible_shadow = False
 
 
-def logo_capot(p, m, profondeur=0.5):
-    """Emblème LIBRERY gravé en creux dans le dessus du capot (0,5 mm).
+def logo_capot(p, m, profondeur=1.0):
+    """Emblème LIBRERY gravé en creux dans le dessus du capot (1 mm).
 
     Un « tampon » est soustrait du capot : une grille posée juste au-dessus
     du capot, creusée vers le bas par l'alpha de l'emblème, puis épaissie

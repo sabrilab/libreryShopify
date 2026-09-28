@@ -459,7 +459,7 @@ def caramel(i):
 
     def ep(t):
         return larg(t) * 0.5 + 0.1
-    ob = balayage(f"caramel{i}", chemin, larg, ep, nt=90, na=24, torsion=lambda t: 1.4 * t)
+    ob = balayage(f"caramel{i}", chemin, larg, ep, nt=110, na=28, torsion=lambda t: 0.7 * t)
     modifs(ob, subsurf=1)
     m = mat("ambre", (0.86, 0.44, 0.07), 0.04, trans=0.75, ior=1.54)
     assign(ob, m)
@@ -483,36 +483,29 @@ def ambre_pepite(i):
 
 
 def copeau(i):
-    """Éclat de bois (santal) : baguette fendue à section irrégulière,
-    fibres en long, bouts éclatés en échardes."""
+    """Copeau de santal raboté : ruban de bois fin (13 mm) qui s'enroule sur
+    lui-même en se resserrant, bords un peu déchirés, fibres en long."""
     g = 2.7 * i + 1.3
-    L = 64.0
-
-    def larg(t):
-        bout = min(1.0, 7 * t, 7 * (1 - t)) ** 0.7
-        return 4.6 * bout * (1 + 0.18 * bruit(t * 3, 0, 0, g))
-
-    def ep(t):
-        bout = min(1.0, 6 * t, 6 * (1 - t)) ** 0.6
-        return 2.4 * bout
-
-    def fibres(t, a):
-        n = bruit(math.cos(a) * 5, math.sin(a) * 5, t * 1.2, g)
-        return 1 - 0.1 * sillon(n, 0.1) + 0.05 * bruit(math.cos(a) * 2, math.sin(a) * 2, t * 8, g + 1)
-    ob = balayage(f"copeau{i}", lambda t: (L * (t - 0.5), 1.5 * math.sin(math.pi * t), 0),
-                  larg, ep, nt=70, na=36, rayon=fibres, carre=3.2, torsion=lambda t: 0.25 * t)
-    parts = [ob]
-    rnd = random.Random(i + 7)
-    for k in range(3):        # quelques échardes au bout cassé
-        y, z = rnd.uniform(-2, 2), rnd.uniform(-1, 1)
-        e = tige(f"echarde{i}_{k}", [(L * 0.44, y, z), (L * 0.5 + rnd.uniform(3, 6), y * 1.3, z),
-                                     (L * 0.5 + rnd.uniform(8, 13), y * 1.8 + rnd.uniform(-1, 1), z)],
-                 0.5, 0.06, na=6)
-        parts.append(e)
-    ob = joindre(f"copeau{i}", parts)
-    smooth(ob)
-    assign(ob, mat_texture("bois", (0.74, 0.55, 0.36), (0.64, 0.46, 0.29), 0.7,
-                           echelle=160, seuil=(0.25, 0.75), type_tex="WAVE", ondes=1.2))
+    nu, nv, W = 150, 12, 13.0
+    rangs = []
+    for k in range(nu + 1):
+        s = k / nu
+        th = 1.8 * TAU * s
+        r = 12.0 * (1 - 0.55 * s) + 2.0
+        bord = min(1.0, 14 * s, 14 * (1 - s)) ** 0.35
+        rang = []
+        for j in range(nv + 1):
+            v = -1 + 2 * j / nv
+            dechire = 1 + 0.1 * bruit(s * 30, v * 0.5, 0, g) * abs(v) ** 3
+            y = v * W / 2 * bord * dechire + 7.0 * s
+            fibres = 0.14 * bruit(v * 18, s * 1.5, 0, g + 2) + 0.35 * v * v
+            rr = r + fibres
+            rang.append((rr * math.cos(th), y, rr * math.sin(th)))
+        rangs.append(rang)
+    ob = maillage(f"copeau{i}", rangs, cyclique=False)
+    ob.data.materials.append(mat_texture("bois", (0.74, 0.55, 0.36), (0.64, 0.46, 0.29), 0.7,
+                                         echelle=160, seuil=(0.25, 0.75), type_tex="WAVE", ondes=1.2, sens="Z"))
+    modifs(ob, 0.7, 1, offset=0.0)
     return recentrer(ob)
 
 
@@ -609,6 +602,13 @@ def poire(i, moitie=False):
     q = tige(f"queue{i}", [(3.5 * s, 0, H - 1), (4.2 * s, 0, H + 8 * s), (6.5 * s, 0.5, H + 18 * s),
                            (10 * s, 1, H + 25 * s)], 1.7 * s, 1.0 * s, mat("queue", (0.36, 0.25, 0.13), 0.75))
     parts.append(q)
+    if not moitie:
+        f = lame(f"poire_feuille{i}", 52, 24, contour_ovale(0.8, 0.45), creux=2.4, courbe=-0.45, pli=0.12,
+                 torsion=0.3, relief=lambda u, v: -0.4 * sillon(v, 0.07) + 0.15 * bruit(u * 5, v * 3, g))
+        modifs(f, 0.4, 1)
+        assign(f, mat("feuille_poirier", (0.25, 0.40, 0.14), 0.35, coat=0.2))
+        placer(f, (5.5 * s, 0.5, H + 11 * s), (0.5, -0.6, 0.4))
+        parts.append(f)
     for k in range(5):                                  # l'œil (calice sec) sous le fruit
         a = TAU * k / 5
         c = bouton(f"calice{i}_{k}", 3.2 * s, 0.9 * s, mat("calice", (0.22, 0.16, 0.08), 0.8))
@@ -913,10 +913,10 @@ def orchidee(i):
     jaune = mat("orchidee_labelle", (0.97, 0.86, 0.42), 0.4, sss=0.3)
     vert = mat("tige_verte", (0.33, 0.42, 0.20), 0.6)
     parts = []
-    etroit = contour_ovale(pointe=0.9, base=0.6)
-    for k, (L, W, a, ouv) in enumerate([(44, 10, 0.0, 1.35), (44, 10, 2.2, 1.35), (44, 10, 4.1, 1.35),
-                                        (40, 9, 1.1, 1.2), (40, 9, 5.2, 1.2)]):
-        pe = lame(f"orch{i}_{k}", L, W, etroit, creux=1.2, courbe=-0.35, torsion=0.5 * (1 if k % 2 else -1),
+    etroit = contour_ovale(pointe=0.75, base=0.5)
+    for k, (L, W, a, ouv) in enumerate([(44, 13, 0.0, 1.35), (44, 13, 2.2, 1.35), (44, 13, 4.1, 1.35),
+                                        (40, 12, 1.1, 1.2), (40, 12, 5.2, 1.2)]):
+        pe = lame(f"orch{i}_{k}", L, W, etroit, creux=1.6, courbe=-0.3, torsion=0.35 * (1 if k % 2 else -1),
                   relief=lambda u, v: -0.25 * sillon(v, 0.1))
         modifs(pe, 0.4, 1)
         assign(pe, creme)
@@ -932,7 +932,7 @@ def orchidee(i):
         rang = []
         for j in range(nv + 1):
             a = 0.45 + (TAU - 0.9) * j / nv
-            rr = r + 1.4 * math.sin(9 * a) * u ** 5
+            rr = r + 1.9 * math.sin(11 * a) * u ** 4 + 0.6 * math.sin(23 * a + 1) * u ** 6
             rang.append((rr * math.cos(a) - 2.5, rr * math.sin(a), 30 * u))
         rangs.append(rang)
     lab = maillage(f"labelle{i}", rangs, cyclique=False)
