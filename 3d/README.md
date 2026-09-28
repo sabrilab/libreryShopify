@@ -57,9 +57,9 @@ photo et monte photo | modèle côte à côte : voir
 | Verre | 63 × 48 × 103,5 (l'ajustement photo donnait 60 × 37,8 ; élargi et approfondi à l'œil) ; arêtes verticales en pans coupés de 7,3 ; épaules à 45° sur 11 de haut |
 | Dessus du verre | 40,3 × 38,2, pans coupés de 3,4 |
 | Entailles du socle | V dans chaque arête, de 11 à 27,5 de haut, pointe à 19, profondeur 5 |
-| Cavité (jus) | parois de 5,4, fond de verre de 22,5 |
-| Virole | Ø 27 × 3 visibles |
-| Capot | 36,5 × 31,3 × 28,3 ; pans coupés de 4,9 ; entailles en V de 1,8 à 11, pointe à 4,8, profondeur 2,8 |
+| Cavité (jus) | suit la forme extérieure jusqu'à 3,5 sous le haut ; parois de 8,5 (photo Tonka Love), fond de verre de 22,5 ; ≈ 100 ml |
+| Virole | Ø 22 × 3,4 visibles (photo Tonka Love) |
+| Capot | 36,5 × 31,3 × 28,3 ; pans coupés de 4,9 ; petite entaille en V pointue de 6,2 à 12,5 du bas, pointe à 9,2, profondeur 2,4 |
 | Hors tout | 134,8 |
 
 Objets du GLB (chacun animable séparément) : `Verre`, `Jus`, `Virole`,

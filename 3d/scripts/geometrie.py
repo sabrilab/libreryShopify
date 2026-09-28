@@ -32,13 +32,19 @@ P = {
     # Cavité du jus.
     # La cavité suit la forme extérieure (épaules comprises) à épaisseur de
     # paroi constante : sur les photos, le jus monte jusque sous le col.
-    "CAV_MUR": 5.4, "CAV_Z0": 22.5, "CAV_HAUT": 3.5, "CAV_R": 3.0,
+    # Parois de 8,5 mm : bord de la cavité à 74 % de la largeur sur la photo
+    # de Tonka Love (volume intérieur ≈ 100 ml).
+    "CAV_MUR": 8.5, "CAV_Z0": 22.5, "CAV_HAUT": 3.5, "CAV_R": 3.0,
     "REMPLI": 0.995,
-    # Virole (bague dorée entre verre et capot).
-    "VIR_R": 13.51, "VIR_H": 3.0,
+    # Virole (bague dorée entre verre et capot) : Ø 22 × 3,4 mm visibles,
+    # mesurés sur la photo de Tonka Love (les rendus de synthèse de la
+    # marque la montrent plus large).
+    "VIR_R": 11.0, "VIR_H": 3.4,
     # Capot.
+    # Entailles du capot : petit V pointu, symétrique, de 6,2 à 12,5 mm du
+    # bas du capot (pointe à 9,2), mesuré sur la photo de Tonka Love.
     "CA": 18.23, "CB": 15.64, "CC": 4.92, "CH": 28.31, "C_ARRONDI": 1.0,
-    "CG_HAUT": 11.0, "CG_POINTE": 4.8, "CG_BAS": 1.8, "CG_PROF": 2.8,
+    "CG_HAUT": 12.5, "CG_POINTE": 9.2, "CG_BAS": 6.2, "CG_PROF": 2.4,
 }
 
 

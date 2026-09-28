@@ -148,9 +148,9 @@ def matieres(handle, tau=None):
     m["Jus"] = mat
 
     mat, nt, b = node_mat("OrCycles")
-    b.inputs["Base Color"].default_value = (*lin((0.96, 0.84, 0.71)), 1)
+    b.inputs["Base Color"].default_value = (*lin((0.95, 0.79, 0.70)), 1)   # or rose champagne
     b.inputs["Metallic"].default_value = 1.0
-    b.inputs["Roughness"].default_value = 0.055
+    b.inputs["Roughness"].default_value = 0.045
     m["Or"] = mat
 
     mat, nt, b = node_mat("TubeCycles")
@@ -241,12 +241,26 @@ def studio(fond=FOND_PAGE):
 
     # Boîte à lumière principale (avant gauche), plafonnier, bandes de contour
     # derrière le flacon (liserés lumineux sur les arêtes), contre-jour doux.
-    area("Principale", (-0.34, -0.36, 0.30), (0.45, 0.45), 8)
+    principale = area("Principale", (-0.34, -0.36, 0.30), (0.45, 0.45), 8)
+    principale.visible_glossy = False   # éclaire sans poser de bande blanche en reflet sur le jus
     area("Plafond", (0.02, -0.02, 0.48), (0.5, 0.35), 5)
     area("BandeG", (-0.26, 0.10, 0.10), (0.06, 0.5), 6)
     area("BandeD", (0.27, 0.06, 0.12), (0.06, 0.5), 5)
-    # Pas de réflecteur côté caméra : il posait un voile blanc sur la face
-    # avant et délavait le jus (mesuré avec calibrer.py).
+    # Réflecteur côté caméra, placé haut : un miroir vertical ne renvoie que
+    # ce qui est à sa hauteur, donc le capot (vers 12 cm) le voit et devient
+    # champagne clair, tandis que la face avant du jus (3 à 9 cm) ne le voit
+    # pas (un réflecteur bas y posait un voile blanc, mesuré avec calibrer.py).
+    haut = area("ReflecteurCapot", (0.05, -0.62, 0.215), (0.6, 0.09), 6,
+                target=(0, -0.62, 0.0), color=(1, 0.97, 0.95))
+    haut.rotation_euler = (math.radians(75), 0, 0)    # tourné vers le flacon, légèrement vers le bas
+    haut.visible_diffuse = False    # ne sert qu'aux reflets
+    # Liaison de lumière : ce réflecteur n'éclaire que les pièces dorées,
+    # jamais le verre ni le jus (sinon, bande blanche en reflet sur le jus).
+    dores = bpy.data.collections.new("PiecesDorees")
+    for n in ("Capot", "Virole", "Col", "Poussoir"):
+        if n in bpy.data.objects:
+            dores.objects.link(bpy.data.objects[n])
+    haut.light_linking.receiver_collection = dores
     area("ContreJour", (0.0, 0.3, 0.10), (0.35, 0.2), 3.0, color=(1, 0.97, 0.94))
 
     # Drapeaux noirs, invisibles pour la caméra mais vus en reflet.
@@ -314,6 +328,25 @@ def contact_jus(p, m):
     jus.data.materials.append(libre)
 
 
+def cartes_noires():
+    """Cartes noires de part et d'autre, en retrait (fond noir « dark field ») :
+    vues au travers des arêtes épaisses, elles dessinent le contour du verre
+    comme sur les photos, sans assombrir le centre du jus."""
+    for i, x in enumerate((-0.11, 0.11)):
+        bm = bmesh.new()
+        bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=0.5)
+        ob = G.mesh_object(f"Carte{i}", bm)
+        ob.scale = (0.08, 0.48, 1)
+        ob.location = (x, 0.1, 0.07)
+        ob.rotation_euler = (Vector((0, -0.5, 0.07)) - ob.location).to_track_quat("Z", "Y").to_euler()
+        mat, nt, b = node_mat("CarteNoire")
+        b.inputs["Base Color"].default_value = (0.01, 0.01, 0.01, 1)
+        b.inputs["Roughness"].default_value = 0.8
+        BF.assign(ob, mat)
+        ob.visible_camera = False
+        ob.visible_shadow = False
+
+
 def scene(handle, tau=None):
     BF.build(handle)
     p = BF.cotes()
@@ -328,6 +361,7 @@ def scene(handle, tau=None):
             BF.assign(ob, m[name])
     contact_jus(p, m)
     studio()
+    cartes_noires()
     return p
 
 
