@@ -353,7 +353,7 @@ def logo_capot(p, m):
     emb = os.path.join(ROOT, "..", "maquette", "assets", "img", "v2", "emblem-blanc.png")
     img = bpy.data.images.load(emb)
     haut = (p["H"] + p["VIR_H"] + p["CH"]) * MM
-    taille = 20.0 * MM                      # hauteur de l'emblème sur le capot
+    taille = 26.0 * MM                      # hauteur de l'emblème : il occupe presque tout le dessus du capot (31,3 de profondeur)
     bm = bmesh.new()
     bmesh.ops.create_grid(bm, x_segments=220, y_segments=248, size=0.5)
     ob = G.mesh_object("LogoCapot", bm)
