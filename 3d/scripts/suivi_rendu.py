@@ -37,12 +37,17 @@ def etat():
             recents = dates[-min(12, n):]
             s_img = (recents[-1] - recents[0]) / (len(recents) - 1)
             vitesse_connue = s_img
-        fini = n >= total and os.path.exists(mp4) and (not dates or os.path.getmtime(mp4) >= dates[-1])
+        # Prête quand le MP4 est écrit et n'a plus bougé depuis 20 s (le
+        # montage avec interpolation prend une bonne minute).
+        fini = n >= total and os.path.exists(mp4) and (not dates or os.path.getmtime(mp4) >= dates[-1]) \
+            and time.time() - os.path.getmtime(mp4) > 20
         # Images d'un rendu interrompu, pas encore effacées : ce parfum attend son tour.
         if not fini and dates and time.time() - dates[-1] > 180:
             imgs, dates, n = [], [], 0
         if fini:
             statut = "prête"
+        elif n >= total:
+            statut = "montage"
         elif n == 0:
             statut = "en attente"
         else:
