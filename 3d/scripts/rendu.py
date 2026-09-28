@@ -347,14 +347,16 @@ def cartes_noires():
         ob.visible_shadow = False
 
 
-def logo_capot(p, m, profondeur=1.0, grille=(200, 226)):
-    """Emblème LIBRERY gravé en creux dans le dessus du capot (1 mm).
+def logo_capot(p, m, profondeur=0.6, grille=(400, 452)):
+    """Emblème LIBRERY gravé dans le dessus du capot, comme sur le vrai
+    flacon : traits nets, creusés, au fond sombre et mat.
 
     Un « tampon » est soustrait du capot : une grille posée juste au-dessus
-    du capot, creusée vers le bas par l'alpha de l'emblème, puis épaissie
-    vers le haut. Là où l'alpha est nul le tampon reste au-dessus du capot et
-    ne coupe rien ; le fondu des bords de l'image donne des flancs biseautés."""
-    emb = os.path.join(ROOT, "..", "maquette", "assets", "img", "v2", "emblem-blanc.png")
+    du capot, creusée vers le bas par l'emblème (3d/textures/emblem-gravure.png,
+    version seuillée et agrandie de l'emblème : flancs francs), puis épaissie
+    vers le haut. Là où l'emblème est vide, le tampon reste au-dessus du capot
+    et ne coupe rien. Le fond des gravures reçoit un or bruni, plus sombre."""
+    emb = os.path.join(ROOT, "textures", "emblem-gravure.png")
     img = bpy.data.images.load(emb)
     haut = (p["H"] + p["VIR_H"] + p["CH"]) * MM
     taille = 26.0 * MM                      # hauteur de l'emblème : il occupe presque tout le dessus du capot (31,3 de profondeur)
@@ -384,7 +386,7 @@ def logo_capot(p, m, profondeur=1.0, grille=(200, 226)):
     mod.strength = -(profondeur + 0.1) * MM
     mod.mid_level = 0.0
     sol = ob.modifiers.new("epaisseur", "SOLIDIFY")
-    sol.thickness = 0.4 * MM
+    sol.thickness = (profondeur + 0.6) * MM    # plus épais que le creux : le tampon ressort au-dessus du capot
     sol.offset = 1.0
     G.apply_all(ob)
     bm3 = bmesh.new()
@@ -394,6 +396,25 @@ def logo_capot(p, m, profondeur=1.0, grille=(200, 226)):
     bm3.free()
     capot = bpy.data.objects["Capot"]
     G.boolean(capot, ob)
+    # Fond et flancs des gravures : or bruni (plus sombre, satiné).
+    base = capot.data.materials[0]
+    grave = base.copy()
+    grave.name = base.name + "_grave"
+    bsdf = next((n for n in grave.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None) if grave.use_nodes else None
+    if bsdf is not None:
+        c = bsdf.inputs["Base Color"].default_value
+        bsdf.inputs["Base Color"].default_value = (c[0] * 0.12, c[1] * 0.09, c[2] * 0.07, 1)
+        bsdf.inputs["Metallic"].default_value = 0.5
+        bsdf.inputs["Roughness"].default_value = 0.6
+    capot.data.materials.append(grave)
+    k = len(capot.data.materials) - 1
+    mw = capot.matrix_world
+    seuil = haut - 0.12 * MM
+    for poly in capot.data.polygons:
+        z = (mw @ poly.center).z
+        if haut - profondeur * MM - 0.05 * MM < z < seuil:
+            poly.material_index = k
+            poly.use_smooth = False
     return capot
 
 

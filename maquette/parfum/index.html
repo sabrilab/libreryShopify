@@ -183,6 +183,25 @@ label.emissiveMap = null;
 parts.Etiquette.renderOrder = 2;
 
 const texLoader = new THREE.TextureLoader();
+
+// Emblème gravé dans le dessus du capot : décalque aux traits nets, fond
+// d'or bruni (comme sur le vrai flacon), posé à plat sur la face supérieure.
+{
+  const cap = parts.Capot;
+  cap.geometry.computeBoundingBox();
+  const bb = cap.geometry.boundingBox;
+  const tex = texLoader.load(`emblem-gravure.png?v=${v}`);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const hauteur = 0.026, largeur = hauteur * 1844 / 2080;          // 26 mm de haut, comme dans Blender
+  const grave = new THREE.MeshStandardMaterial({ map: tex, color: 0x3b271a, metalness: 0.5, roughness: 0.55,
+    transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 });
+  const embleme = new THREE.Mesh(new THREE.PlaneGeometry(largeur, hauteur), grave);
+  embleme.name = "EmblemeCapot";
+  embleme.rotation.x = -Math.PI / 2;
+  embleme.position.set((bb.min.x + bb.max.x) / 2, bb.max.y + 0.00001, (bb.min.z + bb.max.z) / 2);
+  cap.add(embleme);
+}
 const labels = {};
 function labelTexture(handle) {
   if (!labels[handle]) {
