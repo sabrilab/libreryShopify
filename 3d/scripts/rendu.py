@@ -347,7 +347,7 @@ def cartes_noires():
         ob.visible_shadow = False
 
 
-def logo_capot(p, m, profondeur=1.0):
+def logo_capot(p, m, profondeur=1.0, grille=(200, 226)):
     """Emblème LIBRERY gravé en creux dans le dessus du capot (1 mm).
 
     Un « tampon » est soustrait du capot : une grille posée juste au-dessus
@@ -359,7 +359,7 @@ def logo_capot(p, m, profondeur=1.0):
     haut = (p["H"] + p["VIR_H"] + p["CH"]) * MM
     taille = 26.0 * MM                      # hauteur de l'emblème : il occupe presque tout le dessus du capot (31,3 de profondeur)
     bm = bmesh.new()
-    bmesh.ops.create_grid(bm, x_segments=200, y_segments=226, size=0.5)
+    bmesh.ops.create_grid(bm, x_segments=grille[0], y_segments=grille[1], size=0.5)
     ob = G.mesh_object("TamponLogo", bm)
     ratio = img.size[0] / img.size[1]
     ob.scale = (taille * ratio, taille, 1)

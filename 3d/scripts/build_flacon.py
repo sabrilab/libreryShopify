@@ -309,6 +309,8 @@ if __name__ == "__main__":
 
     handle = args.render or "tonka-love"
     build(handle)
+    import rendu  # noqa: E402  (importe build_flacon : pas en tête de fichier)
+    rendu.logo_capot(cotes(), None, grille=(130, 147))   # emblème gravé en creux (grille allégée pour le web)
     glb = os.path.join(WEB, "flacon-100ml.glb")
     export_glb(glb)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, "flacon-100ml.blend"))
