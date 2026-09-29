@@ -27,9 +27,9 @@ def etat():
         imgs = sorted(glob.glob(os.path.join(d, "img_*.jpg")), key=os.path.getmtime)
         mp4 = os.path.join(VIDEOS, h + ".mp4")
         n = len(imgs)
-        # Mode rapide : une image sur deux (img_0001, img_0003…).
+        # Une image sur deux si img_0001, img_0003… ; sinon toutes.
         nums = sorted(int(os.path.basename(f)[4:8]) for f in imgs)
-        pas = (nums[1] - nums[0]) if len(nums) > 1 else 2
+        pas = (nums[1] - nums[0]) if len(nums) > 1 else 1
         total = IMAGES_24 // pas
         dates = [os.path.getmtime(f) for f in imgs]
         s_img = None
@@ -73,7 +73,7 @@ def etat():
     return {"maj": round(maintenant), "parfums": parfums, "fin_tout": round(maintenant + cumul)}
 
 
-def document(chemin):
+def document(chemin, videos=None):
     """Écrit l'état + une miniature (data URI JPEG 180×320) de la dernière
     image de chaque vidéo : c'est le document lu par la page de suivi."""
     import base64
@@ -92,6 +92,10 @@ def document(chemin):
         elif os.path.exists(os.path.join(VIDEOS, p["handle"] + ".mp4")) and p["statut"] == "prête":
             pass
     e["apercus"] = apercus
+    # Liens des vidéos terminées, lisibles sur la page (fichier tenu à jour
+    # à chaque vidéo publiée).
+    if videos and os.path.exists(videos):
+        e["videos"] = json.load(open(videos))
     with open(chemin, "w") as f:
         json.dump(e, f, ensure_ascii=False)
     return e
@@ -101,9 +105,10 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--boucle", type=float, help="intervalle en secondes")
     ap.add_argument("--document", help="écrit le document de la page de suivi (JSON)")
+    ap.add_argument("--videos", help="JSON {parfum: lien de la vidéo} à joindre au document")
     a = ap.parse_args()
     if a.document:
-        e = document(a.document)
+        e = document(a.document, a.videos)
         print(json.dumps({"maj": e["maj"], "etat": [(p["handle"], p["statut"], p["faites"]) for p in e["parfums"]]}))
     elif not a.boucle:
         print(json.dumps(etat(), ensure_ascii=False))

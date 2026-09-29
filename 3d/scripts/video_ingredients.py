@@ -327,6 +327,9 @@ def plans(handle, danseurs, flacon_d):
                 x = u / frole
                 cam = S + n * haut(x) + tan * course * (x - 0.5)
                 return cam, vise(x), 11.0, 40.0
+            # Remontée et recul : distance en progression géométrique
+            # (vitesse apparente constante, pas d'effet d'aspiration), direction
+            # interpolée sur la sphère, départ et arrivée en douceur.
             x = (u - frole) / (1 - frole)
             e = lisse(x)
             cam0 = S + n * haut(1) + tan * course * 0.5
@@ -334,8 +337,13 @@ def plans(handle, danseurs, flacon_d):
             dS = S - centre
             a_s = math.degrees(math.atan2(dS.x, -dS.y))
             cam1 = orbite(centre, dist, a_s + 137.5 / PHI ** 2, elev_fin)
-            cam = cam0.lerp(cam1, e) + Vector((0, 0, 1)) * math.sin(math.pi * e) * 0.35 * dist * MM   # reprend de la hauteur
-            cib = cib0.lerp(centre, e ** (1 / PHI))
+            v0, v1 = cam0 - centre, cam1 - centre
+            r0, r1 = max(v0.length, 1e-4), v1.length
+            r = r0 * (r1 / r0) ** e
+            d = v0.normalized().slerp(v1.normalized(), e) if v0.normalized().dot(v1.normalized()) > -0.99 \
+                else v0.normalized().lerp(v1.normalized(), e).normalized()
+            cam = centre + d * r + Vector((0, 0, 1)) * math.sin(math.pi * e) * 0.18 * r   # reprend de la hauteur
+            cib = cib0.lerp(centre, lisse(min(1.0, x * PHI)))
             return cam, cib, 11.0 - 6.0 * e, 40.0 + 10.0 * e
         return f
 
@@ -358,11 +366,12 @@ def plans(handle, danseurs, flacon_d):
 
     # Découpage en nombre d'or : reveal à 15/φ = 9,27 s ; plans FPV de
     # 2,19 s (15/φ⁴·…), détails du flacon de 1,35 s, dernier plan de 0,84 s.
+    # Plan d'ouverture plus long (15/φ⁴·φ² = 3,54 s) pour que la remontée
+    # depuis la peau se lise ; le plan du socle, peu lisible, disparaît.
     return [
-        (0.00, 2.19, plan_fpv(0, -30, 26)),
-        (2.19, 3.54, capot),
-        (3.54, 5.73, plan_fpv(1, 25, 21)),
-        (5.73, 7.08, verre),
+        (0.00, 3.54, plan_fpv(0, -30, 26)),
+        (3.54, 4.89, capot),
+        (4.89, 7.08, plan_fpv(1, 25, 21)),
         (7.08, 8.43, plan_fpv(2, -15, 30, frole=1 / PHI)),
         (8.43, REVEAL, etiquette),
         (REVEAL, DUREE + 1, reveal),
@@ -578,9 +587,9 @@ def ouvrir_poire(vide, t, f):
     """La poire se fissure (léger entrebâillement à 0,38 s), puis s'ouvre
     en deux comme un livre et montre sa chair blanche (de 0,62 à 1,62 s :
     temps et angles en proportions φ)."""
-    # Plan de 2,19 s : la caméra frôle la peau jusqu'à 0,84 s (2,19/φ²),
-    # la fissure s'ouvre à 0,84 s, la poire s'ouvre de 1,1 à 2,0 s.
-    u = 0.146 * lisse((t - 0.84) / 0.236) + 0.854 * lisse((t - 1.1) / 0.9)
+    # Plan de 3,54 s : la caméra frôle la peau jusqu'à 1,35 s (3,54/φ²),
+    # la fissure s'ouvre à 1,35 s, la poire s'ouvre de 1,75 à 3,1 s.
+    u = 0.146 * lisse((t - 1.35) / 0.382) + 0.854 * lisse((t - 1.75) / 1.35)
     for enfant in vide.children:
         cote = -1 if enfant.name.endswith("_A") else 1
         enfant.location = (cote * 7.0 * MM * u, -3.0 * MM * u, 0)
@@ -704,12 +713,12 @@ def rendre(handle, apercu, debut=1, fin=None, echantillons=None, gris=False, rap
     s.render.use_persistent_data = True          # garde la scène entre deux images
     if rapide:
         # ≈ 5 s par image au lieu de 13 : 540 × 960, 6 échantillons, rebonds
-        # réduits, une image sur deux (12 i/s, interpolées à 24 au montage).
+        # réduits ; les 24 images par seconde sont calculées.
         c = s.cycles
         c.max_bounces, c.transmission_bounces, c.glossy_bounces, c.diffuse_bounces = 6, 6, 2, 1
         c.use_adaptive_sampling = True
         c.adaptive_threshold = 0.1
-        s.frame_step = 2
+        s.frame_step = 1                     # 24 images réelles : plus d'interpolation
     w, h = (360, 640) if apercu else (540, 960) if rapide else (720, 1280)
     s.render.resolution_x, s.render.resolution_y = w, h
     s.cycles.samples = echantillons or (3 if gris else 6 if apercu or rapide else 24)
