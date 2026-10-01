@@ -723,6 +723,19 @@ def argile():
         d.inputs["Color"].default_value = (gris, gris, gris, 1)
         out = nt.nodes.new("ShaderNodeOutputMaterial")
         nt.links.new(d.outputs[0], out.inputs["Surface"])
+        if not m.name.startswith("mur"):
+            # Léger grain de surface (± 12 % de valeur) : en très gros plan,
+            # le glissé de la caméra sur la « peau » reste lisible.
+            co = nt.nodes.new("ShaderNodeTexCoord")
+            bruit_ = nt.nodes.new("ShaderNodeTexNoise")
+            bruit_.inputs["Scale"].default_value = 900.0
+            bruit_.inputs["Detail"].default_value = 3.0
+            nt.links.new(co.outputs["Object"], bruit_.inputs["Vector"])
+            rampe = nt.nodes.new("ShaderNodeValToRGB")
+            rampe.color_ramp.elements[0].color = (gris * 0.82, gris * 0.82, gris * 0.82, 1)
+            rampe.color_ramp.elements[1].color = (min(1.0, gris * 1.12),) * 3 + (1,)
+            nt.links.new(bruit_.outputs["Fac"], rampe.inputs["Fac"])
+            nt.links.new(rampe.outputs["Color"], d.inputs["Color"])
     s.world.node_tree.nodes["Background"].inputs["Color"].default_value = (0.6, 0.6, 0.6, 1)
     # Étiquette (plan à alpha) et gravure n'ont plus de sens en argile.
     for nom in ("Etiquette", "Gravure"):
