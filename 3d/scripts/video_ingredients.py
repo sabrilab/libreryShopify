@@ -220,7 +220,7 @@ def catmull(p0, p1, p2, p3, u):
 VEDETTES = {
     "tonka-love": [(0, 95), (11, 120), (8, 105)],          # fève, zeste, ambre
     "magnetic-flowers": [(0, 150), (2, 120), (4, 110)],    # demi-poire, jasmin, fleur d'oranger
-    "vanilla-plum": [(3, 120), (0, 105), (9, 110)],        # demi-prune, gousse, orchidée
+    "vanilla-plum": [(3, 120), (0, 140), (9, 110)],        # demi-prune, gousse, orchidée
 }
 REVEAL = 15 / ((1 + 5 ** 0.5) / 2)       # début du dernier plan : on recule et le flacon se révèle
 
@@ -267,6 +267,24 @@ def plans(handle, danseurs, flacon_d):
             cam_loc = orbite(c_loc, dist, az0 + (az1 - az0) * u, el0 + (el1 - el0) * u)
             return m @ cam_loc, m @ c_loc, 22.0, focale
         return f
+
+    capsules = {id(d): capsule_locale(d.ob) for d in ing}
+
+    def hors_des_objets(cam, t, marge=15 * MM):
+        """Garde la caméra à `marge` de tout ingrédient (hors frôlement)."""
+        for _ in range(3):
+            for d in ing:
+                a, b, r = capsules[id(d)]
+                p, rot = d.pose(t)
+                M = Matrix.Translation(p) @ Euler(tuple(rot)).to_matrix().to_4x4() @ Matrix.Diagonal((*d.ob.scale, 1.0))
+                pa, pb = M @ a, M @ b
+                q, _ = segments_proches(cam, cam, pa, pb)
+                proche = _
+                v = cam - proche
+                lim = r * d.ob.scale.x + marge
+                if v.length < lim:
+                    cam = proche + (v.normalized() if v.length > 1e-6 else Vector((0, -1, 0))) * lim
+        return cam
 
     def plan_fpv(k, azim, elev_fin, frole=1 / PHI ** 2):
         """Plan « drone FPV » : départ au ras de la peau de l'ingrédient (à
@@ -336,13 +354,19 @@ def plans(handle, danseurs, flacon_d):
             cib0 = vise(1)
             dS = S - centre
             a_s = math.degrees(math.atan2(dS.x, -dS.y))
-            cam1 = orbite(centre, dist, a_s + 137.5 / PHI ** 2, elev_fin)
+            # Le recul reste du côté de la caméra (face au décor) : jamais
+            # derrière l'ingrédient, où se trouve le mur du fond.
+            a1 = (a_s + 137.5 / PHI ** 2 + 180) % 360 - 180
+            a1 = max(-75.0, min(75.0, a1))
+            cam1 = orbite(centre, dist, a1, elev_fin)
             v0, v1 = cam0 - centre, cam1 - centre
             r0, r1 = max(v0.length, 1e-4), v1.length
             r = r0 * (r1 / r0) ** e
             d = v0.normalized().slerp(v1.normalized(), e) if v0.normalized().dot(v1.normalized()) > -0.99 \
                 else v0.normalized().lerp(v1.normalized(), e).normalized()
             cam = centre + d * r + Vector((0, 0, 1)) * math.sin(math.pi * e) * 0.18 * r   # reprend de la hauteur
+            cam.y = min(cam.y, 0.19)                # le mur du fond est à y = 0,22 m
+            cam = hors_des_objets(cam, t)
             cib = cib0.lerp(centre, lisse(min(1.0, x * PHI)))
             return cam, cib, 11.0 - 6.0 * e, 40.0 + 10.0 * e
         return f
