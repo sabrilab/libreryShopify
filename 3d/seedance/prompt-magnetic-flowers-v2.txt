@@ -1,0 +1,27 @@
+Vertical 9:16, 15 seconds. Photorealistic live-action film of a floating still life. @Video1 is a colourless grey motion study: use it only for camera path, timing, framing and the movement of each element. Do not copy its grey surfaces, its lighting or its rendering in any way. @Image1 is a real photograph of the glass bottle: the bottle in this film is exactly that bottle, from the very first close view to the last frame.
+
+Reference rule. Nothing in this film looks computer generated. Every surface is a real material filmed with a real lens: real fruit, real fresh flowers, real faceted glass, real polished metal. The grey study only tells where things move and when; colour, texture and light come from this text and from @Image1.
+
+Continuity rule. The film follows the scene changes of @Video1 at exactly the same moments, with clean straight changes only. Inside each scene the movement is one continuous flow. No fades, no dissolves, no crossfades, no morphing, no blending between scenes, no transition effects.
+
+The bottle. Thick faceted clear glass, pale golden liquid, a polished pale champagne-gold cap with the engraved emblem on top, the gold emblem and the gold lettering on the front exactly as in @Image1. Its shape, proportions, colours and lettering never change.
+
+The ingredients. A ripe Williams pear, yellow-green with fine russet freckles. A fresh jasmine sprig with small white star flowers, glossy dark leaves and pink-tipped buds. A tall tuberose stem with waxy white flowers. Orange blossom: pure white thick petals with bright yellow stamens on a green stem, never orange coloured. A soft silver-green sage leaf. A few loose white petals. Everything floats weightlessly in an open warm beige space, each piece turning slowly on its own axis in its own direction, stems swaying gently, petals trembling slightly in the air, like real objects adrift in zero gravity. The motion is organic and slightly irregular, never mechanical, never perfectly smooth or perfectly regular.
+
+Camera character. Real lens optics, slight wide-angle character, the small natural corrections of a skilled camera pilot, speed that rises and falls on long gentle ramps, light motion blur in the faster moments, shallow depth of field with focus that breathes naturally. Never jerky, never snapping, never reversing abruptly.
+
+Progression.
+0.0 to 3.5 s. The camera glides very close along the freckled peel of the whole pear, the surface sliding past softly out of focus at the edges, then rises and drifts back until the whole pear floats in frame. As the camera moves away, the pear slowly parts into two halves that open gently like a book, showing a pale cream interior and a few dark seeds, seen from a calm middle distance.
+3.5 to 4.9 s. A slow close orbit over the champagne-gold cap of the bottle from @Image1, the engraved emblem catching a line of warm light that glides across the polished metal.
+4.9 to 7.1 s. The camera begins on the white jasmine flowers, then lifts and eases back to reveal the whole sprig with its leaves and buds, the tuberose stem floating behind it.
+7.1 to 8.4 s. A gentle pass over white orange blossom petals and their yellow stamens, the sage leaf turning slowly in the foreground.
+8.4 to 9.3 s. The camera slides down the shoulder of the bottle to its gold lettering, sharp and legible as in @Image1.
+9.3 to 15 s. One long smooth retreat from the cap to the whole bottle, which ends perfectly centred in the frame, facing the camera. As the camera retreats, the ingredients drift calmly toward a point just behind the bottle, as if drawn by it, on soft curving paths, slowing down and settling into a graceful floating cluster around it: the two pear halves, a whole pear, jasmine, tuberose, orange blossom, the sage leaf and a few petals. They slow almost to stillness without fully stopping. Final frame: an elegant floating still life, bottle centred.
+
+Framing rules. The opened pear halves are seen only from the middle or far distance, never in close view, never filling the frame. Close passes happen only along the peel of the whole pear, the flower petals and the metal cap. The bottle is never distorted, cropped into an unreadable shape or partly replaced.
+
+Look. Warm beige seamless backdrop, soft warm sunlight from the upper left, gentle long shadows, delicate dust floating in the light. Photorealistic cinematography, crisp material detail, true colours, subtle film grain.
+
+Sound. Real recorded sounds only: soft air movement rising and falling with the camera, a faint rustle of petals and leaves, a gentle glass tone near the bottle, thinning to near silence at the end. No music, no score, no melody, no synth pad, no drums, no voice.
+
+Avoid. No CGI, no 3D render look, no grey clay surfaces, no animation style. No fades, no dissolves, no crossfades, no morphing, no transition effects. No orange-coloured flowers. No close view of the opened pear halves. No change to the bottle, its cap or its lettering. No extra objects, no captions, no people, no hands.
