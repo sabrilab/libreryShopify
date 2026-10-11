@@ -260,7 +260,7 @@ def vaporisateur(p):
 
     cu = bpy.data.curves.new("TubePlongeur", "CURVE")
     cu.dimensions = "3D"
-    cu.bevel_depth = 1.2 * MM
+    cu.bevel_depth = 0.8 * MM                  # Ø 1,6 mm : la réfraction du jus le grossit déjà
     cu.bevel_resolution = 3
     sp = cu.splines.new("BEZIER")
     pts = [(0, 0, p["H"] + 1), (0, 0, 70), (-6, -4, 42), (-14, -6, p["CAV_Z0"] + 1.3)]

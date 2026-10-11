@@ -347,7 +347,79 @@ def cartes_noires():
         ob.visible_shadow = False
 
 
-def scene(handle, tau=None):
+def logo_capot(p, m, profondeur=0.6, grille=(400, 452)):
+    """Emblème LIBRERY gravé dans le dessus du capot, comme sur le vrai
+    flacon : traits nets, creusés, au fond sombre et mat.
+
+    Un « tampon » est soustrait du capot : une grille posée juste au-dessus
+    du capot, creusée vers le bas par l'emblème (3d/textures/emblem-gravure.png,
+    version seuillée et agrandie de l'emblème : flancs francs), puis épaissie
+    vers le haut. Là où l'emblème est vide, le tampon reste au-dessus du capot
+    et ne coupe rien. Le fond des gravures reçoit un or bruni, plus sombre."""
+    emb = os.path.join(ROOT, "textures", "emblem-gravure.png")
+    img = bpy.data.images.load(emb)
+    haut = (p["H"] + p["VIR_H"] + p["CH"]) * MM
+    taille = 26.0 * MM                      # hauteur de l'emblème : il occupe presque tout le dessus du capot (31,3 de profondeur)
+    bm = bmesh.new()
+    bmesh.ops.create_grid(bm, x_segments=grille[0], y_segments=grille[1], size=0.5)
+    ob = G.mesh_object("TamponLogo", bm)
+    ratio = img.size[0] / img.size[1]
+    ob.scale = (taille * ratio, taille, 1)
+    ob.location = (0, 0, haut + 0.1 * MM)
+    # Sans rotation : lisible depuis l'avant du flacon (clé vers soi).
+    tex = bpy.data.textures.new("emblemeRelief", "IMAGE")
+    tex.image = img
+    tex.use_alpha = True
+    tex.extension = "CLIP"
+    bm2 = bmesh.new()
+    bm2.from_mesh(ob.data)
+    uv = bm2.loops.layers.uv.new("UVMap")
+    for f in bm2.faces:
+        for loop in f.loops:
+            loop[uv].uv = (loop.vert.co.x + 0.5, loop.vert.co.y + 0.5)
+    bm2.to_mesh(ob.data)
+    bm2.free()
+    mod = ob.modifiers.new("creux", "DISPLACE")
+    mod.texture = tex
+    mod.texture_coords = "UV"
+    mod.direction = "Z"
+    mod.strength = -(profondeur + 0.1) * MM
+    mod.mid_level = 0.0
+    sol = ob.modifiers.new("epaisseur", "SOLIDIFY")
+    sol.thickness = (profondeur + 0.6) * MM    # plus épais que le creux : le tampon ressort au-dessus du capot
+    sol.offset = 1.0
+    G.apply_all(ob)
+    bm3 = bmesh.new()
+    bm3.from_mesh(ob.data)
+    bmesh.ops.recalc_face_normals(bm3, faces=bm3.faces)   # le solidify vers le haut les laisse inversées
+    bm3.to_mesh(ob.data)
+    bm3.free()
+    capot = bpy.data.objects["Capot"]
+    G.boolean(capot, ob)
+    # Fond et flancs des gravures : or bruni (plus sombre, satiné).
+    base = capot.data.materials[0]
+    grave = base.copy()
+    grave.name = base.name + "_grave"
+    bsdf = next((n for n in grave.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None) if grave.use_nodes else None
+    if bsdf is not None:
+        c = bsdf.inputs["Base Color"].default_value
+        bsdf.inputs["Base Color"].default_value = (c[0] * 0.12, c[1] * 0.09, c[2] * 0.07, 1)
+        bsdf.inputs["Metallic"].default_value = 0.5
+        bsdf.inputs["Roughness"].default_value = 0.6
+    capot.data.materials.append(grave)
+    k = len(capot.data.materials) - 1
+    mw = capot.matrix_world
+    seuil = haut - 0.12 * MM
+    for poly in capot.data.polygons:
+        z = (mw @ poly.center).z
+        if haut - profondeur * MM - 0.05 * MM < z < seuil:
+            poly.material_index = k
+            poly.use_smooth = False
+    return capot
+
+
+def flacon(handle, tau=None):
+    """Le flacon seul, matières Cycles comprises (sans studio)."""
     BF.build(handle)
     p = BF.cotes()
     glass = bpy.data.objects["Verre"]
@@ -360,6 +432,12 @@ def scene(handle, tau=None):
         if name in m:
             BF.assign(ob, m[name])
     contact_jus(p, m)
+    logo_capot(p, m)
+    return p
+
+
+def scene(handle, tau=None):
+    p = flacon(handle, tau)
     studio()
     cartes_noires()
     return p

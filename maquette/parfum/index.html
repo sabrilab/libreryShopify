@@ -66,6 +66,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
 const canvas = document.getElementById("scene");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -109,6 +110,16 @@ function studio() {
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(studio(), 0.01).texture;
 scene.environmentIntensity = 1.0;
+// Vrai studio photo (HDRI Poly Haven « studio_small_09 », CC0) : boîtes à
+// lumière octogonales, cyclo blanc et plafond noir. Ses reflets donnent au
+// verre et à l'or le rendu d'une photo produit. Le studio dessiné ci-dessus
+// sert en attendant le téléchargement.
+new RGBELoader().loadAsync("studio.hdr").then((hdr) => {
+  scene.environment = pmrem.fromEquirectangular(hdr).texture;
+  hdr.dispose();
+  scene.environmentIntensity = 0.85;
+  scene.environmentRotation.set(0, -0.9, 0);   // boîtes à lumière à gauche et à droite, un peu devant
+}).catch(() => {});
 
 const camera = new THREE.PerspectiveCamera(26, 1, 0.01, 5);
 camera.position.set(0.16, 0.10, 0.36);
@@ -132,12 +143,41 @@ const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.08),
   new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
 shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.0005; scene.add(shadow);
 
+// Caustique : la lumière de la boîte à lumière gauche traverse le jus et
+// projette au sol, derrière le flacon, une tache colorée plus vive au cœur
+// (comme sur les photos de campagne). Additive : elle éclaircit le sol.
+const causticTex = (() => {
+  const c = document.createElement("canvas"); c.width = 128; c.height = 256;
+  const g = c.getContext("2d");
+  const halo = g.createRadialGradient(64, 150, 4, 64, 150, 64);
+  halo.addColorStop(0, "rgba(255,255,255,.55)"); halo.addColorStop(1, "rgba(255,255,255,0)");
+  g.save(); g.scale(1, 1.8); g.translate(0, -66); g.fillStyle = halo; g.fillRect(0, 0, 128, 256); g.restore();
+  const coeur = g.createRadialGradient(64, 170, 1, 64, 170, 18);
+  coeur.addColorStop(0, "rgba(255,255,255,1)"); coeur.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = coeur; g.fillRect(0, 0, 128, 256);
+  for (let k = 0; k < 5; k++) {           // filets lumineux des arêtes du verre
+    g.strokeStyle = `rgba(255,255,255,${0.18 + 0.1 * (k % 2)})`; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(40 + k * 12, 60); g.quadraticCurveTo(44 + k * 10, 150, 52 + k * 6, 230); g.stroke();
+  }
+  return new THREE.CanvasTexture(c);
+})();
+const caustic = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.1),
+  new THREE.MeshBasicMaterial({ map: causticTex, transparent: true, depthWrite: false,
+    blending: THREE.AdditiveBlending, toneMapped: false }));
+caustic.rotation.set(-Math.PI / 2, 0, 0.55);
+caustic.position.set(0.028, 0.0007, -0.05);
+scene.add(caustic);
+
 // Le suffixe ?v= évite qu'un ancien modèle reste en cache après une mise à jour.
 const modele = await fetch("modele.json", { cache: "no-store" }).then((r) => r.json()).catch(() => ({}));
 const v = encodeURIComponent(modele.date || Date.now());
 // La vue 360° se charge en même temps que le modèle 3D, sans l'attendre.
 const handleInitial = location.hash.slice(1) || "tonka-love";
-const premier360 = charger360(handleInitial);
+// Vue photo 360° (images Cycles) désactivée : ces images ne suivent plus le
+// modèle (typo des étiquettes, logo du capot). La page reste sur la 3D temps
+// réel, qui charge toujours le dernier modèle. Passer à true pour la rétablir.
+const AVEC_360 = false;
+const premier360 = AVEC_360 ? charger360(handleInitial) : Promise.resolve(null);
 const [gltf, parfums] = await Promise.all([
   new GLTFLoader().loadAsync(`flacon-100ml.glb?v=${v}`),
   fetch(`parfums.json?v=${v}`).then((r) => r.json()),
@@ -150,25 +190,31 @@ if (modele.date) {
 const flacon = gltf.scene;
 scene.add(flacon);
 const parts = {};
-flacon.traverse((o) => { if (o.isMesh) parts[o.name] = o; });
+const matieres = {};
+flacon.traverse((o) => { if (o.isMesh) { parts[o.name] = o; matieres[o.material.name] = o.material; } });
 
 // Matières. Three.js ne montre pas un objet transmissif à travers un autre,
 // sauf la face arrière des objets double face : le jus est donc transmissif
 // et double face (sa paroi du fond entre dans l'image que le verre réfracte),
 // le verre transmissif en simple face. Le tube plongeur est opaque, pour
 // rester visible au travers du jus et du verre.
-const glass = parts.Verre.material;
+const glass = matieres.Verre;
+// Socle massif (≈ 22 mm de verre plein) : matière à part, plus épaisse.
+const socle = matieres.VerreSocle || glass;
 Object.assign(glass, { roughness: 0, metalness: 0, transmission: 1, ior: 1.5,
-  thickness: 0.02, attenuationDistance: 0.1, specularIntensity: 1,
+  thickness: 0.017, attenuationDistance: 0.1, specularIntensity: 1,   // parois de 8,5 mm, réfraction forcée : elles renvoient le jus
+  dispersion: 0.35,          // irisations aux arêtes, comme un vrai verre épais
   side: THREE.FrontSide, envMapIntensity: 1 });
 const juice = parts.Jus.material;
 Object.assign(juice, { roughness: 0, metalness: 0, transmission: 1, ior: 1.36,
-  thickness: 0.03, attenuationDistance: 0.028, side: THREE.DoubleSide, envMapIntensity: 0.6 });
+  thickness: 0.03, attenuationDistance: 0.042, side: THREE.DoubleSide, envMapIntensity: 0.6 });
 const or = parts.Capot.material;
 Object.assign(or, { metalness: 1, roughness: 0.08, envMapIntensity: 1.1 });
 or.color.setRGB(0.95, 0.83, 0.70, THREE.SRGBColorSpace);   // or champagne, légèrement rosé
 for (const n of ["Virole", "Col", "Poussoir"]) if (parts[n]) parts[n].material = or;
-const plastique = new THREE.MeshStandardMaterial({ color: 0xf4f1ec, roughness: 0.25, transparent: true, opacity: 0.55 });
+// Tube plongeur : opaque, sinon Three.js ne le dessine pas au travers du
+// verre et du jus (les objets transparents sont exclus de la transmission).
+const plastique = new THREE.MeshStandardMaterial({ color: 0xe9e3d8, roughness: 0.25, metalness: 0 });
 for (const n of ["TubePlongeur", "Tige"]) if (parts[n]) parts[n].material = plastique;
 const label = parts.Etiquette.material;
 Object.assign(label, { transparent: true, depthWrite: false, alphaTest: 0.02,
@@ -179,6 +225,25 @@ label.emissiveMap = null;
 parts.Etiquette.renderOrder = 2;
 
 const texLoader = new THREE.TextureLoader();
+
+// Emblème gravé dans le dessus du capot : décalque aux traits nets, fond
+// d'or bruni (comme sur le vrai flacon), posé à plat sur la face supérieure.
+{
+  const cap = parts.Capot;
+  cap.geometry.computeBoundingBox();
+  const bb = cap.geometry.boundingBox;
+  const tex = texLoader.load(`emblem-gravure.png?v=${v}`);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const hauteur = 0.026, largeur = hauteur * 1844 / 2080;          // 26 mm de haut, comme dans Blender
+  const grave = new THREE.MeshStandardMaterial({ map: tex, color: 0x3b271a, metalness: 0.5, roughness: 0.55,
+    transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 });
+  const embleme = new THREE.Mesh(new THREE.PlaneGeometry(largeur, hauteur), grave);
+  embleme.name = "EmblemeCapot";
+  embleme.rotation.x = -Math.PI / 2;
+  embleme.position.set((bb.min.x + bb.max.x) / 2, bb.max.y + 0.00001, (bb.min.z + bb.max.z) / 2);
+  cap.add(embleme);
+}
 const labels = {};
 function labelTexture(handle) {
   if (!labels[handle]) {
@@ -205,10 +270,27 @@ let select = function (handle) {
   glass.attenuationDistance = teinte ? 0.035 : 0.06;
   // Teinte de surface en plus : sur un fond clair, l'atténuation seule laisse
   // le socle presque blanc, alors qu'en vrai il renvoie la couleur du jus.
-  glass.color.set(1, 1, 1).lerp(glass.attenuationColor, teinte ? 0.55 : 0.4);
+  // Verre teinté : sa couleur propre est saturée, proche du jus (socle
+  // magenta de Palmeira, violet de Mango Wave…).
+  if (teinte) glass.color.copy(jus).lerp(new THREE.Color().setRGB(...p.verre, THREE.SRGBColorSpace), 0.35)
+    .lerp(new THREE.Color(1, 1, 1), 0.3);
+  else glass.color.set(1, 1, 1).lerp(glass.attenuationColor, 0.4);
   // Le jus se colore dans sa masse (atténuation), pas en surface.
+  if (socle !== glass) {
+    const nom = socle.name;
+    socle.copy(glass); socle.name = nom;
+    socle.thickness = 0.024;                                    // verre plein du socle
+    socle.attenuationDistance = glass.attenuationDistance * 1.6;
+  }
   juice.attenuationColor.copy(jus);
+  // Tube plongeur : plastique translucide, il prend la couleur du jus et ne
+  // se détache qu'à peine (un filet discret, comme sur les photos).
+  plastique.color.copy(jus).lerp(new THREE.Color(1, 1, 1), 0.3);
+  juice.attenuationDistance = teinte ? 0.07 : 0.042;   // le verre teinté assombrit déjà
   juice.color.set(1, 1, 1);
+  // Caustique et ombre prennent la couleur du jus.
+  caustic.material.color.copy(jus).multiply(jus).multiplyScalar(0.42);   // couleur saturée, lumière douce
+  shadow.material.color.set(1, 1, 1).lerp(jus, 0.35);
   label.map = labelTexture(handle);
   label.emissiveMap = label.map;
   label.needsUpdate = true;
@@ -370,14 +452,15 @@ const selectOrig = select;
 select = async (handle) => {
   selectOrig(handle);
   if (vue.mode === "360" && !(await mode360(handle))) appliquerMode("3d");
-  modeBtn.hidden = !(await fetch(`360/${handle}/info.json?v=${v}`, { cache: "no-store" }).then((r) => r.ok).catch(() => false));
+  modeBtn.hidden = !AVEC_360 || !(await fetch(`360/${handle}/info.json?v=${v}`, { cache: "no-store" }).then((r) => r.ok).catch(() => false));
 };
 for (const b of nav.querySelectorAll(".swatch")) b.onclick = () => select(b.dataset.handle);
 
 // Au chargement : 360° par défaut si disponible (sauf ?fixe, gardé pour les captures 3D).
 appliquerMode("3d");
 const deja = currentHandle() === handleInitial ? premier360 : null;
-if (!new URLSearchParams(location.search).has("fixe") && await mode360(currentHandle(), deja)) appliquerMode("360");
+if (!AVEC_360) modeBtn.hidden = true;
+else if (!new URLSearchParams(location.search).has("fixe") && await mode360(currentHandle(), deja)) appliquerMode("360");
 else modeBtn.hidden = !(await (deja || charger360(currentHandle())));
 
 const capHome = parts.Capot.position.clone();
