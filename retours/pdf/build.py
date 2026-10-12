@@ -176,6 +176,7 @@ TOC = [
     ('Les renvois aux pages du catalogue retirés', 'Photos et vocaux 15:30–15:31'),
     ('Fiche produit : la photo suit le format choisi', 'Vidéo 15:33'),
     ('Vos prix', 'Message 17:14'),
+    ('Vos coffrets, en photo produit', ''),
     ('Le film Skin Obsession en ouverture', 'Vidéo reçue le 12/10'),
     ('Les vingt-cinq points de vente', 'Liste reçue le 12/10'),
     ('Vos questions', 'Le code du coffret, le paiement en trois fois'),
@@ -235,7 +236,7 @@ change('04', 'La collection Skin Obsession', 'Seules les trois tuiles descendent
        f'<div class="plans">{plan_fig("avant", "Avant")}{plan_fig("apres", "Après")}</div>',
        ['Les trois tuiles (le coffret, « Portrait olfactif », « Nos adresses ») passent sous les textes, en fin de page',
         'L’introduction, les parfums et la mosaïque gardent leur ordre ; sur téléphone, le premier parfum s’affiche en grand',
-        'L’ouverture est désormais votre film (page 12)'], 'paper2')
+        'L’ouverture est désormais votre film (page 13)'], 'paper2')
 
 # ---------------------------------------------------------------- 05 légendes
 change('05', 'Les petites légendes', 'Les mentions « fig. 1 — … » sous les images sont retirées.',
@@ -281,22 +282,32 @@ change('08', 'Vos prix', 'Les formats et les coffrets, aux prix que vous nous av
            <div class="pair">{shot(SH['coffret']['avant'], 'Avant', note='Le Coffret Découverte')}{shot(SH['coffret']['apres'], 'Après', href='/produit?p=coffret-decouverte', note='Le Coffret Découverte')}</div>''',
        ['Parfums : 100 ml 170 €, 30 ml 90 €, 2 ml 7 €',
         'Coffret Découverte : une seule version, les huit parfums en 2 ml, 40 €',
+        'Les coffrets ont désormais leurs vraies photos, ouverts et fermés, d’après les vôtres',
         'Coffrets 30 ml : Summer Vibes 430 €, Skin Obsession 250 €',
         'Le « Coffret à composer » est mis en pause : ses liens mènent au Coffret Découverte',
         'Page Offrir : « Moins de 50 € » et « Autour de 90 € »'], 'paper2')
 
+# ---------------------------------------------------------------- 08 suite : les coffrets en photo produit
+SETS = [('2ml', 'Coffret Découverte, 2 ml'), ('30ml-summer-vibes', 'Coffret Summer Vibes, 30 ml'), ('30ml-skin-obsession', 'Coffret Skin Obsession, 30 ml')]
+cols = ''.join(f'''<div class="nb__col"><p class="nb__t">{t}</p>
+  <div class="nb__pair"><img src="img/nb-{k}-ouvert.jpg"><img src="img/nb-{k}-ferme.jpg"></div>
+  <div class="nb__src"><span class="tag tag--a">Votre photo</span><img src="img/src-{k}-ouvert.jpg"><img src="img/src-{k}-ferme.jpg"></div></div>''' for k, t in SETS)
+page(head('09', 'Vos coffrets, en photo produit', 'Recréés en studio d’après vos photos, sur fond blanc.') + f'''<div class="ch">
+  <aside class="ch__side">{done(['Les trois coffrets, ouverts et fermés, sur le même fond blanc que les flacons', 'Les flacons, leurs noms et le logo repris fidèlement, dans l’ordre réel du coffret', 'En ligne sur les fiches des coffrets et sur l’accueil ; sur le Coffret Collection, la photo suit la version choisie'])}</aside>
+  <div class="ch__main"><div class="nb">{cols}</div></div></div>''', 'paper2')
+
 # ---------------------------------------------------------------- 09 film
 film = ''.join(f'<img src="{f}">' for f in FILM)
-page(head('09', 'Le film Skin Obsession', 'Il ouvre désormais la page de la collection.') + f'''<div class="ch">
+page(head('10', 'Le film Skin Obsession', 'Il ouvre désormais l’accueil et la page de la collection.') + f'''<div class="ch">
   <aside class="ch__side">{quote('Là, du coup, on verra si on met pas aussi une vidéo. Je sais pas si c’est possible d’incruster une vidéo, mais ce serait top si on peut mettre une vidéo.', 'Vidéo du 12/10, 15:28')}
-    {done(['Votre film ouvre la page Skin Obsession, en boucle et sans le son', 'Une version plus légère est servie sur téléphone', 'Un petit bouton « Pause / Lecture » dans le coin de l’image'])}</aside>
+    {done(['Votre film ouvre le site, en haut de l’accueil, à la place du diaporama : seul, en boucle et sans le son', 'Il ouvre aussi la page Skin Obsession', 'Une version plus légère est servie sur téléphone', 'Un petit bouton « Pause / Lecture » dans le coin de l’image'])}</aside>
   <div class="ch__main">
     <div class="pair">{shot(SH['hero']['avant'], 'Avant', note='L’ouverture : une photo')}{shot(SH['hero']['apres'], 'Après', href='/collection?c=skin-obsession', note='L’ouverture : votre film')}</div>
     <div class="film"><span class="tag tag--b">Le film, 22 s</span><div class="film__row">{film}</div></div>
   </div></div>''')
 
 # ---------------------------------------------------------------- 10 carte
-change('10', 'Les points de vente', 'Vingt-cinq adresses, dans treize pays.',
+change('11', 'Les points de vente', 'Vingt-cinq adresses, dans treize pays.',
        '', '',
        f'''<div class="pair">{shot(SH['carte']['avant'], 'Avant', note='13 adresses')}{shot(SH['carte']['apres'], 'Après', href='/points-de-vente', note='25 adresses')}</div>''',
        ['La carte reprend exactement votre liste : 10 adresses en France, 15 dans le monde',
@@ -320,13 +331,13 @@ QA = [
         'Sur les petits montants, l’option peut ne pas s’afficher : chaque prestataire fixe un minimum.',
     ]),
     ('Peut-on mettre une vidéo sur le site ?', [
-        'Oui, c’est fait : votre film ouvre la page Skin Obsession (page 12). D’autres pages peuvent en accueillir une de la même façon.',
+        'Oui, c’est fait : votre film ouvre l’accueil et la page Skin Obsession (page 13). D’autres pages peuvent en accueillir une de la même façon.',
     ]),
     ('Les petites mentions « fig. » et « p. », c’était voulu ?', [
         'Oui : un clin d’œil aux légendes et aux pages du catalogue papier. Comme vous le préférez, elles sont retirées partout.',
     ]),
 ]
-page(head('11', 'Vos questions', 'Nos réponses, simplement.') + '<div class="qa">' + ''.join(
+page(head('12', 'Vos questions', 'Nos réponses, simplement.') + '<div class="qa">' + ''.join(
     f'<section class="qa__item"><h3>{q}</h3><ul>{"".join(f"<li>{x}</li>" for x in r)}</ul></section>' for q, r in QA) + '</div>', 'paper2')
 
 # ---------------------------------------------------------------- à venir
@@ -339,7 +350,7 @@ page(f'''
       <li><b>Mosaïques</b>De nouvelles photos pour Skin Obsession et Summer Vibes, pas seulement des mannequins</li>
       <li><b>Bougies</b>Photos et textes, pour rouvrir la page</li>
       <li><b>Coffret à composer</b>Son prix, le jour où vous voudrez le lancer</li>
-      <li><b>Validations</b>L’écrin (page 4), la photo de Magnetic Flowers (page 10), les adresses retirées (page 13)</li>
+      <li><b>Validations</b>L’écrin (page 4), la photo de Magnetic Flowers (page 10), les adresses retirées (page 14)</li>
     </ul>
   </div>''')
 

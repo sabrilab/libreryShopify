@@ -73,3 +73,12 @@
 .qa__item ul { list-style: none; margin: 0; padding: 0; }
 .qa__item li { position: relative; padding: 0 0 10px 20px; font-family: var(--sans); font-size: 14px; line-height: 1.55; color: var(--ink); }
 .qa__item li::before { content: ""; position: absolute; left: 2px; top: 10px; width: 8px; border-top: 1px solid var(--gold); }
+
+/* coffrets en photo produit */
+.nb { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; height: 100%; }
+.nb__col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.nb__t { margin: 0; font-family: var(--display); font-size: 19px; }
+.nb__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.nb__pair img { width: 100%; aspect-ratio: 900 / 1117; object-fit: cover; display: block; border-radius: 3px; box-shadow: 0 0 0 1px rgba(47,43,40,.08), 0 18px 30px -22px rgba(40,28,18,.4); }
+.nb__src { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.nb__src img { width: 74px; height: 74px; object-fit: cover; border-radius: 3px; opacity: .9; }
