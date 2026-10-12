@@ -648,22 +648,34 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
 
 /* ---------- Catalogue feuilleté (accueil) : couverture fermée, puis les pages tournent au défilement ----------
    Une feuille = 20 bandes chaînées qui se courbent ; chaque feuille a sa profondeur (le z-index ne joue pas en 3D). */
-.flip { --ratio: 1.4144; height: 360vh; position: relative; background: var(--paper-2); }
-.flip__sticky { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); height: calc(100svh - var(--header-h)); display: grid; grid-template-columns: 300px 1fr; align-items: center; gap: 32px; }
+.flip { --ratio: 1.4144; height: 300vh; position: relative; }
+.flip__sticky { --pw: min(340px, 26vw, calc((100svh - var(--header-h) - 96px) / 1.4144)); --ph: calc(var(--pw) * var(--ratio));
+  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); height: calc(100svh - var(--header-h));
+  display: grid; grid-template-columns: 300px 1fr; grid-template-areas: "cap stage" "cta stage"; align-content: center; column-gap: 32px; }
+/* bande beige pleine largeur, 80 % de la hauteur du catalogue : le livre en dépasse en haut et en bas */
+.flip__sticky::before { content: ""; position: absolute; z-index: -1; left: 50%; width: 100vw; transform: translateX(-50%); top: calc(50% - var(--ph) * .4); height: calc(var(--ph) * .8); background: var(--paper-2); }
+.flip__cap { grid-area: cap; align-self: end; }
+.flip__stage { grid-area: stage; }
+.flip__cta { grid-area: cta; align-self: start; }
 .flip__k { font-family: var(--sans); font-size: 12px; letter-spacing: .06em; color: var(--gold); margin: 0 0 12px; }
 .flip__cap .h2 { min-height: 2.2em; margin: 0 0 10px; }
 .flip__hint { font-family: var(--sans); font-size: 13px; color: var(--grey); margin: 0; }
 .flip__bar { margin-top: 22px; height: 1px; background: var(--line); }
 .flip__bar span { display: block; height: 1px; width: 0; background: var(--ink); }
 .flip__cta { display: flex; align-items: center; gap: 24px; margin-top: 30px; flex-wrap: wrap; }
-.flip__stage { perspective: 2400px; display: grid; place-items: center; }
-.flip .flip__book { --pw: min(360px, 27vw); --ph: calc(var(--pw) * var(--ratio)); position: relative; width: calc(var(--pw) * 2); height: var(--ph); transform: rotateX(14deg) translateX(-25%); transform-style: preserve-3d; }
+.flip__stage { perspective: 2600px; display: grid; place-items: center; height: 100%; }
+.flip .flip__book { position: relative; width: calc(var(--pw) * 2); height: var(--ph); transform: translateX(-25%); transform-style: preserve-3d; }
 .flip .flip__l, .flip .flip__r { position: absolute; top: 0; width: var(--pw); height: var(--ph); background: #fff; transform: translateZ(0); box-shadow: 0 30px 60px -30px rgba(40,28,18,.35); }
 .flip .flip__l { left: 0; } .flip .flip__r { right: 0; }
 .flip .flip__book img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .flip .flip__book::after { content: ""; position: absolute; left: calc(50% - 18px); top: 0; width: 36px; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,0,0,.08) 45%, rgba(0,0,0,.14) 50%, rgba(0,0,0,.08) 55%, transparent); transform: translateZ(9px); pointer-events: none; }
 .flip .flip__book.is-closed::after { opacity: 0; }
 .flip .flip__leaf { position: absolute; top: 0; left: 50%; width: var(--pw); height: var(--ph); transform-origin: left center; transform-style: preserve-3d; }
+.flip .flip__flat { position: absolute; inset: 0; transform-style: preserve-3d; display: none; }
+.flip .flip__flat > i { position: absolute; inset: 0; background: #fff center / cover no-repeat; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flip .flip__flat > i.b { transform: rotateY(180deg); }
+.flip .flip__leaf.is-flat > .flip__flat { display: block; }
+.flip .flip__leaf.is-flat > .flip__strip { visibility: hidden; }
 .flip .flip__strip { position: absolute; top: 0; left: 0; height: 100%; transform-origin: left center; transform-style: preserve-3d; }
 .flip .flip__strip .flip__strip { left: 100%; }
 .flip .flip__strip > i { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background-repeat: no-repeat; background-color: #fff; }
@@ -673,10 +685,10 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
 .flip .flip__strip > i.fill.last { width: calc(100% + 3px); }
 .flip .flip__strip > i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(40,28,18,var(--sa, 0)), rgba(40,28,18,var(--sb, 0))); }
 @media (max-width: 800px) {
-  .flip { height: 320vh; }
-  .flip__sticky { grid-template-columns: 1fr; align-content: center; gap: 22px; }
+  .flip { height: 280vh; }
+  .flip__sticky { --pw: 44vw; grid-template-columns: 1fr; grid-template-areas: "cap" "stage" "cta"; align-content: center; row-gap: 22px; }
+  .flip__stage { height: auto; padding: 4vw 0; }
   .flip__cap .h2 { min-height: 0; }
   .flip__hint, .flip__bar { display: none; }
   .flip__cta { margin-top: 14px; }
-  .flip .flip__book { --pw: 44vw; }
 }

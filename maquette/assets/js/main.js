@@ -490,6 +490,8 @@
       const pw = spread.querySelector('.flip__r').offsetWidth, ph = spread.offsetHeight, sw = pw / N;
       for (let k = 0; k < 7; k++) {
         const el = document.createElement('div'); el.className = 'flip__leaf';
+        // page à plat d'un seul tenant (aucune jointure visible) ; les bandes ne servent que pendant le tour
+        el.innerHTML = `<div class="flip__flat"><i style="background-image:url(${P(1 + 2 * k)})"></i><i class="b" style="background-image:url(${P(2 + 2 * k)})"></i></div>`;
         let parent = el; const strips = [];
         const fr = (x, f) => `<i class="fr${f}" style="background-image:url(${P(1 + 2 * k)});background-size:${pw}px ${ph}px;background-position:${x}px 0"></i>`;
         const bk = (x, f) => `<i class="bk${f}" style="background-image:url(${P(2 + 2 * k)});background-size:${pw}px ${ph}px;background-position:${x}px 0"></i>`;
@@ -508,7 +510,7 @@
     const draw = () => {
       const r = track.getBoundingClientRect(), prog = clamp(-r.top / (r.height - innerHeight)), p = prog * leaves.length;
       const t0 = still ? (p > .5 ? 1 : 0) : ease(clamp(p));
-      spread.style.transform = `rotateX(14deg) translateX(${(-25 * (1 - t0)).toFixed(2)}%)`;
+      spread.style.transform = `translateX(${(-25 * (1 - t0)).toFixed(2)}%)`;   // de face, bien droit
       spread.querySelector('.flip__l').style.opacity = t0 > .5 ? 1 : 0;
       spread.classList.toggle('is-closed', t0 < .5);
       leaves.forEach(({ el, strips }, i) => {
@@ -516,6 +518,7 @@
         const bend = 95 * lift * (t < .5 ? 1 : .8), base = -180 * t - bend * .35;
         const z = (t > .5 ? 1 + i * .8 : 1 + (leaves.length - i) * .8) + lift * 14;
         el.style.transform = `translateZ(${z.toFixed(2)}px) rotateY(${base.toFixed(2)}deg)`;
+        el.classList.toggle('is-flat', lift < .002);
         let acc = base, prev = 0;
         strips.forEach((st, j) => {
           const step = j === 0 ? 0 : bend * W[j] / WS * N / (N - 1) * .9;
