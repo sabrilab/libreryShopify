@@ -475,6 +475,22 @@
     filmControl(root);
   }
 
+  /* Écran de chargement : attend le film d'ouverture, les pages du catalogue, les polices et la page ; 5 s au plus */
+  function initLoader() {
+    const L = $('#loader'); if (!L) return;
+    if (document.documentElement.classList.contains('is-seen')) { L.remove(); return; }
+    const bar = $('.loader__bar i', L), tasks = [];
+    const add = p => tasks.push(p.catch(() => {}).then(() => { done++; bar.style.width = (done / tasks.length * 100) + '%'; }));
+    let done = 0;
+    add(document.fonts ? document.fonts.ready : Promise.resolve());
+    add(new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r, { once: true })));
+    const film = $('.s-hero__film, .coll-hero video');
+    if (film) add(new Promise(r => film.readyState >= 2 ? r() : (film.addEventListener('loadeddata', r, { once: true }), film.addEventListener('error', r, { once: true }))));
+    if ($('[data-flip]')) for (let n = 1; n <= 15; n++) add(new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = `/assets/img/catalogue/p${String(n).padStart(2, '0')}.webp`; }));
+    const fin = () => { L.classList.add('is-done'); try { sessionStorage.setItem('librery-vu', '1'); } catch (e) {} setTimeout(() => L.remove(), 900); };
+    Promise.race([Promise.all(tasks), new Promise(r => setTimeout(r, 5000))]).then(() => setTimeout(fin, 250));
+  }
+
   /* Catalogue feuilleté (accueil) : le défilement tourne les pages ; feuille 0 = la couverture (p. 1, verso p. 2) */
   function initFlip() {
     const spread = $('[data-flip]'); if (!spread) return;
@@ -858,6 +874,6 @@
   initCollection();            // avant l'en-tête : fixe le titre courant
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
-  initHero(); initHome(); initFlip(); filmControl(document); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
+  initLoader(); initHero(); initHome(); initFlip(); filmControl(document); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
   renderCart(); bindToasts(); bindCards(); accordions(); newsletters(); balanceGrids();
 })();

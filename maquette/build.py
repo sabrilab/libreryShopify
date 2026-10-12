@@ -43,6 +43,7 @@ for f in sorted((root / 'src').glob('[!_]*.html')):
     out = (head.replace('{{TITLE}}', meta.get('title', 'LIBRERY')).replace('/assets/css/style.css', css)
            + '</head>\n<body data-page="%s" class="%s"%s%s>\n' % (meta.get('page', ''), meta.get('body', ''),
                  (' data-run="%s"' % meta['run']) if meta.get('run') else '', (' data-folio="%s"' % meta['folio']) if meta.get('folio') else '')
+           + '<div class="loader" id="loader" aria-hidden="true">' + (root / 'assets/img/v2/logo-librery.svg').read_text() + '<span class="loader__bar"><i></i></span></div>\n'
            + '<div id="site-header"></div>\n<main>\n' + body.rstrip() + '\n</main>\n<div id="site-footer"></div>\n'
            + meta.get('scripts', '').replace('\\n', '\n')
            + js + '</body>\n</html>\n')

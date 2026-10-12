@@ -653,7 +653,16 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
   position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); height: calc(100svh - var(--header-h));
   display: grid; grid-template-columns: 300px 1fr; grid-template-areas: "cap stage" "cta stage"; align-content: center; column-gap: 32px; }
 /* bande beige pleine largeur, 80 % de la hauteur du catalogue : le livre en dépasse en haut et en bas */
-.flip__sticky::before { content: ""; position: absolute; z-index: -1; left: 50%; width: 100vw; transform: translateX(-50%); top: calc(50% - var(--ph) * .4); height: calc(var(--ph) * .8); background: var(--paper-2); }
+.flip__sticky::before { content: ""; position: absolute; z-index: -1; left: 50%; width: 100vw; transform: translateX(-50%); top: calc(50% - var(--ph) * .4); height: calc(var(--ph) * .8);
+  background: #3b2618 url(/assets/img/catalogue/bureau.webp) center / cover no-repeat; box-shadow: inset 0 18px 28px -18px rgba(0,0,0,.45), inset 0 -18px 28px -18px rgba(0,0,0,.45); }
+/* sur le bois (ordinateur) : texte crème, bouton inversé */
+.flip .flip__cap, .flip .flip__cta { color: #efe6d6; }
+.flip .flip__cap .h2 { color: #f6efe3; }
+.flip .flip__k { color: #d4b48c; }
+.flip .flip__hint { color: rgba(239,230,214,.72); }
+.flip .flip__bar { background: rgba(239,230,214,.25); } .flip .flip__bar span { background: #efe6d6; }
+.flip .flip__cta .btn { background: #efe6d6; color: var(--espresso); border-color: #efe6d6; }
+.flip .flip__cta .tlink { color: #efe6d6; }
 .flip__cap { grid-area: cap; align-self: end; }
 .flip__stage { grid-area: stage; }
 .flip__cta { grid-area: cta; align-self: start; }
@@ -665,7 +674,7 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
 .flip__cta { display: flex; align-items: center; gap: 24px; margin-top: 30px; flex-wrap: wrap; }
 .flip__stage { perspective: 2600px; display: grid; place-items: center; height: 100%; }
 .flip .flip__book { position: relative; width: calc(var(--pw) * 2); height: var(--ph); transform: translateX(-25%); transform-style: preserve-3d; }
-.flip .flip__l, .flip .flip__r { position: absolute; top: 0; width: var(--pw); height: var(--ph); background: #fff; transform: translateZ(0); box-shadow: 0 30px 60px -30px rgba(40,28,18,.35); }
+.flip .flip__l, .flip .flip__r { position: absolute; top: 0; width: var(--pw); height: var(--ph); background: #fff; transform: translateZ(0); box-shadow: 0 30px 50px -22px rgba(0,0,0,.6), 0 3px 8px rgba(0,0,0,.28); }
 .flip .flip__l { left: 0; } .flip .flip__r { right: 0; }
 .flip .flip__book img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .flip .flip__book::after { content: ""; position: absolute; left: calc(50% - 18px); top: 0; width: 36px; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,0,0,.08) 45%, rgba(0,0,0,.14) 50%, rgba(0,0,0,.08) 55%, transparent); transform: translateZ(9px); pointer-events: none; }
@@ -688,7 +697,20 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
   .flip { height: 280vh; }
   .flip__sticky { --pw: 44vw; grid-template-columns: 1fr; grid-template-areas: "cap" "stage" "cta"; align-content: center; row-gap: 22px; }
   .flip__stage { height: auto; padding: 4vw 0; }
+  .flip__sticky::before { background-image: url(/assets/img/catalogue/bureau-m.webp); }
+  /* sur mobile, texte et boutons sont hors du bureau : couleurs d'origine */
+  .flip .flip__cap, .flip .flip__cta, .flip .flip__cta .tlink { color: var(--ink); } .flip .flip__cap .h2 { color: var(--ink); } .flip .flip__k { color: var(--gold); }
+  .flip .flip__cta .btn { background: var(--ink); color: var(--paper); border-color: var(--ink); }
   .flip__cap .h2 { min-height: 0; }
   .flip__hint, .flip__bar { display: none; }
   .flip__cta { margin-top: 14px; }
 }
+
+/* ---------- Écran de chargement : logo + filet doré, une fois par visite (sécurité : disparaît seul après 6 s) ---------- */
+.loader { position: fixed; inset: 0; z-index: 1000; display: grid; place-content: center; justify-items: center; gap: 30px; background: var(--paper); color: var(--espresso);
+  transition: opacity .8s ease, visibility .8s; animation: loader-securite .01s 6s forwards; }
+.loader svg { width: min(340px, 62vw); height: auto; display: block; }
+.loader__bar { width: min(200px, 40vw); height: 1px; background: var(--line); overflow: hidden; }
+.loader__bar i { display: block; width: 0; height: 100%; background: var(--gold); transition: width .5s ease; }
+.is-seen .loader, .loader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
+@keyframes loader-securite { to { opacity: 0; visibility: hidden; pointer-events: none; } }
