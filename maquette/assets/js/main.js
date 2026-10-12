@@ -30,6 +30,50 @@
     return `<img class="${cls}" src="${src(name)}" srcset="${src(name)} ${w[0]}w, ${src(name, 1)} ${w[1]}w" sizes="${sizes}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
   }
 
+  /* Packshot cadré au nombre d'or : le produit (repéré sur l'image : pixels plus sombres que le fond studio)
+     fait au plus 1/φ de la hauteur du cadre et 84 % de sa largeur ; l'air libre se partage φ:1 (plus d'air au-dessus).
+     Hauteur de référence d'un flacon : 40 % de l'image (100 ml), pour que le 30 ml reste plus petit, posé au même sol. */
+  const PHI = (1 + Math.sqrt(5)) / 2;
+  function frameGold(fig) {
+    const img = fig.querySelector('img'); if (!img) return;
+    let box = null, edge = null;
+    const measure = () => {
+      const c = document.createElement('canvas'), w = c.width = 80, h = c.height = Math.round(80 * img.naturalHeight / img.naturalWidth);
+      const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, w, h);
+      const d = x.getImageData(0, 0, w, h).data; let x0 = w, x1 = 0, y0 = h, y1 = 0;
+      for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { const k = (j * w + i) * 4; if ((d[k] + d[k + 1] + d[k + 2]) / 3 < 200) { x0 = Math.min(x0, i); x1 = Math.max(x1, i); y0 = Math.min(y0, j); y1 = Math.max(y1, j); } }
+      box = x1 > x0 ? { x0: x0 / w, x1: (x1 + 1) / w, y0: y0 / h, y1: (y1 + 1) / h } : { x0: .38, x1: .61, y0: .36, y1: .76 };
+      // couleur du fond, rangée par rangée (bord gauche) : prolonge l'image si elle ne couvre pas tout le cadre
+      edge = Array.from({ length: 9 }, (_, n) => { const j = Math.round(n / 8 * (h - 1)), k = j * w * 4; return `rgb(${d[k]},${d[k + 1]},${d[k + 2]}) ${(n / 8 * 100).toFixed(1)}%`; });
+    };
+    const place = () => {
+      if (!img.naturalWidth) return; if (!box) measure();
+      const W = fig.clientWidth, H = fig.clientHeight; if (!W || !H) return;
+      const iw = img.naturalWidth, ih = img.naturalHeight, bh = box.y1 - box.y0, bw = box.x1 - box.x0;
+      let s = Math.min(H / PHI / (Math.max(bh, .40) * ih), .84 * W / (bw * iw));
+      const sw = iw * s, sh = ih * s, free = H - Math.max(bh, .40) * ih * s;
+      const bottom = H - free / (PHI + 1);                                // air dessous : air dessus = 1 : φ
+      let L = W / 2 - (box.x0 + bw / 2) * sw, T = bottom - box.y1 * sh;
+      if (sw >= W) L = Math.min(0, Math.max(W - sw, L));
+      if (sh >= H) T = Math.min(0, Math.max(H - sh, T));
+      fig.style.background = sw < W || sh < H ? `linear-gradient(to bottom, ${edge.map(e => e.replace(/([\d.]+)%$/, (_, q) => (T + q / 100 * sh).toFixed(0) + 'px')).join(', ')})` : '';
+      fig.classList.toggle('is-inset', sw < W || sh < H);
+      Object.assign(img.style, { width: sw + 'px', height: sh + 'px', transform: `translate(${L}px, ${T}px)` });
+      fig.classList.add('is-set');
+    };
+    if (img.complete && img.naturalWidth) place(); else img.addEventListener('load', place, { once: true });
+    new ResizeObserver(place).observe(fig);
+  }
+
+  /* Catalogue 3D : même onglet, avec l'adresse de retour (bouton « Back to the shop » du catalogue) */
+  function catalogueLinks() {
+    $$('a[href^="https://librery-catalogue-3d.vercel.app/"]').forEach(a => {
+      const u = new URL(a.href); if (!/^\/(index\.html)?$/.test(u.pathname)) return;   // les PDF restent dans un nouvel onglet
+      const ici = new URL(location.href); if (a.closest('#catalogue')) ici.hash = 'catalogue';
+      u.searchParams.set('retour', ici.href); a.href = u.href; a.removeAttribute('target');
+    });
+  }
+
   /* Icônes au trait (32 px, trait 1 px) — snippet icon.liquid dans Shopify */
   const ICONS = {
     vial: '<path d="M11 13.5h7v13.2a1.3 1.3 0 0 1-1.3 1.3h-4.4a1.3 1.3 0 0 1-1.3-1.3z"/><path d="M12.2 9h4.6v4.5h-4.6z"/><path d="M13.4 9V6.5h2.2V9"/><path d="M11 19h7"/><path d="M24 7.5c1.3 1.8 2 3 2 4a2 2 0 0 1-4 0c0-1 .7-2.2 2-4z"/>',
@@ -656,7 +700,7 @@
             // ordinateur : une image par ligne, pleine colonne ; mobile : galerie à glisser
             // un seul packshot à la fois : celui du format choisi (le 30 ml n'apparaît qu'au clic sur « 30 ml »)
             const fmt = g === p.pack ? '100' : g === p.pack30 ? '30' : (p.fmtImages && Object.keys(p.fmtImages).find(k => p.fmtImages[k].includes(g))) || '';
-            return `<figure class="${g === p.pack || g === p.pack30 ? 'is-pack' : ''}"${fmt ? ` data-fmt="${fmt}"` : ''}${fmt && fmt !== defFmt ? ' hidden' : ''}>${pic(g, p.name, '(max-width: 900px) 100vw, 58vw', '', i === 0)}</figure>`;
+            return `<figure class="${g === p.pack || g === p.pack30 ? 'is-pack is-gold' : fmt ? 'is-gold' : ''}"${fmt ? ` data-fmt="${fmt}"` : ''}${fmt && fmt !== defFmt ? ' hidden' : ''}>${pic(g, p.name, '(max-width: 900px) 100vw, 58vw', '', i === 0)}</figure>`;
           }).join('')}</div>
           <span class="pdp__count" id="gcount"></span>
         </div>
@@ -730,6 +774,7 @@
       count();
     };
     showPack(defFmt); count();
+    $$('#gallery figure.is-gold').forEach(frameGold);
     $$('#gallery [data-fmt] img').forEach(i => { i.loading = 'eager'; }); // le 30 ml s'affiche sans attente au clic
     const setFormat = id => {
       current = fmts.find(f => f.id === id) || current;
@@ -874,6 +919,6 @@
   initCollection();            // avant l'en-tête : fixe le titre courant
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
-  initLoader(); initHero(); initHome(); initFlip(); filmControl(document); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
+  initLoader(); initHero(); initHome(); initFlip(); catalogueLinks(); filmControl(document); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
   renderCart(); bindToasts(); bindCards(); accordions(); newsletters(); balanceGrids();
 })();

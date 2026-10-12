@@ -351,6 +351,11 @@ input, textarea, select { font: inherit; color: inherit; }
 .pdp__gallery figure { margin: 0; }
 .pdp__gallery img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: var(--studio); }
 .pdp__gallery figure[hidden] { display: none; }
+/* packshots : cadre = hauteur visible de l'écran, flacon placé au nombre d'or (calculé dans main.js, frameGold) */
+.pdp__gallery figure.is-gold { position: relative; overflow: hidden; height: max(420px, calc(100svh - var(--header-h) - 36px)); background: var(--studio); }
+.pdp__gallery figure.is-gold img { position: absolute; left: 0; top: 0; max-width: none; aspect-ratio: auto; object-fit: fill; opacity: 0; }
+.pdp__gallery figure.is-gold.is-set img { opacity: 1; }
+.pdp__gallery figure.is-inset img { -webkit-mask: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent); mask-composite: intersect; }
 .pdp__gallery figure { scroll-margin-top: var(--header-h); }
 .pdp__count { display: none; }
 .pdp__info { border-left: 1px solid var(--line); }
@@ -412,6 +417,7 @@ input, textarea, select { font: inherit; color: inherit; }
   .pdp__gallery { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 100%; gap: 0; padding: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
   .pdp__gallery::-webkit-scrollbar { display: none; }
   .pdp__gallery figure { scroll-snap-align: start; }
+  .pdp__gallery figure.is-gold { height: min(125vw, max(340px, calc(100svh - var(--header-h) - 36px - 170px))); }
   .pdp__count { display: block; position: absolute; right: var(--gutter); bottom: 12px; font-family: var(--sans); font-size: 12px; color: var(--grey); }
   .pdp__info { border-left: 0; }
   .pdp__box { position: static; max-width: none; padding-top: 22px; }
