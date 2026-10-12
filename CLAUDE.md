@@ -32,7 +32,9 @@ Refonte du site de parfums LIBRERY (Paris). Maquette statique validée avant le 
   (`SHOPIFY_FLAG_STORE`, `SHOPIFY_CLI_THEME_TOKEN`, `SHOPIFY_ADMIN_TOKEN`, etc.).
 
 ## En cours / à venir
-- Retours WhatsApp de Nolwenn (vocaux + vidéos du 12/10 à partir de 14h42) : à transcrire, lister, puis corriger
-  le site. Déposer l'export dans `retours/` (ou fournir un lien de partage).
+- Retours de Nolwenn du 12/10 : traités et en ligne (liste et décisions dans `retours/2026-10-12-nolwenn.md`,
+  réponses à ses questions dans `retours/questions-nolwenn.md`, PDF avant/après dans `retours/pdf/`).
+  En attente côté cliente : photos packagings/coffrets/discovery, photos des mosaïques, contenu Bougies, validations du PDF.
+- Produits / collections « en pause » : `paused: true` (produit) et `hidden: true` (collection) dans `data.js`.
 - Passage sur Shopify dès réception des accès (thème caché, prévisualisation, puis publication).
 - Agents WhatsApp : piste VPS OVH + API WhatsApp Cloud (numéro de test Meta pour commencer) ; rien d'installé.

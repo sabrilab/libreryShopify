@@ -3,7 +3,7 @@
    Ces objets correspondent 1:1 à ce qui sera créé dans Shopify :
    produits (+ métachamps : accroche, notes, parfumeur, matières),
    collections, métaobjets « parfumeur » et « point de vente ».
-   Les prix marqués PRIX_A_CONFIRMER sont provisoires.
+   Prix confirmés par LIBRERY le 12/10/2026 (100 ml 170 €, 30 ml 90 €, 2 ml 7 €, coffrets 40 / 430 / 250 €).
    ========================================================================== */
 
 const IMG = '/assets/img/v2/';
@@ -14,7 +14,7 @@ const CATALOGUE_PDF = 'https://librery-catalogue-3d.vercel.app/telechargements/L
    pack / pack30 = packshots studio à échelle commune (flacon ≈ 40 % du cadre),
    scene = mise en situation révélée au survol (ou `video` : boucle muette, métafield Shopify). */
 
-/* Formats — catalogue : « Extrait de Parfum 25 % · 100 ml & 30 ml » ; échantillon 2 ml (« dès 6 € », maquette Canva). */
+/* Formats — catalogue : « Extrait de Parfum 25 % · 100 ml & 30 ml » ; échantillon 2 ml. */
 /* Familles olfactives (filtre Bibliothèque) — classement proposé, À VALIDER par la maison */
 const FAMILIES = {
   'Gourmand': 'Vanille, caramel, praline, chocolat : des notes que l’on voudrait presque goûter.',
@@ -31,14 +31,13 @@ const FAMILY_ART = { 'Gourmand': 'tonka-capot', 'Floral': 'poire-livres', 'Fruit
 const SERVICES = [
   { i: 'vial', t: 'Essayez-le avant de l’ouvrir', d: 'Un échantillon 2 ml du parfum glissé avec chaque flacon : testez-le d’abord, retour gratuit si le flacon reste scellé.' },
   { i: 'vials', t: 'Deux échantillons offerts', d: 'À choisir dans la bibliothèque, avec chaque commande.' },
-  { i: 'gift', t: 'Écrin & mot manuscrit', d: 'Emballage cadeau offert, message personnalisé, facture sans prix sur demande.' },
   { i: 'parcel', t: 'Livraison offerte dès 100 €', d: 'Expédition soignée depuis Paris, retours gratuits sous 30 jours.' }
 ];
 
 const FORMATS = [
   { id: '100', label: '100 ml', price: 170 },
-  { id: '30', label: '30 ml', price: 75 },   // PRIX_A_CONFIRMER
-  { id: '2', label: '2 ml', price: 6 }
+  { id: '30', label: '30 ml', price: 90 },
+  { id: '2', label: '2 ml', price: 7 }
 ];
 
 const PERFUMERS = {
@@ -222,13 +221,10 @@ const PRODUCTS = [
 
   /* ============ Coffrets — exclusivité site ============ */
   {
-    handle: 'coffret-decouverte', name: 'Coffret Découverte', subtitle: 'Deux collections · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
+    handle: 'coffret-decouverte', name: 'Coffret Découverte', subtitle: 'Les huit parfums · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
     card: 'coffret-2ml', scene: 'skin-trio',
     gallery: ['coffret-2ml', 'skin-trio', 'camp-coffrets'],
-    formats: [
-      { id: 'sv', label: 'Summer Vibes · 5 × 2 ml', price: 30 },   // PRIX_A_CONFIRMER
-      { id: 'so', label: 'Skin Obsession · 3 × 2 ml', price: 18 }  // PRIX_A_CONFIRMER
-    ],
+    formats: [{ id: '8x2', label: '8 × 2 ml', price: 40 }],   // Discovery Set 2 ml : les deux collections
     keyNotes: 'Formats 2 ml · Valeur recréditée',
     tagline: 'Une préface à la collection.',
     description: [
@@ -237,10 +233,11 @@ const PRODUCTS = [
     ]
   },
   {
-    handle: 'coffret-a-composer', name: 'Coffret à composer', subtitle: 'Cinq extraits · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true, builder: 5,
+    // en pause (12/10/2026, « pas pour maintenant ») : retiré des listes, son adresse mène au Coffret Découverte ; le rallumer = supprimer paused: true
+    handle: 'coffret-a-composer', name: 'Coffret à composer', subtitle: 'Cinq extraits · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true, builder: 5, paused: true,
     card: 'camp-mains', scene: 'skin-trio',
     gallery: ['camp-mains', 'skin-trio', 'cover-pile'],
-    formats: [{ id: '5x2', label: '5 × 2 ml', price: 30 }],   // PRIX_A_CONFIRMER
+    formats: [{ id: '5x2', label: '5 × 2 ml', price: 40 }],   // prix à fixer le jour où il revient
     keyNotes: 'Vos cinq parfums · Valeur recréditée',
     tagline: 'Composez votre propre préface : cinq parfums de la bibliothèque, choisis par vous.',
     description: [
@@ -253,8 +250,8 @@ const PRODUCTS = [
     card: 'coffret-30ml', scene: 'camp-coffrets',
     gallery: ['coffret-30ml', 'camp-coffrets', 'cover-pile'],
     formats: [
-      { id: 'sv', label: 'Summer Vibes · 5 × 30 ml', price: 320 },  // PRIX_A_CONFIRMER
-      { id: 'so', label: 'Skin Obsession · 3 × 30 ml', price: 200 } // PRIX_A_CONFIRMER
+      { id: 'sv', label: 'Summer Vibes · 5 × 30 ml', price: 430 },
+      { id: 'so', label: 'Skin Obsession · 3 × 30 ml', price: 250 }
     ],
     keyNotes: 'Extraits 30 ml · Une collection entière',
     tagline: 'Un chapitre entier, à parcourir.',
@@ -265,11 +262,15 @@ const PRODUCTS = [
   }
 ];
 
+/* Collections.
+   `video` / `videoMobile` / `poster` (facultatifs) : boucle muette qui remplace l'image d'ouverture (Shopify : métachamps de collection).
+   `tiles` : 'end' = rangée « Coffret · Portrait olfactif · Nos adresses » en fin de page ; 'grid' = une tuile qui complète la grille des parfums. */
 const COLLECTIONS = {
   'skin-obsession': {
     mosaic: [['camp-lit', 'Skin Obsession, la campagne'], ['skin-homme-tonka', 'Tonka Love'], ['vanilla-plum-mod', 'Vanilla Plum']], wide: 'skin-trio',
     title: 'Skin Obsession', folio: 32, number: '03', chapter: 'Collection II', kicker: 'Nouvelle collection',
-    hero: 'hero-skin',
+    hero: 'hero-skin', tiles: 'end',
+    video: '/assets/video/skin-obsession.mp4', videoMobile: '/assets/video/skin-obsession-m.mp4', poster: '/assets/video/skin-obsession.jpg',
     epigraph: 'La peau est le livre. Le parfum est l’histoire. L’obsession, le désir de le relire.',
     intro: [
       "Il est un instant, presque imperceptible, lors d’une première rencontre : un éveil qui trouble les sens. La découverte d’un monde soudain révélé, une matière qui intrigue, un accord qui émeut.",
@@ -293,6 +294,7 @@ const COLLECTIONS = {
   'summer-vibes': {
     mosaic: [['camp-baie', 'Summer Vibes, la campagne'], ['hot-sand-mod', 'Hot Sand'], ['ambert-sunset-mod', 'Ambert Sunset']], wide: 'hero-portrait',
     title: 'Summer Vibes', folio: 14, number: '02', chapter: 'Collection I', kicker: 'Collection',
+    tiles: 'grid',
     hero: 'hero-summer',
     epigraph: 'Certains étés ne s’achèvent jamais vraiment. Ils persistent sous la peau, dans l’éclat des souvenirs, dans cette chaleur invisible que l’on croyait avoir laissée derrière soi.',
     intro: [
@@ -320,7 +322,7 @@ const COLLECTIONS = {
   },
   'bougies': {
     title: 'Bougies', number: '—', chapter: 'Chapitre à venir', kicker: 'Bientôt',
-    hero: 'hero-collection', soon: true,
+    hero: 'hero-collection', soon: true, hidden: true, // en pause en attendant les photos (12/10) ; Shopify : collection dépubliée + redirection d'URL
     epigraph: 'Un nouveau chapitre s’écrit.',
     intro: ["Les récits LIBRERY s’apprêtent à quitter la peau pour habiter l’espace. Inscrivez-vous pour être parmi les premiers à les découvrir."],
     chapters: []
@@ -338,19 +340,36 @@ const SHELF = [
   { img: 'hot-sand-1', t: 'Le jasmin', h: 'hot-sand' }
 ];
 
-/* Points de vente — coordonnées géocodées depuis les adresses du site actuel */
+/* Points de vente — liste envoyée par LIBRERY le 12/10/2026, géocodée avec OpenStreetMap (Nominatim).
+   Au niveau de la rue seulement : Les Passionnez, Imm Couture, La Rouge, Kyomu, Amyris Essenze. `online` : sans adresse ni repère. */
 const STORES = [
-  { name: 'UNI/VERE Parfumerie', address: '56 bis Rue du Louvre', city: '75002 Paris', country: 'France', phone: '+33 9 86 47 67 13', url: 'http://www.univereparfumerie.com', lat: 48.8658, lng: 2.3435 },
-  { name: 'Sayhar', address: '27 rue de Marignan', city: '75008 Paris', country: 'France', phone: '+33 1 88 61 46 96', url: 'https://sayhar.fr/', lat: 48.8695, lng: 2.3064 },
-  { name: 'Vanora', address: '30/32 Rue Henri Barbusse', city: '92000 Nanterre', country: 'France', phone: '+33 6 14 10 08 74', lat: 48.8902, lng: 2.1954 },
-  { name: 'Parfumerie Basic', address: '39 Rue Jeanne-d’Arc', city: '51100 Reims', country: 'France', phone: '+33 7 67 77 67 05', url: 'https://www.parfumerie-basic.fr/', lat: 49.2548, lng: 4.0250 },
-  { name: 'La Galerie du Flair', address: '41 Avenue Clemenceau', city: '68100 Mulhouse', country: 'France', lat: 47.7456, lng: 7.3409 },
-  { name: 'Evok Shoes', address: '19 Rue du Président Édouard Herriot', city: '69001 Lyon', country: 'France', phone: '+33 4 78 39 61 98', lat: 45.7650, lng: 4.8340 },
-  { name: 'Mon Flacon', address: '16 Rue Carnot', city: '69190 Saint-Fons', country: 'France', phone: '+33 6 62 33 65 74', url: 'https://monflaconparfum.com', lat: 45.7081, lng: 4.8571 },
-  { name: 'Smell Fragrance', address: '26 Rue des Cordeliers', city: '64000 Pau', country: 'France', phone: '+33 6 59 67 00 91', url: 'https://www.smellfragrance.fr/', lat: 43.2972, lng: -0.3718 },
-  { name: 'Parfum 352', address: '1 Rue du Stade', city: '4488 Belvaux Sanem', country: 'Luxembourg', phone: '+352 691 146 250', lat: 49.5095, lng: 5.9281 },
-  { name: 'PuaPua', address: 'Lammstraße 7', city: '76133 Karlsruhe', country: 'Allemagne', phone: '+49 721 96316088', url: 'https://puapua.de', lat: 49.0092, lng: 8.4028 },
-  { name: 'BL Fragrance', address: 'Avenue de Béthusy 38B', city: '1005 Lausanne', country: 'Suisse', url: 'https://bl-parfumerie.ch/', lat: 46.5213, lng: 6.6461 },
-  { name: 'Parfumologue', address: 'Chemin du Trabandan 16', city: '1006 Lausanne', country: 'Suisse', phone: '+41 76 628 99 28', lat: 46.5146, lng: 6.6429 },
-  { name: 'Oligarch', address: '765 Glen Huntly Rd', city: 'Caulfield VIC 3162', country: 'Australie', phone: '+61 3 9193 6953', url: 'https://oligarch.com.au/', lat: -37.8866, lng: 145.0211 }
+  { name: 'Maison Diaphane', address: '11 Rue des Lices', city: '49100 Angers', country: 'France', phone: '+33 2 41 09 15 70', url: 'https://maison-diaphane.com/', lat: 47.4686, lng: -0.5539 },
+  { name: 'Les Passionnez', address: '43 avenue Fortuné Ferrini', city: '13080 Aix-en-Provence', country: 'France', phone: '+33 6 83 22 24 45', url: 'https://lespassionnez.com/', lat: 43.4879, lng: 5.4236 },
+  { name: 'NF Senteurs', address: '30 Avenue Charles de Gaulle', city: '84130 Le Pontet', country: 'France', phone: '+33 6 82 49 50 45', lat: 43.9589, lng: 4.8527 },
+  { name: 'Parfumerie Basic', address: '39 Rue Jeanne-d’Arc', city: '51100 Reims', country: 'France', phone: '+33 7 67 77 67 05', url: 'https://www.parfumerie-basic.fr/', lat: 49.2548, lng: 4.025 },
+  { name: 'Secret Garden', address: '90 Avenue Pasteur', city: '93260 Les Lilas', country: 'France', url: 'https://secretsgarden.fr', lat: 48.876, lng: 2.4153 },
+  { name: 'DSB Parfums', address: '186 Boulevard de Stalingrad', city: '94500 Champigny-sur-Marne', country: 'France', phone: '+33 1 80 91 22 16', url: 'https://dsb-parfums.fr/', lat: 48.8235, lng: 2.4968 },
+  { name: 'Imm Couture', address: '1 Avenue du Président John Fitzgerald Kennedy', city: '78340 Les Clayes-sous-Bois', country: 'France', phone: '+33 7 63 87 26 96', url: 'https://immcouture.com/', lat: 48.8296, lng: 1.9792 },
+  { name: 'Sillâge', address: '9 Rue aux Juifs', city: '76000 Rouen', country: 'France', url: 'https://sillage-parfums.fr/', lat: 49.4416, lng: 1.0939 },
+  { name: 'UNI/VERE Parfumerie', address: '30 Rue d’Aboukir', city: '75002 Paris', country: 'France', phone: '+33 9 86 47 67 13', lat: 48.867, lng: 2.3446 },
+  { name: 'Smell Fragrance', address: '26 Rue des Cordeliers', city: '64000 Pau', country: 'France', phone: '+33 6 59 67 00 91', url: 'https://smellfragrance.fr/', lat: 43.2972, lng: -0.3718 },
+  { name: 'BL Parfumerie', address: 'Avenue de Béthusy 38B', city: '1005 Lausanne', country: 'Suisse', lat: 46.5213, lng: 6.6461 },
+  { name: 'Scent Split', address: '1800 Post Oak Blvd, Ste 6140', city: 'Houston, TX 77056', country: 'États-Unis', url: 'https://www.scentsplit.com', lat: 29.7472, lng: -95.4618 },
+  { name: 'Absolute Fragrance', address: '2150 W First St, Ste 3B', city: 'Fort Myers, FL 33901', country: 'États-Unis', phone: '+1 215-251-4466', url: 'https://www.absolutefragrances.com/', lat: 26.639, lng: -81.8777 },
+  { name: 'Scents Eternal', address: '9351 Warren Parkway', city: 'Frisco, TX 75035', country: 'États-Unis', url: 'https://scentseternal.com/', lat: 33.1092, lng: -96.8019 },
+  { name: 'BeautyLIV', address: '', city: '', country: 'États-Unis', url: 'https://www.beautyliv.com', online: true },
+  { name: 'Odor BXL', address: 'Rue Edouard Faes 100', city: '1090 Bruxelles', country: 'Belgique', phone: '+32 467 64 18 75', url: 'https://odorbxl.com/', note: 'Sur rendez-vous', lat: 50.8716, lng: 4.3318 },
+  { name: 'Parfum Exquis', address: '4956 Boulevard Décarie', city: 'Montréal, QC H3X 2H7', country: 'Canada', phone: '+1 438-930-5109', url: 'https://parfumexquis.com/', lat: 45.4827, lng: -73.6279 },
+  { name: 'Pua Pua Duftkonzept', address: 'Lammstraße 7', city: '76133 Karlsruhe', country: 'Allemagne', phone: '+49 721 96316088', url: 'https://puapua.de/', lat: 49.0092, lng: 8.4028 },
+  { name: 'La Rouge Perfumes', address: 'G5, Park View', city: 'Erbil 44001', country: 'Irak', phone: '+964 750 600 8000', url: 'http://larouge.vip/', lat: 36.2095, lng: 43.9822 },
+  { name: 'House of Merlo', address: 'Mokotowska 46', city: '00-543 Varsovie', country: 'Pologne', phone: '+48 531 015 416', url: 'https://houseofmerlo.pl', lat: 52.2247, lng: 21.0215 },
+  { name: 'Edulge', address: 'Berkeley Square House, 2e étage', city: 'Londres W1J 6BD', country: 'Royaume-Uni', phone: '+44 20 3397 6641', url: 'http://www.edulge.com/', lat: 51.5094, lng: -0.1443 },
+  { name: 'Kyomu', address: 'Calle Valle de Nocito 5', city: '28803 Alcalá de Henares', country: 'Espagne', phone: '+34 657 757 948', url: 'https://www.kyomu-brand.es/', lat: 40.4733, lng: -3.3723 },
+  { name: 'Amyris Essenze', address: 'Piazza Rosolino Pilo 27', city: '00152 Rome', country: 'Italie', phone: '+39 06 4549 6069', url: 'https://amyrisessenze.com/', lat: 41.8818, lng: 12.461 },
+  { name: 'ParfuMaria Parfumsalon', address: 'Tinbergenlaan 5', city: '3401 MT IJsselstein', country: 'Pays-Bas', note: 'Sur rendez-vous', lat: 52.0148, lng: 5.0605 },
+  { name: 'Oligarch Perfumery', address: '765 Glen Huntly Rd', city: 'Caulfield VIC 3162', country: 'Australie', url: 'https://oligarch.com.au/', lat: -37.8866, lng: 145.0211 }
 ];
+
+/* Produits en pause : retirés des listes, réactivés en supprimant leur `paused: true`. */
+const PAUSED_PRODUCTS = PRODUCTS.filter(p => p.paused);
+for (let i = PRODUCTS.length; i--;) if (PRODUCTS[i].paused) PRODUCTS.splice(i, 1);

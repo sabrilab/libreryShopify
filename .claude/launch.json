@@ -1,0 +1,1 @@
+{"version":"0.0.1","configurations":[{"name":"maquette","runtimeExecutable":"npx","runtimeArgs":["-y","serve@14","-l","4173","maquette"],"port":4173}]}

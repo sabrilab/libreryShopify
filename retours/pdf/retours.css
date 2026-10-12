@@ -1,0 +1,66 @@
+/* ---------- PDF des retours : compléments à livraison.css ---------- */
+.hd__n { margin-right: -8px; }
+.lead { font-size: 19px; line-height: 1.5; color: var(--ink); margin: 0 0 18px; max-width: 520px; }
+.lead.muted { color: var(--grey); font-size: 16px; }
+
+/* couverture */
+.cover { position: absolute; left: 110px; top: 190px; width: 470px; z-index: 3; }
+.cover .cover__mark { width: 420px; margin: 6px 0 34px; }
+.cover .cover__sub { font-size: 56px; line-height: 1.02; margin: 0 0 24px; }
+.cover__lead { font-family: var(--sans); font-size: 15px; line-height: 1.6; color: rgba(239,230,214,.62); margin: 0 0 46px; }
+
+/* sommaire */
+.glance .toc li { display: flex; gap: 22px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid rgba(47,43,40,.14); font-size: 20px; }
+.glance .toc li div { display: grid; gap: 4px; }
+.glance .toc li em { margin-left: 0; font-style: normal; font-family: var(--sans); font-size: 12.5px; color: var(--grey); }
+
+/* une page de correction : citation + liste à gauche, captures à droite */
+.ch { position: absolute; left: 72px; right: 72px; top: 150px; bottom: 70px; display: grid; grid-template-columns: 360px 1fr; gap: 56px; }
+.ch__side { display: flex; flex-direction: column; gap: 30px; padding-top: 6px; }
+.ch__main { position: relative; min-height: 0; display: flex; flex-direction: column; gap: 22px; justify-content: center; }
+.q { margin: 0; padding-left: 20px; border-left: 2px solid var(--gold); }
+.q p { margin: 0 0 12px; font-style: italic; font-size: 19px; line-height: 1.45; }
+.q cite { font-style: normal; font-family: var(--sans); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+.done { list-style: none; margin: 0; padding: 0; border-top: 1px solid rgba(47,43,40,.2); }
+.done li { position: relative; padding: 12px 0 12px 28px; border-bottom: 1px solid rgba(47,43,40,.12); font-family: var(--sans); font-size: 13.5px; line-height: 1.5; }
+.done li::before { content: ""; position: absolute; left: 2px; top: 17px; width: 9px; height: 5px; border-left: 1.5px solid var(--gold); border-bottom: 1.5px solid var(--gold); transform: rotate(-45deg); }
+
+/* captures avant / après */
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; min-height: 0; flex: 1; }
+.pair--stack { grid-template-columns: 1fr; flex: 0 0 auto; gap: 14px; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; height: 100%; }
+.sh { margin: 0; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.sh figcaption { display: flex; align-items: center; gap: 12px; font-family: var(--sans); font-size: 12.5px; color: var(--grey); }
+.sh__img { flex: 1; min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
+.sh__img img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; border-radius: 4px; box-shadow: 0 0 0 1px rgba(47,43,40,.1), 0 26px 44px -30px rgba(40,28,18,.45); background: #fff; }
+.tag { font-family: var(--sans); font-weight: 500; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; }
+.tag--a { background: rgba(47,43,40,.08); color: var(--grey); }
+.tag--b { background: var(--ink); color: var(--paper); }
+
+/* plan de page */
+.plans { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; height: 100%; }
+.plan { margin: 0; display: flex; flex-direction: column; gap: 10px; min-height: 0; align-items: flex-start; }
+.plan figcaption { align-self: flex-start; }
+.plan__box { position: relative; display: inline-block; height: 640px; }
+.plan__box img { display: block; height: 640px; width: auto; border-radius: 4px; box-shadow: 0 0 0 1px rgba(47,43,40,.1), 0 26px 44px -30px rgba(40,28,18,.45); }
+.mk { position: absolute; left: calc(100% + 14px); transform: translateY(-50%); white-space: nowrap; font-family: var(--sans); font-size: 12px; color: var(--grey); padding-left: 16px; }
+.mk::before { content: ""; position: absolute; left: 0; top: 50%; width: 10px; border-top: 1px solid rgba(47,43,40,.35); }
+.mk--hl { color: var(--ink); font-weight: 500; }
+.mk--hl::before { border-color: var(--gold); width: 12px; border-top-width: 2px; }
+
+.ready .lead { margin-top: -26px; color: var(--grey); }
+
+.pair--stack .sh__img { justify-content: flex-start; }
+.pair--stack .sh__img img { max-height: 300px; }
+.cover .ph { z-index: 4; }
+
+/* question à valider, sans coche */
+.ask { margin: 0; padding: 14px 16px; background: rgba(183,145,106,.12); border-left: 2px solid var(--gold); font-family: var(--sans); font-size: 13px; line-height: 1.55; color: var(--ink); }
+/* sommaire : séparation entre retours et envois */
+.glance .toc li.sep { border-top: 1px solid var(--ink); margin-top: 10px; }
+.glance .toc li { padding: 11px 0; font-size: 18px; }
+/* bande du film */
+.film { display: flex; flex-direction: column; gap: 10px; }
+.film .tag { align-self: flex-start; }
+.film__row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.film__row img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 3px; }

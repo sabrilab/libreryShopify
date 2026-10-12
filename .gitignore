@@ -1,0 +1,8 @@
+retours/whatsapp/*
+!retours/whatsapp/*.txt
+retours/whatsapp/_chat.txt
+retours/pdf/avant/
+retours/pdf/apres/
+retours/pdf/.pages/
+retours/pdf/img/
+retours/pdf/retours.html

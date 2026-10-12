@@ -1,0 +1,8 @@
+
+[00:00:00.000 --> 00:00:02.640]   Et page produit, est-ce que c'est possible, tu vois, par exemple,
+[00:00:02.700 --> 00:00:06.200]   que quand on clique sur le 30 ml, ce soit la photo du 30 ml qui apparaissent
+[00:00:06.200 --> 00:00:08.000]   et pas le 100 ml, tu vois ?
+[00:00:08.000 --> 00:00:10.180]   Et que du coup, quand tu slides pour le 100 ml,
+[00:00:10.300 --> 00:00:12.600]   t'es pas cette photo, tu vois, par exemple, qui apparaît,
+[00:00:12.680 --> 00:00:13.640]   c'était celle-ci directement.
+[00:00:14.640 --> 00:00:14.920]   Voilà.

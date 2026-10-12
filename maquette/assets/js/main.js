@@ -34,7 +34,6 @@
   const ICONS = {
     vial: '<path d="M11 13.5h7v13.2a1.3 1.3 0 0 1-1.3 1.3h-4.4a1.3 1.3 0 0 1-1.3-1.3z"/><path d="M12.2 9h4.6v4.5h-4.6z"/><path d="M13.4 9V6.5h2.2V9"/><path d="M11 19h7"/><path d="M24 7.5c1.3 1.8 2 3 2 4a2 2 0 0 1-4 0c0-1 .7-2.2 2-4z"/>',
     vials: '<path d="M7.5 13h6v12.8a1.2 1.2 0 0 1-1.2 1.2H8.7a1.2 1.2 0 0 1-1.2-1.2z"/><path d="M8.6 9h3.8v4H8.6z"/><path d="M7.5 18.5h6"/><path d="M18.5 13h6v12.8a1.2 1.2 0 0 1-1.2 1.2h-3.6a1.2 1.2 0 0 1-1.2-1.2z"/><path d="M19.6 9h3.8v4h-3.8z"/><path d="M18.5 18.5h6"/>',
-    gift: '<path d="M6 13h20v4H6z"/><path d="M7.5 17h17v10h-17z"/><path d="M16 13v14"/><path d="M16 13c-1.5-3.8-5.5-5.2-6.3-3.2-.7 1.8 2.6 3.2 6.3 3.2z"/><path d="M16 13c1.5-3.8 5.5-5.2 6.3-3.2.7 1.8-2.6 3.2-6.3 3.2z"/>',
     parcel: '<path d="M16 5.5 26.5 10v12L16 26.5 5.5 22V10z"/><path d="M5.5 10 16 14.5 26.5 10"/><path d="M16 14.5v12"/><path d="m10.8 7.8 10.5 4.5v4.2"/>'
   };
   const icon = k => ICONS[k] ? `<svg class="icon" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>` : '';
@@ -49,7 +48,6 @@
       <div class="announce" id="announce">
         <span class="is-on">Un échantillon 2 ml offert avec chaque flacon</span>
         <span>Livraison offerte dès 100 €</span>
-        <span>Écrin cadeau et mot manuscrit offerts</span>
       </div>
       <header class="header" id="header">
         <div class="header__in">
@@ -62,11 +60,11 @@
                     <a href="/collection?c=skin-obsession">Skin <em>Obsession</em><small>nouveau</small></a>
                     <a href="/collection?c=summer-vibes">Summer <em>Vibes</em></a>
                     <a href="/collection?c=coffrets">Coffrets</a>
-                    <a href="/collection?c=bougies">Bougies<small>bientôt</small></a>
+                    ${COLLECTIONS.bougies && !COLLECTIONS.bougies.hidden ? '<a href="/collection?c=bougies">Bougies<small>bientôt</small></a>' : ''}
                     <a href="/bibliotheque">Tous les parfums</a></div>
                   <div class="mega__col"><span class="ui">Choisir</span>
                     <a href="/portrait-olfactif">Portrait olfactif</a>
-                    <a href="/produit?p=coffret-a-composer">Coffret à composer</a>
+                    <a href="/produit?p=coffret-decouverte">Coffret Découverte</a>
                     <a href="/offrir">Offrir</a>
                     <a href="${CATALOGUE_URL}" target="_blank" rel="noopener">Le catalogue</a></div>
                   <div class="mega__col"><span class="ui">Familles</span>
@@ -97,7 +95,7 @@
             <a href="/bibliotheque#familles">Par famille olfactive</a>
             <a href="/portrait-olfactif">Portrait olfactif</a>
           </div>
-          <a href="/preface">Préface <span class="folio">p. 6</span></a>
+          <a href="/preface">Préface</a>
           <a href="/lexique">Lexique</a>
           <a href="/points-de-vente">Carte</a>
           <a href="/offrir">Offrir</a>
@@ -107,7 +105,7 @@
 
     // titre courant (running head) des pages intérieures
     if (body.dataset.run) {
-      $('#header').insertAdjacentHTML('afterend', `<div class="runhead"><div class="wrap"><span>LIBRERY — ${esc(body.dataset.run)}</span>${body.dataset.folio ? `<span class="folio">p. ${esc(body.dataset.folio)}</span>` : ''}</div></div>`);
+      $('#header').insertAdjacentHTML('afterend', `<div class="runhead"><div class="wrap"><span>LIBRERY — ${esc(body.dataset.run)}</span></div></div>`);
     }
 
     const msgs = $$('#announce span'); let am = 0;
@@ -161,7 +159,7 @@
             <li><a href="${CATALOGUE_URL}" target="_blank" rel="noopener">Le catalogue</a></li></ul></div>
           <div><h4>Choisir</h4><ul>
             <li><a href="/portrait-olfactif">Portrait olfactif</a></li>
-            <li><a href="/produit?p=coffret-a-composer">Coffret à composer</a></li>
+            <li><a href="/produit?p=coffret-decouverte">Coffret Découverte</a></li>
             <li><a href="/offrir">Offrir</a></li></ul></div>
           <div><h4>Extraits de parfum</h4><ul>
             <li><a href="/lexique#concentration">Concentrés à 25 %</a></li>
@@ -174,12 +172,12 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Panier : essayer d'abord, 2 échantillons au choix, écrin, mot       */
+  /* Panier : essayer d'abord, 2 échantillons au choix                  */
   /* ------------------------------------------------------------------ */
   const CART_KEY = 'librery-cart-v2', EXTRA_KEY = 'librery-cart-extras';
   const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
   let cart = load(CART_KEY, []);
-  let extras = Object.assign({ samples: ['', ''], gift: false, msg: '', noPrice: false }, load(EXTRA_KEY, {}));
+  let extras = { samples: (load(EXTRA_KEY, {}).samples || ['', '']) };
   const saveCart = () => { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) {} renderCart(); };
   const saveExtras = () => { try { localStorage.setItem(EXTRA_KEY, JSON.stringify(extras)); } catch (e) {} };
 
@@ -207,10 +205,11 @@
   function closeAll() { $('#cart')?.classList.remove('is-open'); $('#overlay')?.classList.remove('is-open'); $('#cart')?.setAttribute('aria-hidden', 'true'); $('#drawer')?.classList.remove('is-open'); }
 
   function renderCart() {
-    const items = cart.map(l => {
+    // ci = index réel dans `cart` (une ligne dont le produit n'existe plus est ignorée sans décaler les boutons)
+    const items = cart.map((l, ci) => {
       const p = byHandle(l.h); if (!p) return null;
       const f = formatsOf(p).find(x => x.id === l.f) || formatsOf(p)[0];
-      return { ...l, p, fmt: f, total: f.price * l.q };
+      return { ...l, ci, p, fmt: f, total: f.price * l.q };
     }).filter(Boolean);
     const total = items.reduce((s, i) => s + i.total, 0);
     $$('[data-cart-count]').forEach(el => el.textContent = items.reduce((s, i) => s + i.q, 0));
@@ -232,13 +231,13 @@
     const opt = v => perfumes.map(p => `<option value="${p.handle}" ${v === p.handle ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
     const thumb = (p, f) => src(f === '30' && p.pack30 ? p.pack30 : p.pack || p.card);
 
-    $('#cart-items').innerHTML = items.length ? items.map((i, idx) => `
+    $('#cart-items').innerHTML = items.length ? items.map(i => `
       <div class="line">
         <span class="line__img${i.p.pack ? ' is-pack' : ''}"><img src="${thumb(i.p, i.fmt.id)}" alt=""></span>
         <div><div class="line__name">${nm(i.p.name)}</div><div class="line__var">${esc(i.fmt.label)}</div>
           ${i.sel ? `<div class="line__sel">${i.sel.map(h => esc(byHandle(h)?.name || h)).join(', ')}</div>` : ''}
-          <div class="qty"><button data-q="-1" data-i="${idx}" aria-label="Retirer un">−</button><span>${i.q}</span><button data-q="1" data-i="${idx}" aria-label="Ajouter un">+</button></div></div>
-        <div class="line__right"><span>${eur(i.total)}</span><button data-rm="${idx}">Retirer</button></div>
+          <div class="qty"><button data-q="-1" data-i="${i.ci}" aria-label="Retirer un">−</button><span>${i.q}</span><button data-q="1" data-i="${i.ci}" aria-label="Ajouter un">+</button></div></div>
+        <div class="line__right"><span>${eur(i.total)}</span><button data-rm="${i.ci}">Retirer</button></div>
       </div>`).join('') + tryFirst.map(p => `
       <div class="line line--gift">
         <span class="line__img${p.pack ? ' is-pack' : ''}"><img src="${thumb(p)}" alt=""></span>
@@ -248,11 +247,6 @@
       <div class="cart__opts">
         <div class="cart__opt"><span class="ui">Vos deux échantillons offerts (modifiables)</span>
           <div class="cart__selects"><select data-sample="0" aria-label="Premier échantillon">${opt(extras.samples[0])}</select><select data-sample="1" aria-label="Second échantillon">${opt(extras.samples[1])}</select></div></div>
-        <div class="cart__opt">
-          <label class="check"><input type="checkbox" data-x="gift" ${extras.gift ? 'checked' : ''}><span>Écrin cadeau offert</span></label>
-          ${extras.gift ? `<textarea data-x="msg" maxlength="200" placeholder="Votre mot, recopié à la main (200 caractères)">${esc(extras.msg)}</textarea>
-          <label class="check"><input type="checkbox" data-x="noPrice" ${extras.noPrice ? 'checked' : ''}><span>Facture sans prix</span></label>` : ''}
-        </div>
       </div>`
       : `<div class="cart__empty"><p>Votre panier est vide.</p><a class="btn btn--line" href="/bibliotheque">Voir les parfums</a>
           <p class="pdp__small" style="margin-top:24px">Vous hésitez ? <a class="tlink" href="/portrait-olfactif">Portrait olfactif</a></p></div>`;
@@ -264,8 +258,6 @@
     $$('#cart-items [data-q]').forEach(b => b.addEventListener('click', () => { const i = +b.dataset.i; cart[i].q += +b.dataset.q; if (cart[i].q < 1) cart.splice(i, 1); saveCart(); }));
     $$('#cart-items [data-rm]').forEach(b => b.addEventListener('click', () => { cart.splice(+b.dataset.rm, 1); saveCart(); }));
     $$('#cart-items [data-sample]').forEach(el => el.addEventListener('change', () => { extras.samples[+el.dataset.sample] = el.value; saveExtras(); }));
-    $$('#cart-items input[data-x]').forEach(el => el.addEventListener('change', () => { extras[el.dataset.x] = el.checked; saveExtras(); renderCart(); }));
-    $$('#cart-items textarea[data-x]').forEach(el => el.addEventListener('input', () => { extras.msg = el.value; saveExtras(); }));
     bindToasts($('#cart-foot'));
   }
 
@@ -332,12 +324,13 @@
   /* grande tuile sur deux colonnes : l'image de campagne dans la grille */
   const wideTile = (key, img) => { const c = COLLECTIONS[key]; return c && c.wide ? `
       <a class="card tile card--wide" href="/collection?c=${key}"><div class="card__media">${pic(img || c.wide, c.title, '(max-width: 800px) 100vw, 66vw')}</div>
-        <div class="card__body"><span class="card__flag">${esc(c.chapter)}</span><h3 class="card__name">${nm(c.title)}</h3><span class="card__meta">Lire le chapitre${c.folio ? ', p. ' + c.folio : ''}</span></div></a>` : ''; };
-  /* mosaïque de trois images légendées (bloc « image-mosaic » dans Shopify) */
-  const mosaic = (key, n0 = 1) => { const c = COLLECTIONS[key]; return c && c.mosaic ? `<div class="mosaic">${c.mosaic.map(([img, cap], i) =>
-      `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}<figcaption class="fig">fig. ${n0 + i} — ${esc(cap)}</figcaption></figure>`).join('')}</div>` : ''; };
-  const builderTile = (img = 'hero-collection') => tile('/produit?p=coffret-a-composer', img, 'Coffret <em>à composer</em>', 'Cinq parfums en 2 ml — 30 €');
-  const storesTile = () => tile('/points-de-vente', 'camp-mercedes', 'Nos <em>adresses</em>', 'Treize lieux où nos récits prennent vie');
+        <div class="card__body"><span class="card__flag">${esc(c.chapter)}</span><h3 class="card__name">${nm(c.title)}</h3><span class="card__meta">Lire le chapitre</span></div></a>` : ''; };
+  /* mosaïque de trois images (bloc « image-mosaic » dans Shopify) */
+  const mosaic = key => { const c = COLLECTIONS[key]; return c && c.mosaic ? `<div class="mosaic">${c.mosaic.map(([img, cap]) =>
+      `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}</figure>`).join('')}</div>` : ''; };
+  // le Coffret à composer est en pause (12/10) : la tuile « essayer en 2 ml » mène au Coffret Découverte
+  const trialTile = (img = 'hero-collection') => tile('/produit?p=coffret-decouverte', img, 'Coffret <em>Découverte</em>', 'Les huit parfums en 2 ml — 40 €');
+  const storesTile = () => tile('/points-de-vente', 'camp-mercedes', 'Nos <em>adresses</em>', `${STORES.length} adresses où nos récits prennent vie`);
   const quizTile = () => tile('/portrait-olfactif', 'camp-livre', 'Portrait <em>olfactif</em>', 'Quatre questions pour trouver votre parfum');
 
   /* mobile, deux colonnes : si le nombre de cartes simples est impair, la première passe en pleine largeur (pas d'orpheline) */
@@ -361,8 +354,8 @@
     const so = $('#so-grid'), sv = $('#sv-grid'); if (!so) return;
     so.innerHTML = PRODUCTS.filter(p => p.collection === 'skin-obsession').map(card).join('');
     const svp = PRODUCTS.filter(p => p.collection === 'summer-vibes').map(card);
-    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + builderTile('camp-mains') + quizTile();
-    $$('[data-mosaic]').forEach(el => { el.innerHTML = mosaic(el.dataset.mosaic, +el.dataset.fig || 1); });
+    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + trialTile('camp-mains') + quizTile();
+    $$('[data-mosaic]').forEach(el => { el.innerHTML = mosaic(el.dataset.mosaic); });
     const sh = $('#shelf');
     if (sh) sh.innerHTML = SHELF.map(m => { const p = byHandle(m.h); return `<a class="shelf__item" href="/produit?p=${m.h}"><figure>${pic(m.img, m.t, '(max-width: 800px) 62vw, 22vw')}</figure>
         <span class="fig">${esc(m.t)}</span><span class="shelf__name">${nm(p.name)}</span></a>`; }).join('');
@@ -373,7 +366,7 @@
      glisser au doigt, pause quand l'onglet est caché, aucun défilement automatique si l'utilisateur réduit les animations */
   function initHero() {
     const h = $('[data-hero]'); if (!h) return;
-    const slides = $$('.s-hero__slide', h), bars = $$('.s-hero__bars button', h), link = $('[data-hero-link]', h), fig = $('[data-hero-fig]', h);
+    const slides = $$('.s-hero__slide', h), bars = $$('.s-hero__bars button', h), link = $('[data-hero-link]', h);
     const DUR = 6500, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let i = 0, t0 = performance.now(), paused = false, pauseAt = 0;
     const go = n => {
@@ -381,7 +374,7 @@
       slides.forEach((s, k) => s.classList.toggle('is-on', k === i));
       bars.forEach((b, k) => { b.setAttribute('aria-selected', k === i); b.firstChild.style.width = k < i ? '100%' : '0%'; });
       const d = slides[i].dataset; h.querySelector('.s-hero__side').classList.add('is-swap');
-      setTimeout(() => { link.href = d.href; link.textContent = d.label; fig.textContent = d.fig; h.querySelector('.s-hero__side').classList.remove('is-swap'); }, 350);
+      setTimeout(() => { link.href = d.href; link.textContent = d.label; h.querySelector('.s-hero__side').classList.remove('is-swap'); }, 350);
     };
     bars.forEach((b, k) => b.addEventListener('click', () => go(k)));
     const tick = now => {
@@ -425,12 +418,12 @@
       root.innerHTML = (filter === 'all' && !fam && sort === 'default')
         ? ORDER.map(c => {
             const col = COLLECTIONS[c], items = list.filter(p => p.collection === c);
-            return `<div class="chapter"><h2 class="h2">${nm(col.title)}</h2>${col.folio ? `<span class="folio">p. ${col.folio}</span>` : ''}<a class="tlink" href="/collection?c=${c}">Lire</a></div>
-                    <div class="grid">${c === 'skin-obsession' ? items.map(card).join('') + wideTile(c) + builderTile()
+            return `<div class="chapter"><h2 class="h2">${nm(col.title)}</h2><a class="tlink" href="/collection?c=${c}">Lire</a></div>
+                    <div class="grid">${c === 'skin-obsession' ? items.map(card).join('') + wideTile(c) + trialTile()
                       : c === 'summer-vibes' ? items.slice(0, 3).map(card).join('') + wideTile(c) + items.slice(3).map(card).join('') + quizTile() + storesTile()
                       : items.map(card).join('')}</div>`;
           }).join('')
-        : `<div class="grid">${list.map(card).join('') || '<p class="muted">Aucune création pour ce filtre.</p>'}${list.length % 3 ? [builderTile(), quizTile()].slice(0, 3 - list.length % 3).join('') : ''}</div>`;
+        : `<div class="grid">${list.map(card).join('') || '<p class="muted">Aucune création pour ce filtre.</p>'}${list.length % 3 ? [trialTile(), quizTile()].slice(0, 3 - list.length % 3).join('') : ''}</div>`;
       balanceGrids(root);
     };
     const url = () => { const u = new URLSearchParams(); if (filter !== 'all') u.set('f', filter); if (fam) u.set('famille', fam); history.replaceState(null, '', '/bibliotheque' + (u.toString() ? '?' + u : '') + (fam ? '#familles' : '')); };
@@ -445,15 +438,24 @@
 
   function initCollection() {
     const root = $('#collection'); if (!root) return;
-    const key = new URLSearchParams(location.search).get('c') || 'summer-vibes';
-    const col = COLLECTIONS[key] || COLLECTIONS['summer-vibes'];
+    // une collection masquée (Bougies, en pause) ou inconnue renvoie vers Summer Vibes
+    // (Shopify : collection dépubliée + redirection d'URL ; une collection inconnue y donne la page 404 du thème)
+    const asked = new URLSearchParams(location.search).get('c');
+    const key = Object.prototype.hasOwnProperty.call(COLLECTIONS, asked) && !COLLECTIONS[asked].hidden ? asked : 'summer-vibes';
+    const col = COLLECTIONS[key];
+    if (asked !== null && asked !== key) { const u = new URL(location.href); u.searchParams.set('c', key); history.replaceState(null, '', u); }
     const items = PRODUCTS.filter(p => p.collection === key);
+    // tuiles « Coffret · Portrait olfactif · Nos adresses » : en fin de page sur Skin Obsession (retour de Nolwenn, 12/10),
+    // une seule tuile dans la grille des parfums sur Summer Vibes (validée telle quelle) ; aucune sur les coffrets
+    const tilesRow = col.tiles === 'end', tileInGrid = col.tiles === 'grid';
     document.title = `${col.title} — LIBRERY`;
-    body.dataset.run = col.title; if (col.folio) body.dataset.folio = col.folio;
+    body.dataset.run = col.title;
 
     root.innerHTML = `
-      <section class="coll-hero">${pic(col.hero, col.title, '100vw', '', true)}<div class="scrim-b"></div>
-        <div class="coll-hero__txt"><div class="wrap"><h1 class="h1">${nm(col.title)}</h1>${col.folio ? `<span class="folio">p. ${col.folio}</span>` : ''}</div></div></section>
+      <section class="coll-hero">${col.video
+          ? `<video src="${matchMedia('(max-width: 800px)').matches && col.videoMobile ? col.videoMobile : col.video}" poster="${col.poster || src(col.hero, 1)}" ${matchMedia('(prefers-reduced-motion: reduce)').matches ? '' : 'autoplay '}muted loop playsinline preload="metadata" aria-label="${esc(col.title)}"></video>`
+          : pic(col.hero, col.title, '100vw', '', true)}<div class="scrim-b"></div>
+        <div class="coll-hero__txt"><div class="wrap"><h1 class="h1">${nm(col.title)}</h1></div></div></section>
       <section class="block"><div class="wrap split">
         <div><span class="ui muted">${esc(col.chapter)}</span></div>
         <div><p class="epigraph">${col.epigraph}</p><div class="prose">${col.intro.map(t => `<p>${t}</p>`).join('')}</div></div>
@@ -463,11 +465,12 @@
           <form class="field-line" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="E-mail"><button>M’inscrire</button></form></div></section>` : ''}
       ${items.length ? `<section class="block"><div class="wrap">
           <div class="row-head"><div><h2 class="h2">Les parfums</h2></div><span class="ui muted">${items.length} ${items.length > 1 ? 'créations' : 'création'}</span></div>
-          <div class="grid">${items.map(card).join('')}${key === 'coffrets' ? '' : builderTile() + (items.length % 3 === 0 ? quizTile() + storesTile() : '')}</div></div></section>` : ''}
+          <div class="grid">${items.map(card).join('')}${tileInGrid ? trialTile() : ''}</div></div></section>` : ''}
       ${col.mosaic ? `<section class="block block--tight"><div class="wrap">${mosaic(key)}</div></section>` : ''}
       ${col.chapters.length ? `<section class="block"><div class="wrap chapters">
           ${col.chapters.map(ch => `<article class="split"><h2 class="h2">${ch.h}</h2><div class="prose">${ch.p.map(t => `<p>${t}</p>`).join('')}</div></article>`).join('')}
-        </div></section>` : ''}`;
+        </div></section>` : ''}
+      ${items.length && tilesRow ? `<section class="block"><div class="wrap"><div class="grid">${trialTile() + quizTile() + storesTile()}</div></div></section>` : ''}`;
     newsletters();
   }
 
@@ -534,7 +537,10 @@
 
   function initProduct() {
     const root = $('#product'); if (!root) return;
-    const p = byHandle(new URLSearchParams(location.search).get('p')) || PRODUCTS[0];
+    const askedP = new URLSearchParams(location.search).get('p');
+    // un produit en pause (Coffret à composer) mène au Coffret Découverte
+    const p = byHandle(PAUSED_PRODUCTS.some(x => x.handle === askedP) ? 'coffret-decouverte' : askedP) || PRODUCTS[0];
+    if (askedP && askedP !== p.handle && PAUSED_PRODUCTS.some(x => x.handle === askedP)) { const u = new URL(location.href); u.searchParams.set('p', p.handle); history.replaceState(null, '', u); }
     const col = COLLECTIONS[p.collection];
     const perf = p.perfumer && PERFUMERS[p.perfumer];
     const fmts = formatsOf(p); let current = fmts[0];
@@ -553,14 +559,15 @@
       <section class="pdp">
         <div class="pdp__media">
           <div class="pdp__gallery" id="gallery">${p.gallery.map((g, i) => {
-            const cap = g === p.pack ? `${esc(p.name)}, 100 ml` : g === p.pack30 ? `${esc(p.name)}, 30 ml` : '';
             // ordinateur : une image par ligne, pleine colonne ; mobile : galerie à glisser
-            return `<figure class="${g === p.pack || g === p.pack30 ? 'is-pack' : ''}">${pic(g, p.name, '(max-width: 900px) 100vw, 58vw', '', i === 0)}<figcaption class="fig">fig. ${i + 1}${cap ? ' — ' + cap : ''}</figcaption></figure>`;
+            // un seul packshot à la fois : celui du format choisi (le 30 ml n'apparaît qu'au clic sur « 30 ml »)
+            const fmt = g === p.pack ? '100' : g === p.pack30 ? '30' : '';
+            return `<figure class="${fmt ? 'is-pack' : ''}"${fmt ? ` data-fmt="${fmt}"` : ''}${fmt === '30' ? ' hidden' : ''}>${pic(g, p.name, '(max-width: 900px) 100vw, 58vw', '', i === 0)}</figure>`;
           }).join('')}</div>
-          <span class="pdp__count" id="gcount">1 / ${p.gallery.length}</span>
+          <span class="pdp__count" id="gcount"></span>
         </div>
         <div class="pdp__info"><div class="pdp__box">
-          <div class="pdp__crumbs"><span><a href="/bibliotheque">Bibliothèque</a> / <a href="/collection?c=${p.collection}">${esc(col.title)}</a></span>${p.folio ? `<span class="folio">p. ${p.folio}</span>` : ''}</div>
+          <div class="pdp__crumbs"><span><a href="/bibliotheque">Bibliothèque</a> / <a href="/collection?c=${p.collection}">${esc(col.title)}</a></span></div>
           <h1 class="pdp__name">${nm(p.name)}</h1>
           <p class="pdp__type">${isPerfume ? `Extrait de parfum 25 %${p.isNew ? ' · Nouveauté' : ''}` : esc(p.subtitle)}</p>
           ${p.keyNotes && isPerfume ? `<p class="pdp__notes-line">${esc(p.keyNotes.replace(/ · /g, ', '))}</p>` : ''}
@@ -572,20 +579,20 @@
           <button class="btn btn--block" id="add" ${p.builder ? 'disabled' : ''}>${cta()}</button>
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
           <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, valable 90 jours sur un flacon 100 ml.`}</p>
-          <p class="pdp__small">Expédié sous 24 h depuis Paris, livré ${eta()}. Deux échantillons et écrin offerts.</p>
+          <p class="pdp__small">Expédié sous 24 h ouvrées depuis Paris, livré ${eta()}. Deux échantillons offerts.</p>
           ${perf ? `<p class="pdp__by">Composé par <a href="#parfumeur">${esc(perf.name)}</a></p>` : ''}
           <div class="accordion">
             ${notes ? acc('Notes', `<dl class="notes-dl"><div><dt>Tête</dt><dd>${notes.tete}</dd></div><div><dt>Cœur</dt><dd>${notes.coeur}</dd></div><div><dt>Fond</dt><dd>${notes.fond}</dd></div></dl>`) : ''}
             ${isPerfume ? acc('Conseils d’utilisation', '<p>Un extrait se dépose, il ne se frotte pas. Deux ou trois vaporisations à vingt centimètres, sur le cou, les poignets ou les vêtements.</p>') : ''}
             ${acc('Ingrédients', '<p class="muted">Liste INCI complète et allergènes, renseignés dans la fiche produit Shopify.</p>')}
-            ${acc('Livraison, retours et écrin', '<p>Livraison offerte dès 100 €, retours offerts sous 30 jours pour tout flacon scellé. Écrin et mot manuscrit offerts, facture sans prix sur demande.</p>')}
+            ${acc('Livraison et retours', '<p>Livraison offerte dès 100 €, expédition sous 24 h ouvrées depuis Paris. Retours offerts sous 30 jours pour tout flacon scellé.</p>')}
           </div>
         </div></div>
       </section>
       <div class="sticky-buy" id="sticky" aria-hidden="true"><div class="wrap"><span class="n">${nm(p.name)}<span id="st-var">${esc(current.label)}</span></span><button class="btn" id="st-add">Ajouter — <span id="st-price">${eur(current.price)}</span></button></div></div>
 
       <section class="block"><div class="wrap story">
-        <div class="story__margin">${p.folio ? `<span class="folio">p. ${p.folio}</span>` : ''}</div>
+        <div class="story__margin"></div>
         <div class="prose">${story.map(t => `<p>${t}</p>`).join('')}
           ${more.length ? `<div id="more" hidden>${more.map(t => `<p>${t}</p>`).join('')}${p.coda ? `<p>${p.coda.join(' ')}</p>` : ''}</div><button class="tlink more" id="more-btn">Lire la suite</button>` : ''}</div>
         ${p.notes && !p.materials ? `<dl class="story__notes"><div><dt>Tête</dt><dd>${p.notes.tete}</dd></div><div><dt>Cœur</dt><dd>${p.notes.coeur}</dd></div><div><dt>Fond</dt><dd>${p.notes.fond}</dd></div></dl>` : '<div></div>'}
@@ -615,13 +622,25 @@
         <div class="grid grid--rail">${related.map(card).join('')}</div>
       </div></section>`;
 
+    const shown = () => $$('#gallery figure:not([hidden])');
+    const count = () => { const g = $('#gallery'), n = shown().length; $('#gcount').textContent = `${Math.min(n, Math.round(g.scrollLeft / (g.clientWidth || 1)) + 1)} / ${n}`; };
+    const showPack = fmt => {
+      if (!$('#gallery [data-fmt="30"]')) return;
+      const el = $(`#gallery [data-fmt="${fmt}"]`), changed = el.hidden;
+      $$('#gallery [data-fmt]').forEach(f => { f.hidden = f.dataset.fmt !== fmt; });
+      if (!changed) return count();   // même flacon (2 ml, ou 100 ml recliqué) : la page ne bouge pas
+      const g = $('#gallery');
+      if (g.scrollWidth > g.clientWidth + 4) g.scrollTo({ left: shown().indexOf(el) * g.clientWidth, behavior: 'smooth' });
+      else if (el.getBoundingClientRect().top < parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h'))) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      count();
+    };
+    showPack('100'); count();
+    $$('#gallery [data-fmt] img').forEach(i => { i.loading = 'eager'; }); // le 30 ml s'affiche sans attente au clic
     const setFormat = id => {
       current = fmts.find(f => f.id === id) || current;
       $$('#sizes button').forEach(x => x.classList.toggle('is-active', x.dataset.f === current.id));
       $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-price').textContent = eur(current.price);
-      // mobile : la galerie glisse sur le flacon du format choisi
-      const gi = p.gallery.indexOf(current.id === '30' ? p.pack30 : p.pack), gal = $('#gallery');
-      if (gi > -1 && gal.scrollWidth > gal.clientWidth + 4) gal.scrollTo({ left: gi * gal.clientWidth, behavior: 'smooth' });
+      showPack(current.id === '30' ? '30' : '100');
     };
     $$('#sizes button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.f)));
     const add = () => {
@@ -642,7 +661,7 @@
 
     // compteur de la galerie (mobile)
     const g = $('#gallery');
-    g.addEventListener('scroll', () => { $('#gcount').textContent = `${Math.round(g.scrollLeft / g.clientWidth) + 1} / ${p.gallery.length}`; }, { passive: true });
+    g.addEventListener('scroll', count, { passive: true });
 
     // barre d'achat collante
 
@@ -659,28 +678,30 @@
   function initStores() {
     const list = $('#stores-list'); if (!list) return;
     let filter = 'all', q = '';
-    const countries = ['France', ...new Set(STORES.map(s => s.country).filter(c => c !== 'France'))];
+    const countries = ['France', ...[...new Set(STORES.map(s => s.country).filter(c => c !== 'France'))].sort((a, b) => a.localeCompare(b, 'fr'))];
     $('#stores-tabs').innerHTML = `<button data-c="all" class="is-active">Tous</button>` + countries.map(c => `<button data-c="${c}">${c}</button>`).join('');
     let map, markers = [];
     if (window.L) {
       map = L.map('map', { scrollWheelZoom: false }).setView([47.5, 4.5], 5);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 19, className: 'librery-tiles' }).addTo(map);
       const icon = L.divIcon({ className: '', html: '<div class="librery-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] });
-      markers = STORES.map(s => L.marker([s.lat, s.lng], { icon }).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${esc(s.address)}<br>${esc(s.city)}, ${esc(s.country)}`));
+      // une boutique en ligne n'a pas de repère (null garde l'alignement avec STORES)
+      markers = STORES.map(s => s.online ? null : L.marker([s.lat, s.lng], { icon }).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${esc(s.address)}<br>${esc(s.city)}, ${esc(s.country)}`));
     }
     const render = () => {
       const items = STORES.map((s, i) => ({ s, i })).filter(({ s }) => (filter === 'all' || s.country === filter) && (!q || (s.name + ' ' + s.address + ' ' + s.city + ' ' + s.country).toLowerCase().includes(q)));
       list.innerHTML = items.length ? items.map(({ s, i }) => `
         <div class="store" data-i="${i}" role="button" tabindex="0">
           <div class="store__name">${esc(s.name)}</div>
-          <div class="store__addr">${esc(s.address)}, ${esc(s.city)}, ${esc(s.country)}</div>
-          <div class="store__links">${s.phone ? `<a href="tel:${s.phone.replace(/\s/g, '')}">${esc(s.phone)}</a>` : ''}${s.url ? `<a href="${s.url}" target="_blank" rel="noopener">Site</a>` : ''}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name + ' ' + s.address + ' ' + s.city)}" target="_blank" rel="noopener">Itinéraire</a></div>
+          <div class="store__addr">${s.online ? `Boutique en ligne, ${esc(s.country)}` : `${esc(s.address)}, ${esc(s.city)}, ${esc(s.country)}`}${s.note ? ` · ${esc(s.note)}` : ''}</div>
+          <div class="store__links">${s.phone ? `<a href="tel:${s.phone.replace(/\s/g, '')}">${esc(s.phone)}</a>` : ''}${s.url ? `<a href="${s.url}" target="_blank" rel="noopener">Site</a>` : ''}${s.online ? '' : `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name + ' ' + s.address + ' ' + s.city)}" target="_blank" rel="noopener">Itinéraire</a>`}</div>
         </div>`).join('') : '<p class="store muted">Aucune adresse ne correspond.</p>';
       $('#stores-count').textContent = items.length + ' adresses';
-      markers.forEach((m, i) => { if (map) items.some(x => x.i === i) ? m.addTo(map) : m.remove(); });
-      if (map && items.length) { const f = items.filter(({ s }) => s.lng > -30 && s.lng < 60); map.fitBounds(L.latLngBounds((f.length ? f : items).map(({ s }) => [s.lat, s.lng])), { padding: [50, 50], maxZoom: 13 }); }
+      markers.forEach((m, i) => { if (map && m) items.some(x => x.i === i) ? m.addTo(map) : m.remove(); });
+      const placed = items.filter(({ s }) => !s.online);
+      if (map && placed.length) { const f = placed.filter(({ s }) => s.lng > -30 && s.lng < 60); map.fitBounds(L.latLngBounds((f.length ? f : placed).map(({ s }) => [s.lat, s.lng])), { padding: [50, 50], maxZoom: 13 }); }
       $$('.store[data-i]', list).forEach(el => {
-        const go = () => { $$('.store', list).forEach(x => x.classList.remove('is-active')); el.classList.add('is-active'); const s = STORES[+el.dataset.i]; if (map) { map.flyTo([s.lat, s.lng], 15, { duration: .6 }); markers[+el.dataset.i].openPopup(); } };
+        const go = () => { $$('.store', list).forEach(x => x.classList.remove('is-active')); el.classList.add('is-active'); const s = STORES[+el.dataset.i]; if (s.online) { if (s.url) window.open(s.url, '_blank', 'noopener'); return; } if (map) { map.flyTo([s.lat, s.lng], 15, { duration: .6 }); markers[+el.dataset.i].openPopup(); } };
         el.addEventListener('click', e => { if (!e.target.closest('a')) go(); }); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
       });
     };
@@ -708,7 +729,7 @@
       $('#quiz-title').textContent = top ? `Un portrait ${top[0].toLowerCase()}` : 'Votre portrait';
       $('#quiz-sub').textContent = top ? FAMILIES[top[0]] : '';
       $('#quiz-results').innerHTML = `<div class="grid">${ranked.map(card).join('')}</div>`; balanceGrids($('#quiz-results'));
-      const c = $('#quiz-cta'); c.textContent = forGift ? 'Voir les idées cadeaux' : 'Les essayer en 2 ml'; c.href = forGift ? '/offrir' : '/produit?p=coffret-a-composer';
+      const c = $('#quiz-cta'); c.textContent = forGift ? 'Voir les idées cadeaux' : 'Les essayer en 2 ml'; c.href = forGift ? '/offrir' : '/produit?p=coffret-decouverte';
       show(steps.length - 1);
     }));
     $('[data-restart]', root).addEventListener('click', () => { score = {}; colBoost = ''; show(0); });

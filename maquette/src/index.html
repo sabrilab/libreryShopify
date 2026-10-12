@@ -4,13 +4,13 @@
      (Shopify : section « slideshow », un bloc par image, image mobile distincte) -->
 <section class="s-hero" aria-label="LIBRERY" aria-roledescription="carrousel" data-hero>
   <div class="s-hero__slides">
-    <div class="s-hero__slide is-on" data-href="/bibliotheque" data-label="Entrer dans la bibliothèque" data-fig="fig. 1 — Hot Sand, Summer Vibes">
+    <div class="s-hero__slide is-on" data-href="/bibliotheque" data-label="Entrer dans la bibliothèque">
       <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/hero-portrait-m.webp"><img src="/assets/img/v2/hero-portrait.webp" alt="Campagne LIBRERY, Hot Sand" fetchpriority="high" decoding="async"></picture>
     </div>
-    <div class="s-hero__slide" data-href="/collection?c=skin-obsession" data-label="Découvrir Skin Obsession" data-fig="fig. 2 — Skin Obsession, la nouveauté">
+    <div class="s-hero__slide" data-href="/collection?c=skin-obsession" data-label="Découvrir Skin Obsession">
       <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/skin-femme-flacons-m.webp"><img src="/assets/img/v2/hero-skin.webp" alt="Skin Obsession, la nouvelle collection" loading="lazy" decoding="async"></picture>
     </div>
-    <div class="s-hero__slide" data-href="/produit?p=coffret-a-composer" data-label="Composer son coffret" data-fig="fig. 3 — Toute la bibliothèque, en 2 ml">
+    <div class="s-hero__slide" data-href="/produit?p=coffret-decouverte" data-label="Découvrir les huit parfums">
       <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/cover-pile-m.webp"><img src="/assets/img/v2/hero-collection.webp" alt="La bibliothèque LIBRERY au complet" loading="lazy" decoding="async"></picture>
     </div>
   </div>
@@ -19,7 +19,6 @@
     <h1 class="s-hero__mark">{{logo}}</h1>
     <div class="s-hero__side" aria-live="polite">
       <a class="tlink" href="/bibliotheque" data-hero-link>Entrer dans la bibliothèque</a>
-      <p class="fig" data-hero-fig>fig. 1 — Hot Sand, Summer Vibes</p>
     </div>
   </div></div>
   <div class="s-hero__bars wrap" role="tablist" aria-label="Images">
@@ -35,7 +34,7 @@
     <div class="row-head">
       <div><h2 class="h2">Skin <em>Obsession</em></h2>
         <p>Trois extraits de parfum composés par Coralie Spicher avec dsm-firmenich. La peau est le livre, le parfum l’histoire.</p></div>
-      <div class="end"><span class="folio">p. 32</span><a class="tlink" href="/collection?c=skin-obsession">La collection</a></div>
+      <div class="end"><a class="tlink" href="/collection?c=skin-obsession">La collection</a></div>
     </div>
     <div class="grid grid--lead" id="so-grid"></div>
   </div>
@@ -43,7 +42,7 @@
 
 <!-- SECTION : image-mosaic — la campagne Skin Obsession -->
 <section class="block block--tight">
-  <div class="wrap" data-mosaic="skin-obsession" data-fig="4"></div>
+  <div class="wrap" data-mosaic="skin-obsession"></div>
 </section>
 
 <!-- SECTION : book — le catalogue, présenté comme un livre ouvert (index + couverture) -->
@@ -56,10 +55,10 @@
       <p class="book__kicker">Le catalogue · 56 pages</p>
       <h2 class="h2">Sommaire</h2>
       <ol class="book__toc">
-        <li><a href="/preface"><span class="book__f">6</span><span class="book__t">La maison<small>Préface, manifeste, fondateur</small></span><span class="book__th">{{pic camp-coffrets|La bibliothèque LIBRERY|96px}}</span></a></li>
-        <li><a href="/collection?c=summer-vibes"><span class="book__f">14</span><span class="book__t">Summer <em>Vibes</em><small>Collection I, cinq parfums</small></span><span class="book__th">{{pic camp-blanche|Summer Vibes|96px}}</span></a></li>
-        <li><a href="/collection?c=skin-obsession"><span class="book__f">32</span><span class="book__t">Skin <em>Obsession</em><small>Collection II, trois extraits</small></span><span class="book__th">{{pic hero-skin|Skin Obsession|96px}}</span></a></li>
-        <li><a href="/preface#parfumeurs"><span class="book__f">50</span><span class="book__t">Les parfumeurs<small>Chris Maurice, Nathalie Feisthauer, Coralie Spicher</small></span><span class="book__th">{{pic coralie-spicher|Coralie Spicher|96px}}</span></a></li>
+        <li><a href="/preface"><span class="book__t">La maison<small>Préface, manifeste, fondateur</small></span><span class="book__th">{{pic camp-coffrets|La bibliothèque LIBRERY|96px}}</span></a></li>
+        <li><a href="/collection?c=summer-vibes"><span class="book__t">Summer <em>Vibes</em><small>Collection I, cinq parfums</small></span><span class="book__th">{{pic camp-blanche|Summer Vibes|96px}}</span></a></li>
+        <li><a href="/collection?c=skin-obsession"><span class="book__t">Skin <em>Obsession</em><small>Collection II, trois extraits</small></span><span class="book__th">{{pic hero-skin|Skin Obsession|96px}}</span></a></li>
+        <li><a href="/preface#parfumeurs"><span class="book__t">Les parfumeurs<small>Chris Maurice, Nathalie Feisthauer, Coralie Spicher</small></span><span class="book__th">{{pic coralie-spicher|Coralie Spicher|96px}}</span></a></li>
       </ol>
       <div class="book__cta"><a class="btn" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener">Feuilleter le catalogue</a><a class="tlink" href="https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf" target="_blank" rel="noopener">Télécharger le PDF</a></div>
     </div>
@@ -78,10 +77,9 @@
   </div>
 </section>
 
-<!-- SECTION : image-with-caption — la campagne -->
+<!-- SECTION : image-banner — la campagne -->
 <section class="s-figure">
   {{pic hero-emotion|Campagne Skin Obsession|100vw}}
-  <div class="wrap"><p class="fig">fig. 7 — Skin Obsession, la campagne</p><p class="fig">Paris, 2026</p></div>
 </section>
 
 <!-- SECTION : product-grid — Summer Vibes -->
@@ -90,7 +88,7 @@
     <div class="row-head">
       <div><h2 class="h2">Summer <em>Vibes</em></h2>
         <p>Cinq parfums, cinq fragments d’un même été : le sable chaud, les fruits mûrs, un sorbet, une sieste, le soleil couchant.</p></div>
-      <div class="end"><span class="folio">p. 14</span><a class="tlink" href="/collection?c=summer-vibes">La collection</a></div>
+      <div class="end"><a class="tlink" href="/collection?c=summer-vibes">La collection</a></div>
     </div>
     <div class="grid" id="sv-grid"></div>
   </div>
@@ -98,5 +96,5 @@
 
 <!-- SECTION : image-mosaic — la campagne Summer Vibes -->
 <section class="block block--tight">
-  <div class="wrap" data-mosaic="summer-vibes" data-fig="8"></div>
+  <div class="wrap" data-mosaic="summer-vibes"></div>
 </section>
