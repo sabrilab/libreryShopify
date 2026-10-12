@@ -177,6 +177,7 @@ TOC = [
     ('Vos prix', 'Message 17:14'),
     ('Le film Skin Obsession en ouverture', 'Vidéo reçue le 12/10'),
     ('Les vingt-cinq points de vente', 'Liste reçue le 12/10'),
+    ('Vos questions', 'Le code du coffret, le paiement en trois fois'),
 ]
 page(f'''
   <div class="glance">
@@ -287,7 +288,7 @@ change('08', 'Vos prix', 'Les formats et les coffrets, aux prix que vous nous av
 film = ''.join(f'<img src="{f}">' for f in FILM)
 page(head('09', 'Le film Skin Obsession', 'Il ouvre désormais la page de la collection.') + f'''<div class="ch">
   <aside class="ch__side">{quote('Là, du coup, on verra si on met pas aussi une vidéo. Je sais pas si c’est possible d’incruster une vidéo, mais ce serait top si on peut mettre une vidéo.', 'Vidéo du 12/10, 15:28')}
-    {done(['Votre film ouvre la page Skin Obsession, en boucle et sans le son', 'Une version plus légère est servie sur téléphone', 'Si l’appareil demande moins d’animations, l’image fixe reste'])}</aside>
+    {done(['Votre film ouvre la page Skin Obsession, en boucle et sans le son', 'Une version plus légère est servie sur téléphone', 'Un petit bouton « Pause / Lecture » dans le coin de l’image'])}</aside>
   <div class="ch__main">
     <div class="pair">{shot(SH['hero']['avant'], 'Avant', note='L’ouverture : une photo')}{shot(SH['hero']['apres'], 'Après', href='/collection?c=skin-obsession', note='L’ouverture : votre film')}</div>
     <div class="film"><span class="tag tag--b">Le film, 22 s</span><div class="film__row">{film}</div></div>
@@ -303,11 +304,35 @@ change('10', 'Les points de vente', 'Vingt-cinq adresses, dans treize pays.',
         'Odor BXL et ParfuMaria : « sur rendez-vous »'],
        'paper2', ask('Ne sont plus sur la carte, car absentes de votre liste : Sayhar, Vanora, La Galerie du Flair, Evok Shoes, Mon Flacon, Parfum 352 et Parfumologue. Dites-nous si l’une d’elles doit rester.'))
 
+# ---------------------------------------------------------------- vos questions (réponses simples, sans noms ni sources)
+QA = [
+    ('Le Discovery Set 2 ml : comment les 40 € sont-ils reportés ?', [
+        'Par un code : 40 € déduits d’un flacon 100 ml, valable 90 jours après l’achat du coffret, une fois par cliente.',
+        'Il est envoyé automatiquement, dans l’e-mail de confirmation de commande, seulement quand la commande contient le coffret. Vous n’avez rien à envoyer.',
+        'Si vous le souhaitez, une petite carte imprimée peut aussi être glissée dans chaque coffret : toujours la même, sans rien à écrire.',
+        'Une seule condition pour la cliente : commander avec la même adresse e-mail.',
+    ]),
+    ('Le paiement en trois fois : y a-t-il quelque chose à gérer ?', [
+        'Presque rien. Il s’active dans Shopify (Klarna) : le paiement en trois fois sans frais s’affiche aux clientes qui y ont droit.',
+        'Vous êtes payés en totalité tout de suite ; c’est Klarna qui se fait rembourser par la cliente et qui porte le risque d’impayé.',
+        'Coût : 4,99 % + 0,35 € par paiement en plusieurs fois, contre 1,5 % + 0,25 € pour une carte. PayPal propose aussi le paiement en quatre fois à ses clientes.',
+        'Sur les petits montants, l’option peut ne pas s’afficher : chaque prestataire fixe un minimum.',
+    ]),
+    ('Peut-on mettre une vidéo sur le site ?', [
+        'Oui, c’est fait : votre film ouvre la page Skin Obsession (page 12). D’autres pages peuvent en accueillir une de la même façon.',
+    ]),
+    ('Les petites mentions « fig. » et « p. », c’était voulu ?', [
+        'Oui : un clin d’œil aux légendes et aux pages du catalogue papier. Comme vous le préférez, elles sont retirées partout.',
+    ]),
+]
+page(head('11', 'Vos questions', 'Nos réponses, simplement.') + '<div class="qa">' + ''.join(
+    f'<section class="qa__item"><h3>{q}</h3><ul>{"".join(f"<li>{x}</li>" for x in r)}</ul></section>' for q, r in QA) + '</div>', 'paper2')
+
 # ---------------------------------------------------------------- à venir
 page(f'''
   <div class="ready">
     <div><p class="kick">Pour la suite</p><h1>Ce qu’il nous faut<br>encore.</h1>
-      <p class="lead">Dès réception, nous les intégrons au site. Vos questions sur le code du coffret et le paiement en trois fois ont leur réponse à part.</p></div>
+      <p class="lead">Dès réception, nous les intégrons au site.</p></div>
     <ul>
       <li><b>Photos</b>Les packagings, les coffrets et les discovery (même au téléphone)</li>
       <li><b>Mosaïques</b>De nouvelles photos pour Skin Obsession et Summer Vibes, pas seulement des mannequins</li>

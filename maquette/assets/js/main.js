@@ -453,9 +453,9 @@
 
     root.innerHTML = `
       <section class="coll-hero">${col.video
-          ? `<video src="${matchMedia('(max-width: 800px)').matches && col.videoMobile ? col.videoMobile : col.video}" poster="${col.poster || src(col.hero, 1)}" ${matchMedia('(prefers-reduced-motion: reduce)').matches ? '' : 'autoplay '}muted loop playsinline preload="metadata" aria-label="${esc(col.title)}"></video>`
+          ? `<video src="${matchMedia('(max-width: 800px)').matches && col.videoMobile ? col.videoMobile : col.video}" poster="${col.poster || src(col.hero, 1)}" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-label="${esc(col.title)}"></video>`
           : pic(col.hero, col.title, '100vw', '', true)}<div class="scrim-b"></div>
-        <div class="coll-hero__txt"><div class="wrap"><h1 class="h1">${nm(col.title)}</h1></div></div></section>
+        <div class="coll-hero__txt"><div class="wrap"><h1 class="h1">${nm(col.title)}</h1>${col.video ? '<button type="button" class="coll-hero__play" data-film>Pause</button>' : ''}</div></div></section>
       <section class="block"><div class="wrap split">
         <div><span class="ui muted">${esc(col.chapter)}</span></div>
         <div><p class="epigraph">${col.epigraph}</p><div class="prose">${col.intro.map(t => `<p>${t}</p>`).join('')}</div></div>
@@ -472,6 +472,18 @@
         </div></section>` : ''}
       ${items.length && tilesRow ? `<section class="block"><div class="wrap"><div class="grid">${trialTile() + quizTile() + storesTile()}</div></div></section>` : ''}`;
     newsletters();
+    filmControl(root);
+  }
+
+  /* film d'ouverture : lecture muette lancée explicitement (Safari, iPhone), bouton Pause / Lecture toujours visible.
+     Si l'appareil bloque la lecture automatique (économie d'énergie), le bouton propose « Lecture ». */
+  function filmControl(root) {
+    const v = $('.coll-hero video', root), b = $('[data-film]', root); if (!v || !b) return;
+    v.muted = true; v.defaultMuted = true; v.playsInline = true;
+    const label = () => { b.textContent = v.paused ? 'Lecture' : 'Pause'; b.setAttribute('aria-label', v.paused ? 'Lire le film' : 'Mettre le film en pause'); };
+    ['play', 'playing', 'pause'].forEach(e => v.addEventListener(e, label));
+    b.addEventListener('click', () => { v.paused ? v.play().catch(() => {}) : v.pause(); });
+    v.play().catch(() => {}); label();
   }
 
   /* date de livraison estimée : +3 jours ouvrés */

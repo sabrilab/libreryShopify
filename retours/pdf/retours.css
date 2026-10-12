@@ -58,9 +58,18 @@
 .ask { margin: 0; padding: 14px 16px; background: rgba(183,145,106,.12); border-left: 2px solid var(--gold); font-family: var(--sans); font-size: 13px; line-height: 1.55; color: var(--ink); }
 /* sommaire : séparation entre retours et envois */
 .glance .toc li.sep { border-top: 1px solid var(--ink); margin-top: 10px; }
-.glance .toc li { padding: 11px 0; font-size: 18px; }
+.glance .toc { margin-top: 18px; }
+.glance .toc li { padding: 8px 0; font-size: 17px; }
 /* bande du film */
 .film { display: flex; flex-direction: column; gap: 10px; }
 .film .tag { align-self: flex-start; }
 .film__row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 .film__row img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 3px; }
+
+/* vos questions */
+.qa { position: absolute; left: 72px; right: 72px; top: 150px; bottom: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 34px 64px; align-content: start; }
+.qa__item { border-top: 1px solid var(--ink); padding-top: 18px; }
+.qa__item h3 { margin: 0 0 14px; font-family: var(--display); font-weight: 400; font-size: 25px; line-height: 1.2; }
+.qa__item ul { list-style: none; margin: 0; padding: 0; }
+.qa__item li { position: relative; padding: 0 0 10px 20px; font-family: var(--sans); font-size: 14px; line-height: 1.55; color: var(--ink); }
+.qa__item li::before { content: ""; position: absolute; left: 2px; top: 10px; width: 8px; border-top: 1px solid var(--gold); }
