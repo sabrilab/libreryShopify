@@ -263,14 +263,14 @@ const PRODUCTS = [
 ];
 
 /* Collections.
-   `video` / `videoMobile` / `poster` (facultatifs) : boucle muette qui remplace l'image d'ouverture (Shopify : métachamps de collection).
+   `video` / `videoMobile` (facultatifs) : boucle muette, seule à l'ouverture, sans image d'attente (Shopify : métachamps de collection).
    `tiles` : 'end' = rangée « Coffret · Portrait olfactif · Nos adresses » en fin de page ; 'grid' = une tuile qui complète la grille des parfums. */
 const COLLECTIONS = {
   'skin-obsession': {
     mosaic: [['camp-lit', 'Skin Obsession, la campagne'], ['skin-homme-tonka', 'Tonka Love'], ['vanilla-plum-mod', 'Vanilla Plum']], wide: 'skin-trio',
     title: 'Skin Obsession', folio: 32, number: '03', chapter: 'Collection II', kicker: 'Nouvelle collection',
     hero: 'hero-skin', tiles: 'end',
-    video: '/assets/video/skin-obsession.mp4', videoMobile: '/assets/video/skin-obsession-m.mp4', poster: '/assets/video/skin-obsession.jpg',
+    video: '/assets/video/skin-obsession.mp4', videoMobile: '/assets/video/skin-obsession-m.mp4',
     epigraph: 'La peau est le livre. Le parfum est l’histoire. L’obsession, le désir de le relire.',
     intro: [
       "Il est un instant, presque imperceptible, lors d’une première rencontre : un éveil qui trouble les sens. La découverte d’un monde soudain révélé, une matière qui intrigue, un accord qui émeut.",

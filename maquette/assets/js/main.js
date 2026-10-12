@@ -453,7 +453,7 @@
 
     root.innerHTML = `
       <section class="coll-hero">${col.video
-          ? `<video src="${matchMedia('(max-width: 800px)').matches && col.videoMobile ? col.videoMobile : col.video}" poster="${col.poster || src(col.hero, 1)}" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-label="${esc(col.title)}"></video>`
+          ? `<video src="${matchMedia('(max-width: 800px)').matches && col.videoMobile ? col.videoMobile : col.video}#t=0.001" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-label="${esc(col.title)}"></video>`
           : pic(col.hero, col.title, '100vw', '', true)}<div class="scrim-b"></div>
         <div class="coll-hero__txt"><div class="wrap"><h1 class="h1">${nm(col.title)}</h1>${col.video ? '<button type="button" class="coll-hero__play" data-film>Pause</button>' : ''}</div></div></section>
       <section class="block"><div class="wrap split">
