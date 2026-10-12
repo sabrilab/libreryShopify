@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=8cf56f9b">
+<link rel="stylesheet" href="/assets/css/style.css?v=357ce393">
 </head>
 <body data-page="home" class="page-home">
 <div id="site-header"></div>
@@ -47,23 +47,21 @@
   <div class="wrap" data-mosaic="skin-obsession"></div>
 </section>
 
-<!-- SECTION : book — le catalogue, présenté comme un livre ouvert (index + couverture) -->
-<section class="book" id="catalogue" aria-label="Le catalogue">
-  <div class="wrap book__in">
-    <a class="book__cover" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener" aria-label="Feuilleter le catalogue">
-      <img src="/assets/img/v2/catalogue-couverture.webp?v=1329e851" alt="Couverture du catalogue LIBRERY" loading="lazy">
-    </a>
-    <div class="book__page">
-      <p class="book__kicker">Le catalogue · 56 pages</p>
-      <h2 class="h2">Sommaire</h2>
-      <ol class="book__toc">
-        <li><a href="/preface"><span class="book__t">La maison<small>Préface, manifeste, fondateur</small></span><span class="book__th"><img src="/assets/img/v2/camp-coffrets-m.webp?v=62bd400a" srcset="/assets/img/v2/camp-coffrets-m.webp?v=62bd400a 600w, /assets/img/v2/camp-coffrets.webp?v=62bd400a 1066w" sizes="96px" alt="La bibliothèque LIBRERY" loading="lazy" decoding="async"></span></a></li>
-        <li><a href="/collection?c=summer-vibes"><span class="book__t">Summer <em>Vibes</em><small>Collection I, cinq parfums</small></span><span class="book__th"><img src="/assets/img/v2/camp-blanche-m.webp?v=16183127" srcset="/assets/img/v2/camp-blanche-m.webp?v=16183127 600w, /assets/img/v2/camp-blanche.webp?v=16183127 1066w" sizes="96px" alt="Summer Vibes" loading="lazy" decoding="async"></span></a></li>
-        <li><a href="/collection?c=skin-obsession"><span class="book__t">Skin <em>Obsession</em><small>Collection II, trois extraits</small></span><span class="book__th"><img src="/assets/img/v2/hero-skin-m.webp?v=ead0b7fe" srcset="/assets/img/v2/hero-skin-m.webp?v=ead0b7fe 1100w, /assets/img/v2/hero-skin.webp?v=ead0b7fe 2400w" sizes="96px" alt="Skin Obsession" loading="lazy" decoding="async"></span></a></li>
-        <li><a href="/preface#parfumeurs"><span class="book__t">Les parfumeurs<small>Chris Maurice, Nathalie Feisthauer, Coralie Spicher</small></span><span class="book__th"><img src="/assets/img/v2/coralie-spicher-m.webp?v=ad40e008" srcset="/assets/img/v2/coralie-spicher-m.webp?v=ad40e008 633w, /assets/img/v2/coralie-spicher.webp?v=ad40e008 1125w" sizes="96px" alt="Coralie Spicher" loading="lazy" decoding="async"></span></a></li>
-      </ol>
-      <div class="book__cta"><a class="btn" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener">Feuilleter le catalogue</a><a class="tlink" href="https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf" target="_blank" rel="noopener">Télécharger le PDF</a></div>
+<!-- SECTION : flipbook — le catalogue se feuillette au défilement : couverture fermée, puis sept doubles pages
+     (Shopify : section « catalogue », pages en images, liens vers le catalogue 3D et le PDF) -->
+<section class="flip" id="catalogue" aria-label="Le catalogue">
+  <div class="flip__sticky wrap">
+    <div class="flip__cap">
+      <p class="flip__k" data-flip-n>Le catalogue · 56 pages</p>
+      <h2 class="h2" data-flip-t>La couverture</h2>
+      <p class="flip__hint">Faites défiler pour feuilleter.</p>
+      <div class="flip__bar"><span data-flip-bar></span></div>
+      <div class="flip__cta"><a class="btn" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener">Feuilleter le catalogue</a><a class="tlink" href="https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf" target="_blank" rel="noopener">Télécharger le PDF</a></div>
     </div>
+    <div class="flip__stage"><div class="flip__book" data-flip>
+      <div class="flip__l" style="opacity:0"><img src="/assets/img/catalogue/p02.webp" alt=""></div>
+      <div class="flip__r"><img src="/assets/img/catalogue/p15.webp" alt="" loading="lazy"></div>
+    </div></div>
   </div>
 </section>
 
@@ -105,6 +103,6 @@
 <script src="/assets/js/logo.js?v=5a17e5f9"></script>
 <script src="/assets/js/imgw.js?v=375448ae"></script>
 <script src="/assets/js/data.js?v=41e64f15"></script>
-<script src="/assets/js/main.js?v=612554b6"></script>
+<script src="/assets/js/main.js?v=57d2bfa9"></script>
 </body>
 </html>

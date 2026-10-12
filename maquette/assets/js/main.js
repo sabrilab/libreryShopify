@@ -475,6 +475,66 @@
     filmControl(root);
   }
 
+  /* Catalogue feuilleté (accueil) : le défilement tourne les pages ; feuille 0 = la couverture (p. 1, verso p. 2) */
+  function initFlip() {
+    const spread = $('[data-flip]'); if (!spread) return;
+    const track = spread.closest('.flip'), N = 20, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const CH = ['La couverture', 'La Préface', 'Le manifeste', 'Le fondateur', 'L’extrait de parfum', 'Summer Vibes', 'Hot Sand', 'Skin Obsession'];
+    const P = n => `/assets/img/catalogue/p${String(n).padStart(2, '0')}.webp`;
+    const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+    const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    const W = Array.from({ length: N }, (_, i) => Math.pow((i + .5) / N, 1.6)), WS = W.reduce((a, b) => a + b, 0);
+    let leaves = [];
+    const build = () => {
+      leaves.forEach(l => l.el.remove()); leaves = [];
+      const pw = spread.querySelector('.flip__r').offsetWidth, ph = spread.offsetHeight, sw = pw / N;
+      for (let k = 0; k < 7; k++) {
+        const el = document.createElement('div'); el.className = 'flip__leaf';
+        let parent = el; const strips = [];
+        const fr = (x, f) => `<i class="fr${f}" style="background-image:url(${P(1 + 2 * k)});background-size:${pw}px ${ph}px;background-position:${x}px 0"></i>`;
+        const bk = (x, f) => `<i class="bk${f}" style="background-image:url(${P(2 + 2 * k)});background-size:${pw}px ${ph}px;background-position:${x}px 0"></i>`;
+        for (let i = 0; i < N; i++) {
+          const st = document.createElement('div'); st.className = 'flip__strip'; st.style.width = sw + 'px';
+          const last = i === N - 1, xb = -(pw - (i + 1) * sw);
+          // bouche-trous derrière chaque bande, sauf côté reliure (pages serrées au centre)
+          const fills = i === 0 ? '' : last ? fr(-i * sw + 3, ' fill last') + bk(xb, ' fill last') : fr(-i * sw + 3, ' fill') + bk(xb + 3, ' fill');
+          st.innerHTML = fills + fr(-i * sw, '') + bk(xb, '');
+          parent.appendChild(st); strips.push(st); parent = st;
+        }
+        spread.appendChild(el); leaves.push({ el, strips });
+      }
+      draw();
+    };
+    const draw = () => {
+      const r = track.getBoundingClientRect(), prog = clamp(-r.top / (r.height - innerHeight)), p = prog * leaves.length;
+      const t0 = still ? (p > .5 ? 1 : 0) : ease(clamp(p));
+      spread.style.transform = `rotateX(14deg) translateX(${(-25 * (1 - t0)).toFixed(2)}%)`;
+      spread.querySelector('.flip__l').style.opacity = t0 > .5 ? 1 : 0;
+      spread.classList.toggle('is-closed', t0 < .5);
+      leaves.forEach(({ el, strips }, i) => {
+        const t = still ? (p > i + .5 ? 1 : 0) : ease(clamp(p - i)), lift = Math.sin(t * Math.PI);
+        const bend = 95 * lift * (t < .5 ? 1 : .8), base = -180 * t - bend * .35;
+        const z = (t > .5 ? 1 + i * .8 : 1 + (leaves.length - i) * .8) + lift * 14;
+        el.style.transform = `translateZ(${z.toFixed(2)}px) rotateY(${base.toFixed(2)}deg)`;
+        let acc = base, prev = 0;
+        strips.forEach((st, j) => {
+          const step = j === 0 ? 0 : bend * W[j] / WS * N / (N - 1) * .9;
+          st.style.transform = `rotateY(${step.toFixed(2)}deg)`; acc += step;
+          const c = Math.cos(acc * Math.PI / 180), sh = lift * (.04 + .2 * (1 - Math.abs(c)));
+          st.style.setProperty('--sa', (j ? prev : sh).toFixed(3)); st.style.setProperty('--sb', sh.toFixed(3)); prev = sh;
+        });
+      });
+      const k = Math.min(CH.length - 1, Math.round(p));
+      $('[data-flip-n]').textContent = k ? `Pages ${2 * k} – ${2 * k + 1}` : 'Le catalogue · 56 pages';
+      $('[data-flip-t]').textContent = CH[k];
+      $('[data-flip-bar]').style.width = (prog * 100).toFixed(1) + '%';
+    };
+    let raf = 0;
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); }); }, { passive: true });
+    let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(build, 150); });
+    build();
+  }
+
   /* film d'ouverture : lecture muette lancée explicitement (Safari, iPhone), bouton Pause / Lecture toujours visible.
      Si l'appareil bloque la lecture automatique (économie d'énergie), le bouton propose « Lecture ». */
   function filmControl(root) {
@@ -795,6 +855,6 @@
   initCollection();            // avant l'en-tête : fixe le titre courant
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
-  initHero(); initHome(); filmControl(document); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
+  initHero(); initHome(); initFlip(); filmControl(document); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
   renderCart(); bindToasts(); bindCards(); accordions(); newsletters(); balanceGrids();
 })();
