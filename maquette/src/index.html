@@ -1,31 +1,17 @@
 <!-- title: LIBRERY — La bibliothèque olfactive | page: home | body: page-home -->
 
-<!-- SECTION : hero-slideshow — diaporama de campagne, barre de progression par image
-     (Shopify : section « slideshow », un bloc par image, image mobile distincte) -->
-<section class="s-hero" aria-label="LIBRERY" aria-roledescription="carrousel" data-hero>
-  <div class="s-hero__slides">
-    <div class="s-hero__slide is-on" data-href="/bibliotheque" data-label="Entrer dans la bibliothèque">
-      <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/hero-portrait-m.webp"><img src="/assets/img/v2/hero-portrait.webp" alt="Campagne LIBRERY, Hot Sand" fetchpriority="high" decoding="async"></picture>
-    </div>
-    <div class="s-hero__slide" data-href="/collection?c=skin-obsession" data-label="Découvrir Skin Obsession">
-      <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/skin-femme-flacons-m.webp"><img src="/assets/img/v2/hero-skin.webp" alt="Skin Obsession, la nouvelle collection" loading="lazy" decoding="async"></picture>
-    </div>
-    <div class="s-hero__slide" data-href="/produit?p=coffret-decouverte" data-label="Découvrir les huit parfums">
-      <picture><source media="(max-width: 800px)" srcset="/assets/img/v2/cover-pile-m.webp"><img src="/assets/img/v2/hero-collection.webp" alt="La bibliothèque LIBRERY au complet" loading="lazy" decoding="async"></picture>
-    </div>
-  </div>
+<!-- SECTION : hero-video — le film Skin Obsession en boucle, seul, sans image (retour du 12/10)
+     (Shopify : section « video hero », fichier vidéo + version mobile) -->
+<section class="s-hero" aria-label="LIBRERY">
+  <video class="s-hero__film" src="/assets/video/skin-obsession.mp4#t=0.001" data-mobile="/assets/video/skin-obsession-m.mp4#t=0.001" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-label="Le film Skin Obsession"></video>
   <div class="scrim-t"></div><div class="scrim-b"></div>
   <div class="s-hero__content"><div class="wrap">
     <h1 class="s-hero__mark">{{logo}}</h1>
-    <div class="s-hero__side" aria-live="polite">
-      <a class="tlink" href="/bibliotheque" data-hero-link>Entrer dans la bibliothèque</a>
+    <div class="s-hero__side">
+      <a class="tlink" href="/collection?c=skin-obsession">Découvrir Skin Obsession</a>
+      <button type="button" class="coll-hero__play" data-film>Pause</button>
     </div>
   </div></div>
-  <div class="s-hero__bars wrap" role="tablist" aria-label="Images">
-    <button type="button" role="tab" aria-label="Image 1" aria-selected="true"><span></span></button>
-    <button type="button" role="tab" aria-label="Image 2"><span></span></button>
-    <button type="button" role="tab" aria-label="Image 3"><span></span></button>
-  </div>
 </section>
 
 <!-- SECTION : product-grid — nouveau chapitre -->

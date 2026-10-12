@@ -478,7 +478,9 @@
   /* film d'ouverture : lecture muette lancée explicitement (Safari, iPhone), bouton Pause / Lecture toujours visible.
      Si l'appareil bloque la lecture automatique (économie d'énergie), le bouton propose « Lecture ». */
   function filmControl(root) {
-    const v = $('.coll-hero video', root), b = $('[data-film]', root); if (!v || !b) return;
+    const v = $('.coll-hero video, .s-hero__film', root), b = $('[data-film]', root); if (!v || !b || b.dataset.bound) return;
+    b.dataset.bound = 1;
+    if (v.dataset.mobile && matchMedia('(max-width: 800px)').matches) v.src = v.dataset.mobile;
     v.muted = true; v.defaultMuted = true; v.playsInline = true;
     const label = () => { b.textContent = v.paused ? 'Lecture' : 'Pause'; b.setAttribute('aria-label', v.paused ? 'Lire le film' : 'Mettre le film en pause'); };
     ['play', 'playing', 'pause'].forEach(e => v.addEventListener(e, label));
@@ -793,6 +795,6 @@
   initCollection();            // avant l'en-tête : fixe le titre courant
   renderHeader(); renderFooter(); renderCartShell();
   $('#open-cart')?.addEventListener('click', openCart);
-  initHero(); initHome(); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
+  initHero(); initHome(); filmControl(document); initLibrary(); initProduct(); initStores(); initQuiz(); initGifts(); initFamilies(); initLexClock(); initContact();
   renderCart(); bindToasts(); bindCards(); accordions(); newsletters(); balanceGrids();
 })();
