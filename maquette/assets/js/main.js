@@ -329,7 +329,7 @@
   const mosaic = key => { const c = COLLECTIONS[key]; return c && c.mosaic ? `<div class="mosaic">${c.mosaic.map(([img, cap]) =>
       `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}</figure>`).join('')}</div>` : ''; };
   // le Coffret à composer est en pause (12/10) : la tuile « essayer en 2 ml » mène au Coffret Découverte
-  const trialTile = (img = 'hero-collection') => tile('/produit?p=coffret-decouverte', img, 'Coffret <em>Découverte</em>', 'Les huit parfums en 2 ml — 40 €');
+  const trialTile = (img = 'discovery-2ml-ouvert') => tile('/produit?p=coffret-decouverte', img, 'Coffret <em>Découverte</em>', 'Les huit parfums en 2 ml — 40 €');
   const storesTile = () => tile('/points-de-vente', 'camp-mercedes', 'Nos <em>adresses</em>', `${STORES.length} adresses où nos récits prennent vie`);
   const quizTile = () => tile('/portrait-olfactif', 'camp-livre', 'Portrait <em>olfactif</em>', 'Quatre questions pour trouver votre parfum');
 
@@ -354,7 +354,7 @@
     const so = $('#so-grid'), sv = $('#sv-grid'); if (!so) return;
     so.innerHTML = PRODUCTS.filter(p => p.collection === 'skin-obsession').map(card).join('');
     const svp = PRODUCTS.filter(p => p.collection === 'summer-vibes').map(card);
-    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + trialTile('camp-mains') + quizTile();
+    sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + trialTile() + quizTile();
     $$('[data-mosaic]').forEach(el => { el.innerHTML = mosaic(el.dataset.mosaic); });
     const sh = $('#shelf');
     if (sh) sh.innerHTML = SHELF.map(m => { const p = byHandle(m.h); return `<a class="shelf__item" href="/produit?p=${m.h}"><figure>${pic(m.img, m.t, '(max-width: 800px) 62vw, 22vw')}</figure>
@@ -556,6 +556,7 @@
     const col = COLLECTIONS[p.collection];
     const perf = p.perfumer && PERFUMERS[p.perfumer];
     const fmts = formatsOf(p); let current = fmts[0];
+    const defFmt = p.fmtImages ? fmts[0].id : '100';   // packshot montré au chargement
     const isPerfume = !p.type; let picks = [];
     document.title = `${p.name} — LIBRERY`;
     const sample = fmts.find(f => f.id === '2');
@@ -573,8 +574,8 @@
           <div class="pdp__gallery" id="gallery">${p.gallery.map((g, i) => {
             // ordinateur : une image par ligne, pleine colonne ; mobile : galerie à glisser
             // un seul packshot à la fois : celui du format choisi (le 30 ml n'apparaît qu'au clic sur « 30 ml »)
-            const fmt = g === p.pack ? '100' : g === p.pack30 ? '30' : '';
-            return `<figure class="${fmt ? 'is-pack' : ''}"${fmt ? ` data-fmt="${fmt}"` : ''}${fmt === '30' ? ' hidden' : ''}>${pic(g, p.name, '(max-width: 900px) 100vw, 58vw', '', i === 0)}</figure>`;
+            const fmt = g === p.pack ? '100' : g === p.pack30 ? '30' : (p.fmtImages && Object.keys(p.fmtImages).find(k => p.fmtImages[k].includes(g))) || '';
+            return `<figure class="${g === p.pack || g === p.pack30 ? 'is-pack' : ''}"${fmt ? ` data-fmt="${fmt}"` : ''}${fmt && fmt !== defFmt ? ' hidden' : ''}>${pic(g, p.name, '(max-width: 900px) 100vw, 58vw', '', i === 0)}</figure>`;
           }).join('')}</div>
           <span class="pdp__count" id="gcount"></span>
         </div>
@@ -637,8 +638,9 @@
     const shown = () => $$('#gallery figure:not([hidden])');
     const count = () => { const g = $('#gallery'), n = shown().length; $('#gcount').textContent = `${Math.min(n, Math.round(g.scrollLeft / (g.clientWidth || 1)) + 1)} / ${n}`; };
     const showPack = fmt => {
-      if (!$('#gallery [data-fmt="30"]')) return;
-      const el = $(`#gallery [data-fmt="${fmt}"]`), changed = el.hidden;
+      if (new Set($$('#gallery [data-fmt]').map(f => f.dataset.fmt)).size < 2) return;
+      const el = $(`#gallery [data-fmt="${fmt}"]`); if (!el) return;
+      const changed = el.hidden;
       $$('#gallery [data-fmt]').forEach(f => { f.hidden = f.dataset.fmt !== fmt; });
       if (!changed) return count();   // même flacon (2 ml, ou 100 ml recliqué) : la page ne bouge pas
       const g = $('#gallery');
@@ -646,13 +648,13 @@
       else if (el.getBoundingClientRect().top < parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h'))) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       count();
     };
-    showPack('100'); count();
+    showPack(defFmt); count();
     $$('#gallery [data-fmt] img').forEach(i => { i.loading = 'eager'; }); // le 30 ml s'affiche sans attente au clic
     const setFormat = id => {
       current = fmts.find(f => f.id === id) || current;
       $$('#sizes button').forEach(x => x.classList.toggle('is-active', x.dataset.f === current.id));
       $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-price').textContent = eur(current.price);
-      showPack(current.id === '30' ? '30' : '100');
+      showPack(p.fmtImages ? current.id : current.id === '30' ? '30' : '100');
     };
     $$('#sizes button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.f)));
     const add = () => {

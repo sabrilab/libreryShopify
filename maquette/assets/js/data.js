@@ -222,8 +222,8 @@ const PRODUCTS = [
   /* ============ Coffrets — exclusivité site ============ */
   {
     handle: 'coffret-decouverte', name: 'Coffret Découverte', subtitle: 'Les huit parfums · 2 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
-    card: 'coffret-2ml', scene: 'skin-trio',
-    gallery: ['coffret-2ml', 'skin-trio', 'camp-coffrets'],
+    card: 'discovery-2ml-ouvert', scene: 'discovery-2ml-ferme',
+    gallery: ['discovery-2ml-ouvert', 'discovery-2ml-ferme', 'coffret-2ml', 'camp-coffrets'],
     formats: [{ id: '8x2', label: '8 × 2 ml', price: 40 }],   // Discovery Set 2 ml : les deux collections
     keyNotes: 'Formats 2 ml · Valeur recréditée',
     tagline: 'Une préface à la collection.',
@@ -247,8 +247,10 @@ const PRODUCTS = [
   },
   {
     handle: 'coffret-collection', name: 'Coffret Collection', subtitle: 'Une collection · 30 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
-    card: 'coffret-30ml', scene: 'camp-coffrets',
-    gallery: ['coffret-30ml', 'camp-coffrets', 'cover-pile'],
+    card: 'discovery-sv-ouvert', scene: 'discovery-so-ouvert',
+    gallery: ['discovery-sv-ouvert', 'discovery-sv-ferme', 'discovery-so-ouvert', 'discovery-so-ferme', 'coffret-30ml', 'camp-coffrets'],
+    // la galerie suit la version choisie (packshots Nano Banana 2.1 d'après les photos de LIBRERY, 12/10)
+    fmtImages: { sv: ['discovery-sv-ouvert', 'discovery-sv-ferme'], so: ['discovery-so-ouvert', 'discovery-so-ferme'] },
     formats: [
       { id: 'sv', label: 'Summer Vibes · 5 × 30 ml', price: 430 },
       { id: 'so', label: 'Skin Obsession · 3 × 30 ml', price: 250 }
