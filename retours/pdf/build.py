@@ -113,6 +113,7 @@ def head(n, t, sub=''):
 
 
 def quote(q, src):
+    return ''  # pas de citation ni de source dans le PDF envoyé à la cliente
     return f'<blockquote class="q"><p>« {esc(q)} »</p><cite>{esc(src)}</cite></blockquote>'
 
 
@@ -185,10 +186,10 @@ page(f'''
       <p class="kick">Ce qui a changé</p>
       <h1>Sept retours,<br>trois envois.</h1>
       <p class="lead">Tout ce que vous nous avez signalé le 12 octobre est appliqué, avec ce que vous nous avez envoyé dans la journée.
-      Chaque page montre l’écran avant et après, avec vos mots.</p>
+      Chaque page montre l’écran avant et après.</p>
       <p class="lead muted">Summer Vibes et le haut de la page Skin Obsession, que vous avez validés, gardent leur mise en page : seules les petites mentions (« fig. », « p. ») y disparaissent, comme partout.</p>
     </div>
-    <ol class="toc">{''.join(f'<li{" class=sep" if i == 7 else ""}><span>{i + 1:02d}</span><div>{t}<em>{s}</em></div></li>' for i, (t, s) in enumerate(TOC))}</ol>
+    <ol class="toc">{''.join(f'<li{" class=sep" if i == 7 else ""}><span>{i + 1:02d}</span><div>{t}</div></li>' for i, (t, s) in enumerate(TOC))}</ol>
   </div>''')
 
 # ---------------------------------------------------------------- 01 services
