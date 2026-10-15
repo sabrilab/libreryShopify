@@ -195,6 +195,12 @@ input, textarea, select { font: inherit; color: inherit; }
 .entete-pr { position: absolute; left: 0; top: 0; margin: 0; overflow: hidden; background: var(--paper-2); transform-origin: 50% 50%; will-change: transform; backface-visibility: hidden; z-index: 3;
   box-shadow: 0 30px 54px -30px rgba(47, 43, 40, .5), 0 2px 8px -2px rgba(47, 43, 40, .1); outline: 1px solid transparent; }
 .entete-pr img { position: absolute; display: block; max-width: none; object-fit: fill; transform-origin: 50% 50%; will-change: transform; }
+/* l'effet « feuille » (feuille.js) : en mouvement, la photo est dessinée par une toile posée dans son cadre (maillage déformé) ;
+   l'image d'origine reprend sa place dès que la feuille est de nouveau plane */
+.fe-cv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; visibility: hidden; pointer-events: none; }
+.fe-on > .fe-cv { visibility: visible; }
+.fe-on > img { visibility: hidden; }
+.entete-pr.fe-on, .ed-fr.fe-on { background: transparent; }
 /* la phrase de fin, dans la première colonne (largeur posée par main.js) */
 .entete-cap { position: absolute; left: 0; top: 0; z-index: 6; text-align: left; opacity: 0; visibility: hidden; will-change: transform, opacity; }
 .entete-k { font-family: var(--sans); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); margin: 0; }

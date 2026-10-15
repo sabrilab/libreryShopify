@@ -63,7 +63,7 @@ for f in sorted((root / 'src').glob('[!_]*.html')):
     body = re.sub(r'(/assets/img/v2/([\w-]+?)(-m)?\.webp)"', lambda m: '%s?v=%s"' % (m.group(1), IMGW.get(m.group(2), [0, 0, ''])[2]), body)
     body = body.replace('{{logo-couverture}}', (root / 'assets/img/v2/logo-couverture.svg').read_text()).replace('{{logo}}', (root / 'assets/img/v2/logo-librery.svg').read_text())
     css = '/assets/css/style.css?v=' + ver('/assets/css/style.css')
-    js = ''.join('<script src="/assets/js/%s?v=%s"></script>\n' % (n, ver('/assets/js/' + n)) for n in ('logo.js', 'imgw.js', 'data.js', 'paiement.js', 'main.js'))
+    js = ''.join('<script src="/assets/js/%s?v=%s"></script>\n' % (n, ver('/assets/js/' + n)) for n in ('logo.js', 'imgw.js', 'data.js', 'paiement.js', 'feuille.js', 'main.js'))
     s3d = '/assets/js/sillage3d.js?v=' + ver('/assets/js/sillage3d.js')     # module importé à la demande (carte d'import)
     out = (head.replace('{{TITLE}}', meta.get('title', 'LIBRERY')).replace('/assets/css/style.css', css).replace('/assets/js/sillage3d.js', s3d)
            + '</head>\n<body data-page="%s" class="%s"%s%s>\n' % (meta.get('page', ''), meta.get('body', ''),

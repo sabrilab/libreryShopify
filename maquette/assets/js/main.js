@@ -497,7 +497,8 @@
       s._g = [...pl.f, ...pl.b, ...pl.w].map((a, i) => Object.assign(a[1], { el: els[i] }));
       // le voyage de chaque image : profondeur d'arrivée (dans le volume, devant le fond), avancée en sortant, côté vers lequel elle se tourne
       s._items.forEach((it, i) => { const b = B[i];
-        Object.assign(it, { fr: $('.ed-fr', it.el), side: b.x + b.w / 2 < W / 2 ? 1 : -1, zin: D * [.84, .96, .9][i % 3], zout: (sm ? 50 : 160) * [1, 1.2, .8][i % 3] }); });
+        const fr = $('.ed-fr', it.el), img = $('img', fr);
+        Object.assign(it, { fr, img, crop: img && (() => Feuille.coverCrop(fr, img)), side: b.x + b.w / 2 < W / 2 ? 1 : -1, zin: D * [.84, .96, .9][i % 3], zout: (sm ? 50 : 160) * [1, 1.2, .8][i % 3] }); });
       const C = B[B.length - 1]; if (q && C) { s._qy = C.y + C.h * .618034; s._qt = q.offsetTop; }   // l'épigraphe, sur la ligne d'or de C
     };
     // position de chaque cadre dans sa scène (hors transformations), relevée seulement quand la scène change de taille
@@ -526,6 +527,8 @@
         const ty = sm ? (it.top + it.h / 2 - oy) * Math.max(0, -z) / P * .75 : 0;
         const tf = `translate3d(0, ${ty.toFixed(1)}px, ${z.toFixed(1)}px) rotateX(${((sm ? 4 : 7) * e - 3 * x * x).toFixed(2)}deg) rotateY(${(it.side * (sm ? 6 : 11) * e).toFixed(2)}deg)`;
         if (it._tf !== tf) it.fr.style.transform = it._tf = tf;
+        // la feuille : plus marquée pendant le voyage en profondeur, présente aussi en place tant qu'on fait défiler
+        if (it.img) Feuille.drive(it.fr, it.img, .4 + .6 * Math.sin(Math.PI * e) + .4 * x, 0, 1, it.crop);
         const yt = o + (top + it.top + ty - o) * P / (P - z);              // haut apparent (la perspective le rapproche du point de fuite)
         flag(it.el, 'is-in', yt < vh * .94, yt, vh);
         flag(it.el, 'is-set', f < .2, top + it.top, vh);
@@ -668,7 +671,7 @@
     stage.insertAdjacentHTML('beforeend', MODS.map(([n, a]) => { const w = IMGW[n] || [670, 957];
       return `<figure class="entete-pr"><img src="${src(n)}" srcset="${src(n)} ${w[0]}w, ${src(n, 1)} ${w[1]}w" sizes="(max-width: 800px) 92vw, 31vw" alt="${esc(a)}" decoding="async"><i></i></figure>`; }).join(''));
     const els = $$('.entete-pr', stage), N = els.length;
-    els.forEach(f => { if (f.firstChild.decode) f.firstChild.decode().catch(() => {}); });
+    els.forEach(f => { if (f.firstChild.decode) f.firstChild.decode().catch(() => {}); Feuille.prepare(f, f.firstChild); });
     const W1 = (TS - T0) / (1 + (N - 1) * G), STEP = W1 * G;          // chaque arrivée chevauche la précédente (pas = durée / φ)
     const shF = sh.cloneNode(); sh.after(shF);                          // ombre du film à sa place finale
 
@@ -718,7 +721,10 @@
     function pwTo(el, cx, cy, w, h, r = 0, fy = .5) {
       const b = el._b, sx = w / b.w, sy = h / b.h, k = Math.max(w / b.iw, h / b.ih);
       el.style.transform = `translate3d(${px(cx - b.w / 2)}, ${px(cy - b.h / 2)}, 0) rotate(${r.toFixed(3)}deg) scale(${sx.toFixed(5)}, ${sy.toFixed(5)})`;
-      el.firstChild.style.transform = `translate3d(0, ${px((h - b.ih * k) * (fy - .5) / sy)}, 0) scale(${(k / sx).toFixed(5)}, ${(k / sy).toFixed(5)})`;
+      const ty = (h - b.ih * k) * (fy - .5) / sy, dw = b.iw * k / sx, dh = b.ih * k / sy;
+      el.firstChild.style.transform = `translate3d(0, ${px(ty)}, 0) scale(${(k / sx).toFixed(5)}, ${(k / sy).toFixed(5)})`;
+      // pour l'effet « feuille » : la partie de l'image visible dans la fenêtre, et l'agrandissement de la fenêtre
+      el._crop = [.5 - b.w / (2 * dw), .5 - (b.h / 2 + ty) / dh, b.w / dw, b.h / dh]; el._k = Math.max(sx, sy);
     }
 
     // la grille qui suit, mesurée en coordonnées de la scène (haut de la scène quand elle n'est plus tenue)
@@ -823,6 +829,9 @@
         ww = lerp(ww, fi.w, qi) * lift; hh = lerp(hh, fi.h, qi) * lift;
         pwTo(el, cx, cy, ww, hh, lerp(lerp(st.r * 3 + (i % 2 ? 6 : -6), st.r, ai), 0, qi), lerp(.5, fi.fy, qi));
         el.lastChild.style.opacity = Math.min(.28, d * .07 * (1 - qi)).toFixed(3);
+        // la feuille : elle ondule en montant, puis en partant vers sa colonne (sens du trajet à l'écran, y vers le haut)
+        const er = Math.sin(Math.PI * ai), ed = Math.sin(Math.PI * qi);
+        Feuille.drive(el, el.firstChild, Math.max(er, ed), ed > er ? fi.x + fi.w / 2 - st.cx : 0, ed > er ? st.cy - fi.y - fi.h / 2 : 1, el._crop, el._k);
       });
       caption(out(seg(P, CAP[0], CAP[0] + CAP[1])));
     }
