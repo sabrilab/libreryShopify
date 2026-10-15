@@ -9,6 +9,10 @@
 const IMG = '/assets/img/v2/';
 const CATALOGUE_URL = 'https://librery-catalogue-3d.vercel.app/';
 const CATALOGUE_PDF = 'https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf';
+// Le catalogue en ligne reprend-il l'image clé du chevet de l'accueil (décor « chevet », docs/chevet.md du dépôt
+// librery-catalogue-3d) ? Pas encore déployé : depuis la section, le lecteur habituel. À passer à true une fois le décor
+// en ligne — ou le catalogue l'annonce lui-même (« pret » portant decors: ['chevet'], main.js : initLecteur).
+const CATALOGUE_DECOR_CHEVET = false;
 
 /* Visuels produit : pack = flacon détouré sur fond clair (grille façon D'orsay),
    pack / pack30 = packshots studio à échelle commune (flacon ≈ 40 % du cadre),
@@ -25,7 +29,7 @@ const FAMILIES = {
 };
 /* Image de chaque famille (métaobjet Shopify « famille » : nom, texte, image ; les produits y sont reliés
    par un métachamp liste, la première famille étant la famille principale) */
-const FAMILY_ART = { 'Gourmand': 'tonka-capot', 'Floral': 'poire-livres', 'Fruité': 'baies-colonne', 'Ambré': 'ambert-sunset-1', 'Boisé': 'camp-coffrets' };
+const FAMILY_ART = { 'Gourmand': 'famille-gourmand', 'Floral': 'famille-floral', 'Fruité': 'famille-fruite', 'Ambré': 'famille-ambre', 'Boisé': 'famille-boise' };   // matières en gros plan (retour de Nolwenn, 13/10)
 
 /* Services — promesses affichées partout (bandeau, fiche produit, panier) */
 const SERVICES = [
@@ -170,8 +174,8 @@ const PRODUCTS = [
     handle: 'mango-wave', folio: 23, name: 'Mango Wave', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Mangue juteuse, framboise éclatante et ambre gourmand, dans un sillage solaire, fruité et irrésistible.',
     keyNotes: 'Mangue · Framboise · Ambre', families: ['Fruité', 'Ambré'],
-    pack: 'mango-wave-pack', card: 'mango-wave-pack', pack30: 'mango-wave-pack30', scene: 'hero-summer',
-    gallery: ['mango-wave-pack', 'mango-wave-pack30', 'hero-summer', 'cover-pile'],
+    pack: 'mango-wave-pack', card: 'mango-wave-pack', pack30: 'mango-wave-pack30', scene: 'mango-wave-reflet',
+    gallery: ['mango-wave-pack', 'mango-wave-pack30', 'mango-wave-reflet', 'mango-wave-mangue', 'cover-pile'],
     description: [
       "Mango Wave est une vague d’énergie fruitée et de douceur gourmande. En tête, la mangue juteuse et l’orange acidulée éclatent comme un souffle lumineux, vibrant sur la peau.",
       "Le cœur, fruité et floral, mêle grenade, framboise et jasmin, esquissant la douceur d’un soir d’été suspendu entre chaleur et éclat. En fond, l’ambre, la mousse de chêne et la cassonade caramélisée composent un sillage captivant, riche et enveloppant.",
@@ -196,8 +200,8 @@ const PRODUCTS = [
     handle: 'palmeira', folio: 27, name: 'Palmeira', collection: 'summer-vibes', perfumer: 'chris-maurice',
     tagline: 'Fruits rouges juteux, violette et rose élégante, puis praline et santal, dans un sillage fruité, floral et chaleureux.',
     keyNotes: 'Framboise · Violette · Praline', families: ['Fruité', 'Floral'],
-    pack: 'palmeira-pack', card: 'palmeira-pack', pack30: 'palmeira-pack30', scene: 'baies-colonne',
-    gallery: ['palmeira-pack', 'palmeira-pack30', 'baies-colonne', 'hero-summer', 'cover-pile'],
+    pack: 'palmeira-pack', card: 'palmeira-pack', pack30: 'palmeira-pack30', scene: 'palmeira-bois',
+    gallery: ['palmeira-pack', 'palmeira-pack30', 'palmeira-bois', 'hero-summer', 'cover-pile'],
     description: [
       "Palmeira s’ouvre comme une promenade sous les frondaisons d’un jardin d’été, où la lumière danse entre les feuilles et s’attarde sur les fruits.",
       "En tête, framboise, fraise, cassis et myrtille éclatent en un accord lumineux et juteux, comme un panier de baies fraîchement cueillies. Au cœur, un bouquet élégant de violette, rose, prune et Ambroxan apporte profondeur et sophistication, telle une lumière qui traverse les pages d’un récit d’été.",
@@ -269,7 +273,7 @@ const PRODUCTS = [
    `tiles` : 'end' = rangée « Coffret · Portrait olfactif · Nos adresses » en fin de page ; 'grid' = une tuile qui complète la grille des parfums. */
 const COLLECTIONS = {
   'skin-obsession': {
-    mosaic: [['camp-lit', 'Skin Obsession, la campagne'], ['skin-homme-tonka', 'Tonka Love'], ['vanilla-plum-mod', 'Vanilla Plum']], wide: 'skin-trio',
+    mosaic: [['skin-livres', 'Skin Obsession, la collection'], ['skin-voiture', 'La campagne'], ['skin-cabriolet', 'Skin Obsession, la campagne']], wide: 'skin-trio',
     title: 'Skin Obsession', folio: 32, number: '03', chapter: 'Collection II', kicker: 'Nouvelle collection',
     hero: 'hero-skin', tiles: 'end',
     video: '/assets/video/skin-obsession.mp4', videoMobile: '/assets/video/skin-obsession-m.mp4',
@@ -294,7 +298,7 @@ const COLLECTIONS = {
     ]
   },
   'summer-vibes': {
-    mosaic: [['camp-baie', 'Summer Vibes, la campagne'], ['hot-sand-mod', 'Hot Sand'], ['ambert-sunset-mod', 'Ambert Sunset']], wide: 'hero-portrait',
+    mosaic: [['summer-canape', 'Summer Vibes, la campagne'], ['camp-trente', 'La collection en 30 ml'], ['mango-wave-mangue', 'Mango Wave']], wide: 'hero-portrait',
     title: 'Summer Vibes', folio: 14, number: '02', chapter: 'Collection I', kicker: 'Collection',
     tiles: 'grid',
     hero: 'hero-summer',
@@ -315,7 +319,7 @@ const COLLECTIONS = {
     ]
   },
   'coffrets': {
-    mosaic: [['camp-main', 'Magnetic Flowers'], ['cover-pile', 'La bibliothèque'], ['hero-voiture', 'La campagne']],
+    mosaic: [['summer-fenetre', 'La campagne'], ['prune-vanille', 'Vanilla Plum'], ['camp-trente', 'La bibliothèque']],
     title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
     hero: 'hero-collection',
     epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',

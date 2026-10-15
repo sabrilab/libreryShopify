@@ -11,4 +11,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/style.css">
+<!-- modules chargés à la demande (cadran solaire du sillage, chevet de l'accueil) : Three.js r170, comme la visionneuse /parfum -->
+<script type="importmap">{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+  "chevet3d": "/assets/js/chevet3d.js",
+  "chevet-photo": "/assets/js/chevet-photo.js",
+  "sillage3d": "/assets/js/sillage3d.js"
+} }</script>
 <script>try{if(sessionStorage.getItem("librery-vu"))document.documentElement.classList.add("is-seen")}catch(e){}</script>

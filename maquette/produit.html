@@ -10,7 +10,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=7768b13a">
+<link rel="stylesheet" href="/assets/css/style.css?v=5c61be11">
+<!-- modules chargés à la demande (cadran solaire du sillage, chevet de l'accueil) : Three.js r170, comme la visionneuse /parfum -->
+<script type="importmap">{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+  "chevet3d": "/assets/js/chevet3d.js?v=38f72934",
+  "chevet-photo": "/assets/js/chevet-photo.js?v=5bdd93ef",
+  "sillage3d": "/assets/js/sillage3d.js?v=3e588f76"
+} }</script>
 <script>try{if(sessionStorage.getItem("librery-vu"))document.documentElement.classList.add("is-seen")}catch(e){}</script>
 </head>
 <body data-page="bibliotheque" class="">
@@ -21,8 +29,9 @@
 </main>
 <div id="site-footer"></div>
 <script src="/assets/js/logo.js?v=5a17e5f9"></script>
-<script src="/assets/js/imgw.js?v=375448ae"></script>
-<script src="/assets/js/data.js?v=41e64f15"></script>
-<script src="/assets/js/main.js?v=c766c2c1"></script>
+<script src="/assets/js/imgw.js?v=a29cfb70"></script>
+<script src="/assets/js/data.js?v=139e330a"></script>
+<script src="/assets/js/paiement.js?v=7ab22a53"></script>
+<script src="/assets/js/main.js?v=b8ae7484"></script>
 </body>
 </html>

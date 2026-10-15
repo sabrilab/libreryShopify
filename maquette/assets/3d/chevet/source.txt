@@ -1,0 +1,5 @@
+ClassicNightstand_01 — Poly Haven (polyhaven.com/a/ClassicNightstand_01), licence CC0.
+Textures 1k ; géométrie du .bin 4k. Utilisé par assets/js/chevet3d.js (le chevet de l’accueil).
+plateau.glb et plateau-noyer-* : dessus détaché du modèle (uv dépliées sur la moulure et les chants, faces planes à
+normale verticale), noyer « bureau » du catalogue 3D cuit en images (0,61 × 0,472 m, 6 700 texels/m). Mêmes fichiers
+dans librery-catalogue-3d/public/chevet/ (décor « chevet ») : les deux plateaux se confondent.

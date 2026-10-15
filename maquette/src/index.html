@@ -1,17 +1,23 @@
 <!-- title: LIBRERY — La bibliothèque olfactive | page: home | body: page-home -->
 
-<!-- SECTION : hero-video — le film Skin Obsession en boucle, seul, sans image (retour du 12/10)
-     (Shopify : section « video hero », fichier vidéo + version mobile) -->
-<section class="s-hero" aria-label="LIBRERY">
-  <video class="s-hero__film" src="/assets/video/skin-obsession.mp4#t=0.001" data-mobile="/assets/video/skin-obsession-m.mp4#t=0.001" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-label="Le film Skin Obsession"></video>
-  <div class="scrim-t"></div><div class="scrim-b"></div>
-  <div class="s-hero__content"><div class="wrap">
-    <h1 class="s-hero__mark">{{logo}}</h1>
-    <div class="s-hero__side">
-      <a class="tlink" href="/collection?c=skin-obsession">Découvrir Skin Obsession</a>
-      <button type="button" class="coll-hero__play" data-film>Pause</button>
-    </div>
-  </div></div>
+<!-- SECTION : hero-scroll — l'ouverture au défilement, variante A1 « La donne » (validée le 13/10) :
+     le film Skin Obsession part plein cadre, comme avant ; au défilement il recule en tirage, les photos de la campagne
+     montent et s'empilent dessus, puis la pile se distribue sur les trois colonnes de la grille qui suit (initEntete, main.js).
+     (Shopify : section « hero-scroll » : film + version mobile et leurs images d'attente, une photo par parfum de la grille,
+     surtitre, phrase et lien.) Le film est choisi par le navigateur (<source media>) avant tout chargement : un seul film téléchargé. -->
+<section class="entete" aria-label="LIBRERY">
+  <div class="entete-stage">
+    <div class="entete-sh" aria-hidden="true"></div>
+    <div class="entete-film"><div class="entete-film-in"><video class="s-hero__film" autoplay muted loop playsinline preload="auto" disablepictureinpicture data-poster="/assets/img/entete/film-poster.jpg" data-poster-m="/assets/img/entete/film-poster-m.jpg" aria-label="Le film Skin Obsession"><source src="/assets/video/skin-obsession-m.mp4#t=0.001" media="(max-width: 800px)"><source src="/assets/video/skin-obsession.mp4#t=0.001"></video></div><div class="scrim-t"></div><div class="scrim-b"></div><i></i></div>
+    <div class="s-hero__content entete-hero"><div class="wrap">
+      <h1 class="s-hero__mark">{{logo}}</h1>
+      <div class="s-hero__side">
+        <a class="tlink" href="/collection?c=skin-obsession">Découvrir Skin Obsession</a>
+        <button type="button" class="coll-hero__play" data-film>Pause</button>
+      </div>
+    </div></div>
+    <div class="entete-cap"><p class="entete-k">Skin Obsession <b>·</b> <span>la campagne</span></p><h2 class="entete-l">L’obsession,<br><em>le désir de le relire</em>.</h2><a class="tlink" href="#campagne">Voir la campagne</a></div>
+  </div>
 </section>
 
 <!-- SECTION : product-grid — nouveau chapitre -->
@@ -26,22 +32,25 @@
   </div>
 </section>
 
-<!-- SECTION : image-mosaic — la campagne Skin Obsession -->
-<section class="block block--tight">
+<!-- SECTION : image-mosaic — la campagne Skin Obsession (mise en page au nombre d'or, animée au défilement : initEdito) -->
+<section class="ed-sec">
   <div class="wrap" data-mosaic="skin-obsession"></div>
 </section>
 
 <!-- SECTION : flipbook — le catalogue se feuillette au défilement : couverture fermée, puis sept doubles pages
-     (Shopify : section « catalogue », pages en images, liens vers le catalogue 3D et le PDF) -->
+     (Shopify : section « catalogue », pages en images, liens vers le catalogue 3D et le PDF).
+     Avec WebGL : d'abord le chevet en 3D (.flip__chevet, assets/js/chevet3d.js) — d'un seul mouvement, la caméra monte
+     et glisse jusqu'à poser le catalogue, resté sur le plateau, à la place du livre ; sinon, la bande de noyer d'avant -->
 <section class="flip" id="catalogue" aria-label="Le catalogue">
   <div class="flip__sticky wrap">
+    <div class="flip__chevet" aria-hidden="true"></div>
     <div class="flip__cap">
       <p class="flip__k" data-flip-n>Le catalogue · 56 pages</p>
       <h2 class="h2" data-flip-t>La couverture</h2>
       <p class="flip__hint">Faites défiler pour feuilleter.</p>
       <div class="flip__bar"><span data-flip-bar></span></div>
     </div>
-    <div class="flip__cta"><a class="btn" href="https://librery-catalogue-3d.vercel.app/" target="_blank" rel="noopener">Feuilleter le catalogue</a><a class="tlink" href="https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf" target="_blank" rel="noopener">Télécharger le PDF</a></div>
+    <div class="flip__cta"><a class="btn" href="https://librery-catalogue-3d.vercel.app/">Feuilleter le catalogue</a><a class="tlink" href="https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf" target="_blank" rel="noopener">Télécharger le PDF</a></div>
     <div class="flip__stage"><div class="flip__book" data-flip>
       <div class="flip__l" style="opacity:0"><img src="/assets/img/catalogue/p02.webp" alt=""></div>
       <div class="flip__r"><img src="/assets/img/catalogue/p15.webp" alt="" loading="lazy"></div>
@@ -61,9 +70,10 @@
   </div>
 </section>
 
-<!-- SECTION : image-banner — la campagne -->
-<section class="s-figure">
-  {{pic hero-emotion|Campagne Skin Obsession|100vw}}
+<!-- SECTION : image-banner — la campagne : l'image s'ouvre de la largeur de la grille au plein écran en arrivant au centre -->
+<section class="s-figure" data-ed>
+  <div class="ed-fr">{{pic hero-emotion|Campagne Skin Obsession|100vw}}</div>
+  <div class="wrap"><p class="ed-cap ed-rv"><i></i><span>Skin Obsession, la campagne</span></p></div>
 </section>
 
 <!-- SECTION : product-grid — Summer Vibes -->
@@ -79,6 +89,6 @@
 </section>
 
 <!-- SECTION : image-mosaic — la campagne Summer Vibes -->
-<section class="block block--tight">
+<section class="ed-sec">
   <div class="wrap" data-mosaic="summer-vibes"></div>
 </section>
