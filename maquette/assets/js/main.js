@@ -19,6 +19,13 @@
   const body = document.body;
   const page = body.dataset.page || '';
 
+  /* Version simplifiée (15/10, retour de Nolwenn et Rafiq : mise en ligne avec moins d'animations, retravaillées ensuite).
+     false : l'accueil d'avant (film Skin Obsession, livre du catalogue, mosaïques légendées), sans écran de chargement,
+     sans chevet 3D, catalogue feuilleté, cascade 3D, effet « feuille » ni cadran 3D du sillage.
+     Rien n'est supprimé : pour tout réactiver, passer ANIMATIONS à true ici et dans build.py, et reprendre
+     src/_anime/index.html et src/_anime/preface.html (le balisage animé) à la place de src/index.html et src/preface.html. */
+  const ANIMATIONS = false;
+
   /* Nom en deux temps : le second mot en italique (« Tonka Love ») */
   const nm = n => { const w = String(n).split(' '); return w.length > 1 ? `${esc(w[0])} <em>${esc(w.slice(1).join(' '))}</em>` : esc(n); };
 
@@ -383,6 +390,8 @@
      Le quadrillage (.ed-grid) est tracé par initEdito sur la mise en page mesurée. */
   const edLine = (html, i, cls = '') => `<span class="ed-l${cls}"><span class="ed-i" style="--i:${i}">${html}</span></span>`;
   const mosaic = key => { const c = COLLECTIONS[key]; if (!c || !c.mosaic) return '';
+    // version simplifiée : la mosaïque légendée d'avant, trois images côte à côte, sans mouvement
+    if (!ANIMATIONS) return `<div class="mosaic">${c.mosaic.map(([img, cap]) => `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}</figure>`).join('')}</div>`;
     const fig = ([img, cap], i) => `<figure class="ed-f ed-f--${'abc'[i]}"><div class="ed-fr">${pic(img, cap, i ? '(max-width: 800px) 62vw, 22vw' : '(max-width: 800px) 86vw, 36vw')}</div>
         <figcaption class="ed-cap"><span class="folio">0${i + 1}</span><i></i><span>${esc(cap)}</span></figcaption></figure>`;
     // au bout de la cascade, à côté de C : l'épigraphe de la collection (une phrase, deux si la première est brève)
@@ -431,6 +440,7 @@
      ligne de lecture atteint la ligne d'or de C (.is-end). Ce qui est tracé ou ouvert le reste : un élément ne se réarme qu'une
      fois sorti par le bas de l'écran (on remonte sans rien voir se défaire). */
   function initEdito() {
+    if (!ANIMATIONS) return;
     if (!('IntersectionObserver' in window && 'ResizeObserver' in window)) return;
     const narrow = matchMedia('(max-width: 800px)'), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const live = new Set(); let raf = 0, pend = 0;
@@ -956,7 +966,7 @@
       ${items.length ? `<section class="block"><div class="wrap">
           <div class="row-head"><div><h2 class="h2">Les parfums</h2></div><span class="ui muted">${items.length} ${items.length > 1 ? 'créations' : 'création'}</span></div>
           <div class="grid">${items.map(card).join('')}${tileInGrid ? trialTile() : ''}</div></div></section>` : ''}
-      ${col.mosaic ? `<section class="ed-sec"><div class="wrap">${mosaic(key)}</div></section>` : ''}
+      ${col.mosaic ? `<section class="${ANIMATIONS ? 'ed-sec' : 'block block--tight'}"><div class="wrap">${mosaic(key)}</div></section>` : ''}
       ${col.chapters.length ? `<section class="block"><div class="wrap chapters">
           ${col.chapters.map(ch => `<article class="split"><h2 class="h2">${ch.h}</h2><div class="prose">${ch.p.map(t => `<p>${t}</p>`).join('')}</div></article>`).join('')}
         </div></section>` : ''}
@@ -975,7 +985,7 @@
   let chevetEcran = null;      // le chevet, pour l'écran : { fichiers, monte } (promesses, initPrechauffe)
   const vers = ms => new Promise(r => setTimeout(r, Math.max(0, ms - performance.now())));   // à l'instant ms de la page
   function initLoader() {
-    const L = $('#loader'); if (!L) return (ecranFini(), essentielFini());
+    const L = $('#loader'); if (!L || !ANIMATIONS) return (L?.remove(), ecranFini(), essentielFini());
     // lien direct vers le catalogue (#feuilleter) : le catalogue a son propre écran de chargement
     if (document.documentElement.classList.contains('is-seen') || location.hash === '#feuilleter') { L.remove(); return (ecranFini(), essentielFini()); }
     const bar = $('.loader__bar i', L), tasks = [];
@@ -1042,6 +1052,7 @@
      Essais : window.__prechauffe = { depart, chevet, fichiers, cadran, images, monte } (en ms depuis l'ouverture). */
   const aMonter = [];          // lancements de scènes 3D qu'on peut avancer (sundial) ; chacun ne part qu'une fois
   function initPrechauffe() {
+    if (!ANIMATIONS) return;
     const c = navigator.connection, lent = !!c && (c.saveData || /2g|3g/.test(c.effectiveType || ''));
     if (lent) return;
     const mem = navigator.deviceMemory, tot = mem ? mem >= 4 : !matchMedia('(pointer: coarse)').matches;
@@ -1281,6 +1292,8 @@
       const u = new URL(a.href), ici = new URL(location.href); ici.hash = a.closest('#catalogue') ? 'catalogue' : '';
       u.searchParams.set('retour', ici.href); a.href = u.href; a.removeAttribute('target'); a.dataset.lecteur = '';
     });
+    // version simplifiée : le catalogue s'ouvre directement, dans le même onglet, avec l'adresse de retour (sans lecteur ni décor)
+    if (!ANIMATIONS) { liens.forEach(a => delete a.dataset.lecteur); return; }
     const livre = $('#catalogue [data-flip]');
     if (livre) { livre.dataset.lecteur = ''; Object.assign(livre, { tabIndex: 0 }); livre.setAttribute('role', 'button'); livre.setAttribute('aria-label', 'Feuilleter le catalogue'); }   // atteignable au clavier
     if (!liens.length && !livre && location.hash !== ANCRE) return;
@@ -1751,6 +1764,7 @@
   function sundial(el, now) {
     let fait; el.dial = new Promise(r => fait = r);          // résolue quand le cadran est à l'écran, ou qu'il n'y sera pas
     const stage = $('.clock__stage', el); if (!stage) return fait();
+    if (!ANIMATIONS) { stage.remove(); return fait(); }   // version simplifiée : l'horloge seule, sans le cadran 3D
     if (!('IntersectionObserver' in window && 'ResizeObserver' in window) || !hasGL2()) { stage.remove(); return fait(); }
     // monté à son approche, ou plus tôt, hors de l'écran, au premier calme après l'écran de chargement (initPrechauffe)
     let lance = false;

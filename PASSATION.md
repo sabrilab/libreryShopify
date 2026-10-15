@@ -34,6 +34,14 @@ Il se lit dans l'ordre : l'essentiel (§0) suffit pour démarrer ; les annexes A
 
 ## 2. Où en est le site (15/10/2026)
 
+> **Version simplifiée (15/10, retour de Nolwenn et Rafiq, mise en ligne visée pour le week-end)** : les animations du tableau
+> ci-dessous sont **masquées, pas supprimées**. Interrupteur `ANIMATIONS = false` dans `maquette/assets/js/main.js` et
+> `maquette/build.py` ; l'accueil et la Préface reprennent le balisage du 12/10 (film Skin Obsession, livre du catalogue,
+> mosaïques légendées) ; le balisage animé est gardé dans `maquette/src/_anime/`. Le film de Sabri (bouchon doré) passe en
+> tête de la collection Summer Vibes (`data.js`). Gardés : toutes les corrections de contenu, images de Nolwenn, nombre d'or,
+> moyens de paiement. Pour réactiver : les deux interrupteurs à `true` et `src/_anime/*.html` à la place de `src/index.html`
+> et `src/preface.html`.
+
 **En ligne** depuis les commits `ead6a58` (boutique) et `88e3c77` (catalogue 3D), puis `7cc2f33` (« Feuilleter » dans le décor du chevet sur un vrai réseau, questions du Portrait olfactif) :
 
 | Fonction | Où | Fichiers principaux |

@@ -55,6 +55,8 @@ def pic(m):
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
     return (f'<img src="{IMG}{name}-m.webp?v={IMGW.get(name, [0, 0, ""])[2]}" srcset="{srcset(name)}" '
             f'sizes="{sizes or "(max-width: 900px) 100vw, 50vw"}" alt="{alt}" {load} decoding="async">')
+# Version simplifiée (15/10) : sans écran de chargement ni effet « feuille » ; à repasser à True avec ANIMATIONS (main.js)
+ANIMATIONS = False
 head = (root / 'src/_head.html').read_text(encoding='utf8')
 for f in sorted((root / 'src').glob('[!_]*.html')):
     src = f.read_text(encoding='utf8')
@@ -63,12 +65,12 @@ for f in sorted((root / 'src').glob('[!_]*.html')):
     body = re.sub(r'(/assets/img/v2/([\w-]+?)(-m)?\.webp)"', lambda m: '%s?v=%s"' % (m.group(1), IMGW.get(m.group(2), [0, 0, ''])[2]), body)
     body = body.replace('{{logo-couverture}}', (root / 'assets/img/v2/logo-couverture.svg').read_text()).replace('{{logo}}', (root / 'assets/img/v2/logo-librery.svg').read_text())
     css = '/assets/css/style.css?v=' + ver('/assets/css/style.css')
-    js = ''.join('<script src="/assets/js/%s?v=%s"></script>\n' % (n, ver('/assets/js/' + n)) for n in ('logo.js', 'imgw.js', 'data.js', 'paiement.js', 'feuille.js', 'main.js'))
+    js = ''.join('<script src="/assets/js/%s?v=%s"></script>\n' % (n, ver('/assets/js/' + n)) for n in ('logo.js', 'imgw.js', 'data.js', 'paiement.js') + (('feuille.js',) if ANIMATIONS else ()) + ('main.js',))
     s3d = '/assets/js/sillage3d.js?v=' + ver('/assets/js/sillage3d.js')     # module importé à la demande (carte d'import)
     out = (head.replace('{{TITLE}}', meta.get('title', 'LIBRERY')).replace('/assets/css/style.css', css).replace('/assets/js/sillage3d.js', s3d)
            + '</head>\n<body data-page="%s" class="%s"%s%s>\n' % (meta.get('page', ''), meta.get('body', ''),
                  (' data-run="%s"' % meta['run']) if meta.get('run') else '', (' data-folio="%s"' % meta['folio']) if meta.get('folio') else '')
-           + '<div class="loader" id="loader" aria-hidden="true">' + (root / 'assets/img/v2/logo-librery.svg').read_text() + '<span class="loader__bar"><i></i></span></div>\n'
+           + ('<div class="loader" id="loader" aria-hidden="true">' + (root / 'assets/img/v2/logo-librery.svg').read_text() + '<span class="loader__bar"><i></i></span></div>\n' if ANIMATIONS else '')
            + '<div id="site-header"></div>\n<main>\n' + body.rstrip() + '\n</main>\n<div id="site-footer"></div>\n'
            + meta.get('scripts', '').replace('\\n', '\n')
            + js + '</body>\n</html>\n')

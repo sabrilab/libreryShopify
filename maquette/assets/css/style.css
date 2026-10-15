@@ -1025,3 +1025,48 @@ html.lecteur-ouvert { overflow: hidden; scrollbar-gutter: stable; }
 .loader__bar i { display: block; width: 0; height: 100%; background: var(--gold); transition: width .5s ease; }
 .is-seen .loader, .loader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
 @keyframes loader-securite { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+
+/* ==========================================================================
+   Version simplifiée (15/10, retour de Nolwenn et Rafiq) : l’ancienne mosaïque légendée et le livre du catalogue,
+   repris tels qu’au 12/10. Utilisés quand ANIMATIONS = false (main.js, build.py).
+   ========================================================================== */
+/* ---------- Mosaïque légendée ---------- */
+.mosaic { display: grid; grid-template-columns: 5fr 3fr 4fr; gap: 20px; align-items: end; }
+.mosaic figure { margin: 0; }
+.mosaic img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; background: var(--studio); }
+.mosaic figure:nth-child(2) { align-self: start; }
+.mosaic figure:nth-child(2) img { aspect-ratio: 3 / 4; }
+@media (max-width: 800px) {
+  .mosaic { grid-template-columns: 1fr 1fr; gap: 24px 10px; }
+  .mosaic figure:first-child { grid-column: span 2; }
+}
+
+/* ---------- Le catalogue : un livre ouvert (couverture + index) ---------- */
+.book { background: var(--paper-2); padding: 112px 0; }
+.book__in { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: center; }
+.book__cover { grid-column: 2 / 6; position: relative; display: block; transition: transform .6s cubic-bezier(.16, .6, .2, 1); }
+.book__cover img { display: block; width: 100%; aspect-ratio: 1448 / 2048; object-fit: cover; box-shadow: 0 1px 0 rgba(58,42,30,.08), 0 34px 60px -30px rgba(58,42,30,.45); }
+/* le dos du livre : un pli de lumière sur le bord gauche */
+.book__cover::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 5%; background: linear-gradient(90deg, rgba(0,0,0,.14), rgba(255,255,255,.18) 45%, rgba(0,0,0,0)); pointer-events: none; }
+@media (hover: hover) { .book__cover:hover { transform: translateY(-6px); } }
+.book__page { grid-column: 7 / 12; }
+.book__kicker { font-family: var(--sans); font-size: 12px; color: var(--grey); margin: 0 0 12px; }
+.book__toc { list-style: none; margin: 32px 0 0; padding: 0; border-top: 1px solid var(--ink); }
+.book__toc a { display: grid; grid-template-columns: 1fr 56px; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.book__t { font-size: 22px; line-height: 1.2; }
+.book__t small { display: block; font-family: var(--sans); font-size: 12.5px; color: var(--grey); margin-top: 5px; line-height: 1.4; }
+.book__th { display: block; width: 56px; aspect-ratio: 4 / 5; overflow: hidden; background: var(--studio); }
+.book__th img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.16, .6, .2, 1); }
+@media (hover: hover) { .book__toc a:hover .book__th img { transform: scale(1.08); } .book__toc a:hover .book__t { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; } }
+.book__cta { display: flex; align-items: center; gap: 28px; margin-top: 36px; flex-wrap: wrap; }
+@media (max-width: 900px) {
+  .book { padding: 72px 0; }
+  .book__in { display: block; }
+  .book__cover { width: 64%; margin: 0 auto 48px; }
+  .book__toc a { grid-template-columns: 1fr 48px; gap: 12px; padding: 14px 0; }
+  .book__t { font-size: 19px; }
+  .book__th { width: 48px; }
+  .book__cta { gap: 20px; }
+  .book__cta .btn { flex: 1 1 100%; text-align: center; }
+}
+

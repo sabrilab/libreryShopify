@@ -303,6 +303,8 @@ const COLLECTIONS = {
     title: 'Summer Vibes', folio: 14, number: '02', chapter: 'Collection I', kicker: 'Collection',
     tiles: 'grid',
     hero: 'hero-summer',
+    // le film LIBRERY (bouchon doré, envoyé par Sabri le 15/10) : en tête de l'onglet Summer Vibes (retour de Nolwenn, 15/10)
+    video: '/assets/video/film-librery.mp4', videoMobile: '/assets/video/film-librery-m.mp4',
     epigraph: 'Certains étés ne s’achèvent jamais vraiment. Ils persistent sous la peau, dans l’éclat des souvenirs, dans cette chaleur invisible que l’on croyait avoir laissée derrière soi.',
     intro: [
       "L’été a quelque chose de singulier. Pendant quelques semaines précieuses, le temps semble ralentir. Les jours s’étirent sous une lumière sans fin, les heures perdent de leur importance et le quotidien s’éloigne doucement.",
