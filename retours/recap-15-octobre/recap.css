@@ -1,0 +1,20 @@
+/* ---------- PDF « Depuis le 12 octobre » : compléments à livraison.css et retours.css ---------- */
+.pair--one { grid-template-columns: 1fr; }
+.pair--wide { grid-template-columns: 1fr 260px; }
+.sh--plain .sh__img img { box-shadow: none; background: transparent; }
+.hid { margin: 0; align-self: flex-start; padding: 8px 14px; border: 1px solid var(--gold); color: var(--gold); font-family: var(--sans); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; }
+.div3d { position: absolute; left: 110px; top: 250px; width: 900px; }
+.div3d h1 { font-family: var(--display); font-weight: 400; font-size: 92px; line-height: 1.02; margin: 0 0 40px; color: #efe6d6; }
+.div3d h1 i { font-family: var(--serif); }
+.chev { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; flex: 1; min-height: 0; }
+.sil { justify-content: flex-start !important; gap: 18px !important; }
+.sil .sh__img img { box-shadow: none; background: transparent; mix-blend-mode: multiply; }
+.sil__big .sh__img img { max-height: 400px; }
+.sil__row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.sil__row .sh__img img { max-height: 190px; }
+.chevm { justify-content: flex-start !important; }
+.chev { flex: 0 0 auto; }
+.chev .sh__img img { max-height: 330px; }
+.we { display: grid; gap: 22px; height: 100%; }
+.we__row { display: grid; grid-template-columns: 1fr 150px; gap: 18px; min-height: 0; }
+.we__row .sh__img img { max-height: 300px; }
