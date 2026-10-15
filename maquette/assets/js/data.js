@@ -82,7 +82,7 @@ const PRODUCTS = [
   {
     handle: 'vanilla-plum', folio: 39, name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une douceur que l’on veut retenir.',
-    keyNotes: 'Prune · Accord lait · Vanille', families: ['Gourmand', 'Ambré'],
+    keyNotes: 'Prune · Cuir · Vanille', families: ['Gourmand', 'Ambré'],
     pack: 'vanilla-plum-pack', card: 'vanilla-plum-1', pack30: 'vanilla-plum-pack30', scene: 'vanilla-plum-2',
     gallery: ['vanilla-plum-pack', 'vanilla-plum-pack30', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres', 'vanilla-plum-1'],
     description: [
@@ -93,10 +93,10 @@ const PRODUCTS = [
       "Dans le sillage, deux vanilles révèlent leurs facettes contrastées : la vanille de Tahiti, douce, poudrée et amandée, puis la vanille Planifolia de Madagascar, plus riche et plus profonde. Le benjoin Siam, la tonka et les bois ambrés prolongent cette chaleur."
     ],
     coda: ['Une sensation à découvrir.', 'Une empreinte à retenir.', 'Une irrésistible envie d’y revenir.'],
-    notes: { tete: 'Prune, Cannelle', coeur: 'Accord lait, Cuir de Grasse, Myrrhe, Vanille de Tahiti', fond: 'Vanille Planifolia de Madagascar, Ambre, Benjoin Siam' },
+    notes: { tete: 'Prune, Cannelle', coeur: 'Lait, Cuir de Grasse, Myrrhe, Vanille de Tahiti', fond: 'Vanille Planifolia de Madagascar, Ambre, Benjoin Siam' },
     materials: {
       title: 'Entre douceur et profondeur',
-      list: { tete: 'Cannelle SFE, Prune séchée STT, Amande', coeur: 'Accord lait, Cuir de Grasse, Vanille Tahitensis (infusion)', fond: 'Vanille Planifolia Madagascar SFE, Benjoin Siam, Accord tonka' },
+      list: { tete: 'Cannelle SFE, Prune séchée STT, Amande', coeur: 'Lait, Cuir de Grasse, Vanille Tahitensis (infusion)', fond: 'Vanille Planifolia Madagascar SFE, Benjoin Siam, Tonka' },
       text: [
         "Au cœur de Vanilla Plum, deux vanilles d’exception révèlent deux facettes complémentaires de la précieuse gousse. La vanille de Tahiti apporte une expression délicate, poudrée, amandée et subtilement florale ; douce et raffinée, elle prolonge naturellement la note d’amande.",
         "À l’inverse, la vanille Planifolia de Madagascar, extraite par SFE — extraction au CO₂ supercritique —, révèle une expression plus riche et plus profonde. Ce procédé capte avec une précision remarquable les facettes naturelles de la gousse et lui donne chaleur, profondeur et densité.",
@@ -108,7 +108,7 @@ const PRODUCTS = [
   {
     handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une attraction florale.',
-    keyNotes: 'Poire · Tubéreuse · Santal', families: ['Floral', 'Fruité'],
+    keyNotes: 'Sésame · Tubéreuse · Santal', families: ['Floral', 'Fruité'],
     pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', pack30: 'magnetic-flowers-pack30', scene: 'magnetic-flowers-1',
     gallery: ['magnetic-flowers-pack', 'magnetic-flowers-pack30', 'magnetic-flowers-1', 'magnetic-flowers-mod', 'poire-livres', 'magnetic-flowers-30'],
     description: [
@@ -119,22 +119,22 @@ const PRODUCTS = [
       "En s’installant, le santal enveloppe les fleurs d’une chaleur douce et crémeuse. L’ambre approfondit le sillage, tandis que les muscs blancs laissent une impression propre et enveloppante."
     ],
     coda: ['Un bouquet qui attire.', 'Une présence qui demeure.', 'Une sensation que l’on veut revivre.'],
-    notes: { tete: 'Accord poire, Sauge sclarée, Sésame', coeur: 'Accord néroli, Tubéreuse, Jasmin Sambac, Ylang-ylang, Fleur d’oranger', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
+    notes: { tete: 'Poire, Sauge sclarée, Sésame', coeur: 'Néroli, Tubéreuse, Jasmin Sambac, Ylang-ylang, Fleur d’oranger', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
     materials: {
       title: 'L’attraction des fleurs blanches',
-      list: { tete: 'Accord poire, Sauge sclarée FirAbs, Sésame SFE', coeur: 'Accord néroli, Tubéreuse FirAbs, Jasmin Sambac Inde Abs, Ylang Ess, Fleur d’oranger Abs', fond: 'Santal d’Australie FirAbs, Accord ambre, Muscs blancs' },
+      list: { tete: 'Poire, Sauge sclarée, Sésame SFE', coeur: 'Néroli, Tubéreuse, Jasmin Sambac Inde Abs, Ylang Ess, Fleur d’oranger Abs', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
       text: [
         "Magnetic Flowers se construit sur la tension entre la fraîcheur, les facettes vertes et l’opulence crémeuse des fleurs blanches.",
-        "En ouverture, la poire apporte une fraîcheur juteuse et lumineuse. Elle rencontre la sauge sclarée FirAbs, qui introduit une dimension verte et aromatique, tandis que le sésame SFE révèle des facettes toastées, céréalières et gourmandes.",
-        "Au cœur, les fleurs blanches prennent le devant de la scène. La tubéreuse FirAbs apporte un caractère crémeux, solaire et opulent ; l’absolue de jasmin Sambac d’Inde ajoute de la profondeur ; l’huile essentielle d’ylang-ylang assure une transition soyeuse vers les fleurs plus riches.",
-        "En fond, le santal d’Australie FirAbs apporte une texture boisée crémeuse, lactée et chaude. L’ambre renforce la profondeur, les muscs blancs adoucissent la structure. Fraîche et chaude, verte et crémeuse, lumineuse et enveloppante : une architecture olfactive construite sur le contraste."
+        "En ouverture, la poire apporte une fraîcheur juteuse et lumineuse. Elle rencontre la sauge sclarée, qui introduit une dimension verte et aromatique, tandis que le sésame SFE révèle des facettes toastées, céréalières et gourmandes.",
+        "Au cœur, les fleurs blanches prennent le devant de la scène. La tubéreuse apporte un caractère crémeux, solaire et opulent ; l’absolue de jasmin Sambac d’Inde ajoute de la profondeur ; l’huile essentielle d’ylang-ylang assure une transition soyeuse vers les fleurs plus riches.",
+        "En fond, le santal d’Australie apporte une texture boisée crémeuse, lactée et chaude. L’ambre renforce la profondeur, les muscs blancs adoucissent la structure. Fraîche et chaude, verte et crémeuse, lumineuse et enveloppante : une architecture olfactive construite sur le contraste."
       ]
     }
   },
   {
     handle: 'tonka-love', folio: 43, name: 'Tonka Love', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’irrésistible chaleur de la tonka.',
-    keyNotes: 'Amande grillée · Caramel salé · Tonka', families: ['Gourmand', 'Boisé'],
+    keyNotes: 'Cardamome · Tonka · Cèdre', families: ['Gourmand', 'Boisé'],
     pack: 'tonka-love-pack', card: 'tonka-love-1', pack30: 'tonka-love-pack30', scene: 'tonka-love-1',
     gallery: ['tonka-love-pack', 'tonka-love-pack30', 'tonka-love-1', 'tonka-love-mod', 'tonka-capot', 'tonka-love-2'],
     description: [
@@ -234,7 +234,7 @@ const PRODUCTS = [
     tagline: 'Une préface à la collection.',
     description: [
       "La maison LIBRERY vous invite à parcourir sa bibliothèque olfactive. Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml. Chaque fragrance révèle un souvenir, une émotion, un chapitre à explorer au fil de votre lecture sensorielle.",
-      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. Valable 90 jours, il peut être utilisé lors de l’achat d’un parfum 100 ml."
+      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. À usage unique et valable 30 jours, il s’utilise uniquement sur un parfum 100 ml."
     ]
   },
   {
@@ -247,7 +247,7 @@ const PRODUCTS = [
     tagline: 'Composez votre propre préface : cinq parfums de la bibliothèque, choisis par vous.',
     description: [
       "Parce que chaque lecteur a sa manière de parcourir une bibliothèque, le Coffret à composer vous laisse choisir cinq extraits parmi toutes nos créations, en format 2 ml.",
-      "Comme pour le Coffret Découverte, un code de la valeur du coffret vous est envoyé après commande, valable 90 jours sur un flacon 100 ml."
+      "Comme pour le Coffret Découverte, un code de la valeur du coffret vous est envoyé après commande, valable 30 jours sur un flacon 100 ml."
     ]
   },
   {
@@ -324,7 +324,7 @@ const COLLECTIONS = {
     title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
     hero: 'hero-collection',
     epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',
-    intro: ["Nos coffrets ouvrent les premières pages de chaque collection. La valeur du coffret 2 ml vous est recréditée sur l’achat d’un parfum 100 ml, pendant 90 jours."],
+    intro: ["Nos coffrets ouvrent les premières pages de chaque collection. La valeur du Coffret Découverte 2 ml vous est recréditée sur l’achat d’un parfum 100 ml, pendant 30 jours."],
     chapters: []
   },
   'bougies': {
@@ -347,8 +347,8 @@ const SHELF = [
   { img: 'hot-sand-1', t: 'Le jasmin', h: 'hot-sand' }
 ];
 
-/* Points de vente — liste envoyée par LIBRERY le 12/10/2026, géocodée avec OpenStreetMap (Nominatim).
-   Au niveau de la rue seulement : Les Passionnez, Imm Couture, La Rouge, Kyomu, Amyris Essenze. `online` : sans adresse ni repère. */
+/* Points de vente — liste envoyée par LIBRERY le 12/10/2026 (13/10 : Imm Couture et Odor BXL retirés, Olfactions ajouté), géocodée avec OpenStreetMap (Nominatim).
+   Au niveau de la rue seulement : Les Passionnez, La Rouge, Kyomu, Amyris Essenze. `online` : sans adresse ni repère. */
 const STORES = [
   { name: 'Maison Diaphane', address: '11 Rue des Lices', city: '49100 Angers', country: 'France', phone: '+33 2 41 09 15 70', url: 'https://maison-diaphane.com/', lat: 47.4686, lng: -0.5539 },
   { name: 'Les Passionnez', address: '43 avenue Fortuné Ferrini', city: '13080 Aix-en-Provence', country: 'France', phone: '+33 6 83 22 24 45', url: 'https://lespassionnez.com/', lat: 43.4879, lng: 5.4236 },
@@ -356,7 +356,7 @@ const STORES = [
   { name: 'Parfumerie Basic', address: '39 Rue Jeanne-d’Arc', city: '51100 Reims', country: 'France', phone: '+33 7 67 77 67 05', url: 'https://www.parfumerie-basic.fr/', lat: 49.2548, lng: 4.025 },
   { name: 'Secret Garden', address: '90 Avenue Pasteur', city: '93260 Les Lilas', country: 'France', url: 'https://secretsgarden.fr', lat: 48.876, lng: 2.4153 },
   { name: 'DSB Parfums', address: '186 Boulevard de Stalingrad', city: '94500 Champigny-sur-Marne', country: 'France', phone: '+33 1 80 91 22 16', url: 'https://dsb-parfums.fr/', lat: 48.8235, lng: 2.4968 },
-  { name: 'Imm Couture', address: '1 Avenue du Président John Fitzgerald Kennedy', city: '78340 Les Clayes-sous-Bois', country: 'France', phone: '+33 7 63 87 26 96', url: 'https://immcouture.com/', lat: 48.8296, lng: 1.9792 },
+  { name: 'Olfactions', address: '10 Avenue Winston Churchill', city: '31100 Toulouse', country: 'France', url: 'https://olfactions.fr', lat: 43.5688, lng: 1.4013 },
   { name: 'Sillâge', address: '9 Rue aux Juifs', city: '76000 Rouen', country: 'France', url: 'https://sillage-parfums.fr/', lat: 49.4416, lng: 1.0939 },
   { name: 'UNI/VERE Parfumerie', address: '30 Rue d’Aboukir', city: '75002 Paris', country: 'France', phone: '+33 9 86 47 67 13', lat: 48.867, lng: 2.3446 },
   { name: 'Smell Fragrance', address: '26 Rue des Cordeliers', city: '64000 Pau', country: 'France', phone: '+33 6 59 67 00 91', url: 'https://smellfragrance.fr/', lat: 43.2972, lng: -0.3718 },
@@ -365,7 +365,6 @@ const STORES = [
   { name: 'Absolute Fragrance', address: '2150 W First St, Ste 3B', city: 'Fort Myers, FL 33901', country: 'États-Unis', phone: '+1 215-251-4466', url: 'https://www.absolutefragrances.com/', lat: 26.639, lng: -81.8777 },
   { name: 'Scents Eternal', address: '9351 Warren Parkway', city: 'Frisco, TX 75035', country: 'États-Unis', url: 'https://scentseternal.com/', lat: 33.1092, lng: -96.8019 },
   { name: 'BeautyLIV', address: '', city: '', country: 'États-Unis', url: 'https://www.beautyliv.com', online: true },
-  { name: 'Odor BXL', address: 'Rue Edouard Faes 100', city: '1090 Bruxelles', country: 'Belgique', phone: '+32 467 64 18 75', url: 'https://odorbxl.com/', note: 'Sur rendez-vous', lat: 50.8716, lng: 4.3318 },
   { name: 'Parfum Exquis', address: '4956 Boulevard Décarie', city: 'Montréal, QC H3X 2H7', country: 'Canada', phone: '+1 438-930-5109', url: 'https://parfumexquis.com/', lat: 45.4827, lng: -73.6279 },
   { name: 'Pua Pua Duftkonzept', address: 'Lammstraße 7', city: '76133 Karlsruhe', country: 'Allemagne', phone: '+49 721 96316088', url: 'https://puapua.de/', lat: 49.0092, lng: 8.4028 },
   { name: 'La Rouge Perfumes', address: 'G5, Park View', city: 'Erbil 44001', country: 'Irak', phone: '+964 750 600 8000', url: 'http://larouge.vip/', lat: 36.2095, lng: 43.9822 },

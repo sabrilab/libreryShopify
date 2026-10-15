@@ -1807,7 +1807,7 @@
             <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><span class="builder__thumb">${packPic(x.pack, '', '(max-width: 800px) 30vw, 9vw', '', true)}</span><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
           <button class="btn btn--block" id="add" ${p.builder ? 'disabled' : ''}>${cta()}</button>
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
-          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, valable 90 jours sur un flacon 100 ml.`}</p>
+          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, à usage unique et valable 30 jours sur un flacon 100 ml.`}</p>
           <p class="pdp__small">Expédié sous 24 h ouvrées depuis Paris, livré ${eta()}. Deux échantillons offerts.</p>
           ${perf ? `<p class="pdp__by">Composé par <a href="#parfumeur">${esc(perf.name)}</a></p>` : ''}
           <div class="accordion">
