@@ -178,7 +178,7 @@ page(head('06', 'Le chevet, rendu dans Blender', 'Une séquence d’images qui s
     <aside class="ch__side">{done(['Ce ne sera plus de la 3D calculée dans le navigateur : une séquence d’images rendues dans Blender, en haute définition',
       'La séquence s’anime au défilement : plus on descend, plus la caméra avance vers le catalogue. Plus fluide sur téléphone, net sur écran Retina',
       'Le flacon en clair-obscur, le plateau en noyer, le catalogue posé dessus',
-      '121 images par format ; la version iPhone se termine aujourd’hui, la version ordinateur suit'])}{hidden()}</aside>
+      '121 images par format ; la version iPhone est terminée, la version ordinateur suit'])}{hidden()}</aside>
     <div class="ch__main chevm"><div class="chev">{shot(S['ch000'], CH_LBL[0])}{shot(S['ch064'], CH_LBL[1])}{shot(S['ch082'], CH_LBL[2])}</div>
       {shot(S['planche'], CH_LBL[3], cls='sh--plain')}</div>
   </div>''', 'paper2')
