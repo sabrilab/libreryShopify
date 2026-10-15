@@ -44,6 +44,11 @@ const FORMATS = [
   { id: '30', label: '30 ml', price: 90 },
   { id: '2', label: '2 ml', price: 7 }
 ];
+/* Format pas encore en stock : `soon: ['100']` sur le produit (Skin Obsession, retour de Rafiq le 15/10).
+   Le format reste affiché mais ne s'ajoute pas au panier ; la date viendra dans SOON_NOTE quand elle sera fixée.
+   Shopify : variante 100 ml en « continuer à vendre » = non, avec le même message (métachamp ou bloc du thème). */
+const SOON_LABEL = 'Bientôt disponible';
+const SOON_NOTE = 'Le 100 ml arrive très bientôt : les précommandes ouvriront prochainement. En attendant, le 30 ml et l’échantillon 2 ml sont disponibles.';
 
 const PERFUMERS = {
   'chris-maurice': {
@@ -80,7 +85,7 @@ const PERFUMERS = {
 const PRODUCTS = [
   /* ============ Skin Obsession — Collection II (nouveauté) ============ */
   {
-    handle: 'vanilla-plum', folio: 39, name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    handle: 'vanilla-plum', folio: 39, name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une douceur que l’on veut retenir.',
     keyNotes: 'Prune · Cuir · Vanille', families: ['Gourmand', 'Ambré'],
     pack: 'vanilla-plum-pack', card: 'vanilla-plum-1', pack30: 'vanilla-plum-pack30', scene: 'vanilla-plum-2',
@@ -106,7 +111,7 @@ const PRODUCTS = [
     }
   },
   {
-    handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une attraction florale.',
     keyNotes: 'Sésame · Tubéreuse · Santal', families: ['Floral', 'Fruité'],
     pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', pack30: 'magnetic-flowers-pack30', scene: 'magnetic-flowers-1',
@@ -132,7 +137,7 @@ const PRODUCTS = [
     }
   },
   {
-    handle: 'tonka-love', folio: 43, name: 'Tonka Love', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    handle: 'tonka-love', folio: 43, name: 'Tonka Love', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
     tagline: 'L’irrésistible chaleur de la tonka.',
     keyNotes: 'Cardamome · Tonka · Cèdre', families: ['Gourmand', 'Boisé'],
     pack: 'tonka-love-pack', card: 'tonka-love-1', pack30: 'tonka-love-pack30', scene: 'tonka-love-1',
@@ -234,7 +239,7 @@ const PRODUCTS = [
     tagline: 'Une préface à la collection.',
     description: [
       "La maison LIBRERY vous invite à parcourir sa bibliothèque olfactive. Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml. Chaque fragrance révèle un souvenir, une émotion, un chapitre à explorer au fil de votre lecture sensorielle.",
-      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. À usage unique et valable 30 jours, il s’utilise uniquement sur un parfum 100 ml."
+      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. À usage unique et valable 30 jours, il s’utilise uniquement sur un parfum 100 ml et n’est pas cumulable avec un autre code (dont celui de bienvenue de 10 %)."
     ]
   },
   {
@@ -326,7 +331,7 @@ const COLLECTIONS = {
     title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
     hero: 'hero-collection',
     epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',
-    intro: ["Nos coffrets ouvrent les premières pages de chaque collection. La valeur du Coffret Découverte 2 ml vous est recréditée sur l’achat d’un parfum 100 ml, pendant 30 jours."],
+    intro: ["Nos coffrets ouvrent les premières pages de chaque collection. La valeur du Coffret Découverte 2 ml vous est recréditée sur l’achat d’un parfum 100 ml, pendant 30 jours (code non cumulable)."],
     chapters: []
   },
   'bougies': {

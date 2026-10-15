@@ -15,6 +15,7 @@
   const byHandle = h => PRODUCTS.find(p => p.handle === h);
   const formatsOf = p => p.formats || FORMATS;
   const minPrice = p => Math.min(...formatsOf(p).map(f => f.price));
+  const isSoon = (p, f) => !!(p.soon && p.soon.includes(f.id));   // format pas encore en stock (data.js : soon)
   const FREE_SHIPPING = 100;
   const body = document.body;
   const page = body.dataset.page || '';
@@ -191,7 +192,7 @@
       <section class="block" aria-label="Services"><div class="wrap">
         ${page === 'services' ? '' : `<div class="services">${SERVICES.map(x => `<a href="/services">${icon(x.i)}<b>${x.t}</b><span>${x.d}</span></a>`).join('')}</div>`}
         ${$('main form[data-news]') ? '' : `<div class="letter"${page === 'services' ? '' : ' style="margin-top:56px"'}>
-          <div><h2 class="h2">Lettre de la maison</h2><p>Les nouveaux chapitres avant tout le monde, et un 2 ml glissé dans votre première commande.</p></div>
+          <div><h2 class="h2">Lettre de la maison</h2><p>Les nouveaux chapitres avant tout le monde, et 10 % sur tout le site : votre code de bienvenue arrive dès l’inscription.</p></div>
           <form class="field-line" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail"><button>S’inscrire</button></form>
         </div>`}
       </div></section>
@@ -337,7 +338,7 @@
       ? `<video class="card__scene" src="${p.video}" poster="${src(p.scene)}" muted loop playsinline preload="none"></video>`
       : p.scene ? packPic(p.scene, '', S_CARD, 'card__scene') : '';
     const prices = isPerfume
-      ? `<span class="card__fmts"><span>${f[0].label} — ${eur(f[0].price)}</span>${f30 && p.pack30 ? `<span class="card__f30" data-f30>${f30.label} — ${eur(f30.price)}</span>` : ''}</span>`
+      ? `<span class="card__fmts"><span>${f[0].label} — ${isSoon(p, f[0]) ? SOON_LABEL.toLowerCase() : eur(f[0].price)}</span>${f30 && p.pack30 ? `<span class="card__f30" data-f30>${f30.label} — ${eur(f30.price)}</span>` : ''}</span>`
       : `<span class="card__meta">${esc(p.subtitle || p.type)} — dès ${eur(minPrice(p))}</span>`;
     return `
       <a class="card" href="/produit?p=${p.handle}">
@@ -417,7 +418,7 @@
     $$('.acc > button', root).forEach(b => { if (b.dataset.bound) return; b.dataset.bound = 1; b.addEventListener('click', () => { const o = b.parentElement.classList.toggle('is-open'); b.setAttribute('aria-expanded', o); }); });
   }
   function newsletters() {
-    $$('form[data-news]').forEach(f => { if (f.dataset.bound) return; f.dataset.bound = 1; f.addEventListener('submit', e => { e.preventDefault(); f.insertAdjacentHTML('afterend', '<p class="ok">Merci, à très bientôt.</p>'); f.remove(); }); });
+    $$('form[data-news]').forEach(f => { if (f.dataset.bound) return; f.dataset.bound = 1; f.addEventListener('submit', e => { e.preventDefault(); f.insertAdjacentHTML('afterend', `<p class="ok">${f.closest('.letter')?.querySelector('h2')?.textContent === 'Lettre de la maison' ? 'Merci. Votre code de bienvenue de 10 % vous attend dans votre boîte mail.' : 'Merci, à très bientôt.'}</p>`); f.remove(); }); });
   }
 
   /* Mise en page éditoriale au défilement (mosaïques, images de campagne, préface, parfumeur).
@@ -1801,7 +1802,7 @@
     const perfumes = PRODUCTS.filter(x => !x.type);
     const related = PRODUCTS.filter(x => x.handle !== p.handle && x.collection === p.collection).concat(PRODUCTS.filter(x => x.collection !== p.collection && !x.type)).slice(0, 3);
     const acc = (t, c) => `<div class="acc"><button type="button" aria-expanded="false">${t}</button><div class="acc__panel">${c}</div></div>`;
-    const cta = () => p.builder && picks.length < p.builder ? `Choisissez encore ${p.builder - picks.length} parfum${p.builder - picks.length > 1 ? 's' : ''}` : `Ajouter au panier — ${eur(current.price)}`;
+    const cta = () => isSoon(p, current) ? `${current.label} — ${SOON_LABEL.toLowerCase()}` : p.builder && picks.length < p.builder ? `Choisissez encore ${p.builder - picks.length} parfum${p.builder - picks.length > 1 ? 's' : ''}` : `Ajouter au panier — ${eur(current.price)}`;
     const story = p.description.slice(0, 2), more = p.description.slice(2);
     // une seule pyramide : si la « lecture des matières » (catalogue) existe, elle fait foi
     const notes = p.materials ? p.materials.list : p.notes;
@@ -1825,12 +1826,13 @@
           ${p.keyNotes && isPerfume ? `<p class="pdp__notes-line">${esc(p.keyNotes.replace(/ · /g, ', '))}</p>` : ''}
           ${p.families && isPerfume ? `<p class="pdp__fams">Famille ${p.families.map(f => `<a href="/bibliotheque?famille=${encodeURIComponent(f)}#familles">${f}</a>`).join(' · ')}</p>` : ''}
           <p class="pdp__desc">${p.tagline}</p>
-          ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${eur(f.price)}</small></button>`).join('')}</div>` : ''}
+          ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${isSoon(p, f) ? SOON_LABEL : eur(f.price)}</small></button>`).join('')}</div>` : ''}
           ${p.builder ? `<div class="builder"><div class="builder__head"><span>Vos parfums</span><b id="b-count">0 / ${p.builder}</b></div>
             <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><span class="builder__thumb">${packPic(x.pack, '', '(max-width: 800px) 30vw, 9vw', '', true)}</span><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
-          <button class="btn btn--block" id="add" ${p.builder ? 'disabled' : ''}>${cta()}</button>
+          <button class="btn btn--block" id="add" ${p.builder || isSoon(p, current) ? 'disabled' : ''}>${cta()}</button>
+          ${p.soon ? `<p class="pdp__soon" id="soon"${isSoon(p, current) ? '' : ' hidden'}>${esc(SOON_NOTE)}</p>` : ''}
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
-          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, à usage unique et valable 30 jours sur un flacon 100 ml.`}</p>
+          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, à usage unique et valable 30 jours sur un flacon 100 ml, non cumulable avec un autre code.`}</p>
           <p class="pdp__small">Expédié sous 24 h ouvrées depuis Paris, livré ${eta()}. Deux échantillons offerts.</p>
           ${perf ? `<p class="pdp__by">Composé par <a href="#parfumeur">${esc(perf.name)}</a></p>` : ''}
           <div class="accordion">
@@ -1873,7 +1875,7 @@
         <div class="grid grid--rail">${related.map(card).join('')}</div>
       </div></section>`;
     // barre d'achat collante : hors de <main>, que le glissement du lecteur (transformation de <main>) ne l'emporte pas
-    $('main').insertAdjacentHTML('afterend', `<div class="sticky-buy" id="sticky" aria-hidden="true"><div class="wrap"><span class="n">${nm(p.name)}<span id="st-var">${esc(current.label)}</span></span><button class="btn" id="st-add">Ajouter — <span id="st-price">${eur(current.price)}</span></button></div></div>`);
+    $('main').insertAdjacentHTML('afterend', `<div class="sticky-buy" id="sticky" aria-hidden="true"><div class="wrap"><span class="n">${nm(p.name)}<span id="st-var">${esc(current.label)}</span></span><button class="btn" id="st-add"${isSoon(p, current) ? ' disabled' : ''}>Ajouter — <span id="st-price">${isSoon(p, current) ? SOON_LABEL.toLowerCase() : eur(current.price)}</span></button></div></div>`);
 
     const shown = () => $$('#gallery figure:not([hidden])');
     const count = () => { const g = $('#gallery'), n = shown().length; $('#gcount').textContent = `${Math.min(n, Math.round(g.scrollLeft / (g.clientWidth || 1)) + 1)} / ${n}`; };
@@ -1894,11 +1896,13 @@
     const setFormat = id => {
       current = fmts.find(f => f.id === id) || current;
       $$('#sizes button').forEach(x => x.classList.toggle('is-active', x.dataset.f === current.id));
-      $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-price').textContent = eur(current.price);
+      $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-price').textContent = isSoon(p, current) ? SOON_LABEL.toLowerCase() : eur(current.price);
+      if (p.soon) { const soon = isSoon(p, current); $('#add').disabled = soon; $('#st-add').disabled = soon; $('#soon').hidden = !soon; }
       showPack(p.fmtImages ? current.id : current.id === '30' ? '30' : '100');
     };
     $$('#sizes button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.f)));
     const add = () => {
+      if (isSoon(p, current)) return;
       if (p.builder) { if (picks.length !== p.builder) { $('.builder').scrollIntoView({ behavior: 'smooth', block: 'center' }); return toast(`Choisissez ${p.builder} parfums`); } return addToCart(p.handle, current.id, [...picks]); }
       addToCart(p.handle, current.id);
     };
