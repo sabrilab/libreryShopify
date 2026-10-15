@@ -1,0 +1,27 @@
+{%- comment -%} Généré par shopify/build_theme.py : attributs <body> et scripts propres à chaque page de la maquette. {%- endcomment -%}
+{%- case lp -%}
+  {%- when 'index' -%}
+    {%- if partie == 'body' -%}data-page="home" class="page-home"{%- else -%}{%- endif -%}
+  {%- when 'bibliotheque' -%}
+    {%- if partie == 'body' -%}data-page="bibliotheque" class="" data-run="La Bibliothèque"{%- else -%}{%- endif -%}
+  {%- when 'preface' -%}
+    {%- if partie == 'body' -%}data-page="preface" class="" data-run="La Préface"{%- else -%}{%- endif -%}
+  {%- when 'lexique' -%}
+    {%- if partie == 'body' -%}data-page="lexique" class="" data-run="Le Lexique"{%- else -%}{%- endif -%}
+  {%- when 'points-de-vente' -%}
+    {%- if partie == 'body' -%}data-page="carte" class="" data-run="La Carte"{%- else -%}<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"><script defer src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>{%- endif -%}
+  {%- when 'portrait-olfactif' -%}
+    {%- if partie == 'body' -%}data-page="portrait" class="" data-run="Portrait olfactif"{%- else -%}{%- endif -%}
+  {%- when 'offrir' -%}
+    {%- if partie == 'body' -%}data-page="offrir" class="" data-run="Offrir"{%- else -%}{%- endif -%}
+  {%- when 'services' -%}
+    {%- if partie == 'body' -%}data-page="services" class="" data-run="Services"{%- else -%}{%- endif -%}
+  {%- when 'contact' -%}
+    {%- if partie == 'body' -%}data-page="contact" class="" data-run="Contact"{%- else -%}{%- endif -%}
+  {%- when 'produit' -%}
+    {%- if partie == 'body' -%}data-page="bibliotheque" class=""{%- else -%}{%- endif -%}
+  {%- when 'collection' -%}
+    {%- if partie == 'body' -%}data-page="bibliotheque" class=""{%- else -%}{%- endif -%}
+  {%- else -%}
+    {%- if partie == 'body' -%}data-page="page" class=""{%- endif -%}
+{%- endcase -%}

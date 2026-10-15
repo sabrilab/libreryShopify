@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "librery-points-de-vente",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

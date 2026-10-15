@@ -1,0 +1,24 @@
+{%- comment -%} Généré par shopify/build_theme.py depuis maquette/points-de-vente.html — ne pas éditer ici. {%- endcomment -%}
+<section class="page-head"><div class="wrap">
+  <h1 class="h1">Points de vente</h1>
+  <p class="lede">Quelques adresses où nos récits prennent vie, en France et ailleurs.</p>
+</div></section>
+<section class="stores">
+  <div class="stores__side">
+    <div class="stores__search">
+      <input id="stores-q" type="search" placeholder="Une ville, un pays" aria-label="Rechercher une adresse">
+      <div class="tabs" id="stores-tabs"></div>
+      <span class="ui muted" id="stores-count"></span>
+    </div>
+    <div class="stores__list" id="stores-list"></div>
+  </div>
+  <div class="stores__map"><div id="map" aria-label="Carte des points de vente"></div></div>
+</section>
+
+{% schema %}
+{
+  "name": "La Carte",
+  "tag": "div",
+  "class": "librery-points-de-vente"
+}
+{% endschema %}

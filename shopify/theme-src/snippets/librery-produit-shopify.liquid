@@ -1,0 +1,30 @@
+{%- comment -%}
+  Fiche générique, rendue par Shopify : visible quand le produit n'existe pas dans data.js (créé plus tard dans
+  l'admin), et sans JavaScript (moteurs de recherche, lecteurs d'écran). Pour un produit de data.js, la fiche
+  animée de la maquette (main.js : initProduct) remplace ce bloc ; il reste alors dans <noscript>.
+{%- endcomment -%}
+{%- capture fiche -%}
+<section class="block"><div class="wrap pdp-shopify">
+  <p class="ui muted"><a href="{{ routes.root_url }}pages/bibliotheque">Bibliothèque</a>{% if product.collections.first %} / <a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>{% endif %}</p>
+  <h1 class="h1">{{ product.title }}</h1>
+  {%- if product.featured_media %}
+    {{ product.featured_media | image_url: width: 1200 | image_tag: loading: 'eager', sizes: '(max-width: 800px) 100vw, 50vw', widths: '600, 900, 1200', alt: product.title }}
+  {%- endif %}
+  <div class="prose">{{ product.description }}</div>
+  {%- form 'product', product -%}
+    {%- if product.has_only_default_variant -%}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+    {%- else -%}
+      <label class="ui" for="variante-{{ product.id }}">Format</label>
+      <select id="variante-{{ product.id }}" name="id">
+        {%- for v in product.variants -%}
+          <option value="{{ v.id }}"{% if v == product.selected_or_first_available_variant %} selected{% endif %}{% unless v.available %} disabled{% endunless %}>{{ v.title }} — {{ v.price | money }}</option>
+        {%- endfor -%}
+      </select>
+    {%- endif -%}
+    <button class="btn" type="submit"{% unless product.available %} disabled{% endunless %}>{% if product.available %}Ajouter au panier — {{ product.selected_or_first_available_variant.price | money }}{% else %}Épuisé{% endif %}</button>
+  {%- endform -%}
+</div></section>
+{%- endcapture -%}
+<div id="product-shopify" hidden>{{ fiche }}</div>
+<noscript>{{ fiche }}</noscript>

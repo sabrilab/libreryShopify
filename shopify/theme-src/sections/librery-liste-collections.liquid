@@ -1,0 +1,6 @@
+<script>location.replace({{ routes.root_url | append: '/pages/bibliotheque' | replace: '//', '/' | json }});</script>
+<noscript><section class="page-head"><div class="wrap"><h1 class="h1"><a href="{{ routes.root_url }}pages/bibliotheque">La Bibliothèque</a></h1></div></section></noscript>
+
+{% schema %}
+{ "name": "Liste des collections", "tag": "div", "class": "librery-liste-collections" }
+{% endschema %}
