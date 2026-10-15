@@ -1070,13 +1070,3 @@ html.lecteur-ouvert { overflow: hidden; scrollbar-gutter: stable; }
   .book__cta .btn { flex: 1 1 100%; text-align: center; }
 }
 
-
-/* Visuels de marque (15/10) : image et texte au nombre d'or (1,618 / 1) ; bannières recadrées vers la droite,
-   où se trouve l'œil de la spirale (les flacons) */
-.marque__in { display: grid; grid-template-columns: 1.618fr 1fr; gap: clamp(28px, 4vw, 64px); align-items: center; }
-.marque__img { margin: 0; }
-.marque__img img { width: 100%; height: auto; display: block; }
-.marque__txt { display: grid; gap: 16px; justify-items: start; }
-.marque__txt .muted { margin: 0; max-width: 40ch; }
-.s-figure--droite img { object-position: 72% 50%; }
-@media (max-width: 800px) { .marque__in { grid-template-columns: 1fr; } .s-figure--droite img { height: auto; aspect-ratio: 16 / 9; } }

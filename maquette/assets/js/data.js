@@ -84,7 +84,7 @@ const PRODUCTS = [
     tagline: 'L’obsession d’une douceur que l’on veut retenir.',
     keyNotes: 'Prune · Cuir · Vanille', families: ['Gourmand', 'Ambré'],
     pack: 'vanilla-plum-pack', card: 'vanilla-plum-1', pack30: 'vanilla-plum-pack30', scene: 'vanilla-plum-2',
-    gallery: ['vanilla-plum-pack', 'vanilla-plum-pack30', 'marque-vanilla-plum', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres', 'vanilla-plum-1'],
+    gallery: ['vanilla-plum-pack', 'vanilla-plum-pack30', 'ecrin-vanilla-plum', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres', 'vanilla-plum-1'],
     description: [
       "Il y a les parfums que l’on découvre. Et il y a ceux vers lesquels on se surprend à revenir.",
       "Vanilla Plum est né du désir de retrouver une sensation : celle d’un fruit mûr enveloppé dans une étreinte chaude, crémeuse et réconfortante.",
@@ -110,7 +110,7 @@ const PRODUCTS = [
     tagline: 'L’obsession d’une attraction florale.',
     keyNotes: 'Sésame · Tubéreuse · Santal', families: ['Floral', 'Fruité'],
     pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', pack30: 'magnetic-flowers-pack30', scene: 'magnetic-flowers-1',
-    gallery: ['magnetic-flowers-pack', 'magnetic-flowers-pack30', 'marque-magnetic-livres', 'magnetic-flowers-1', 'magnetic-flowers-mod', 'poire-livres', 'magnetic-flowers-30'],
+    gallery: ['magnetic-flowers-pack', 'magnetic-flowers-pack30', 'ecrin-magnetic-flowers', 'magnetic-flowers-1', 'magnetic-flowers-mod', 'ecrin-contenu', 'poire-livres', 'magnetic-flowers-30'],
     description: [
       "Certaines fleurs sont admirées pour leur beauté. D’autres possèdent un pouvoir d’attraction presque instinctif.",
       "Magnetic Flowers est né de cette fascination : un bouquet de fleurs blanches, lumineux et opulent, dont les facettes se dévoilent lentement sur la peau.",
@@ -136,7 +136,7 @@ const PRODUCTS = [
     tagline: 'L’irrésistible chaleur de la tonka.',
     keyNotes: 'Cardamome · Tonka · Cèdre', families: ['Gourmand', 'Boisé'],
     pack: 'tonka-love-pack', card: 'tonka-love-1', pack30: 'tonka-love-pack30', scene: 'tonka-love-1',
-    gallery: ['tonka-love-pack', 'tonka-love-pack30', 'tonka-love-1', 'tonka-love-mod', 'tonka-capot', 'tonka-love-2'],
+    gallery: ['tonka-love-pack', 'tonka-love-pack30', 'ecrin-tonka-love', 'tonka-love-1', 'tonka-love-mod', 'tonka-capot', 'tonka-love-2'],
     description: [
       "Certains ingrédients ont une présence qui s’attarde dans la mémoire. La tonka est de ceux-là. Chaude, veloutée, naturellement addictive, elle est au cœur de Tonka Love.",
       "Le parfum s’ouvre sur l’amande grillée, à la facette chaude et toastée, éclairée par la bergamote d’Italie. Le poivre et la cardamome du Guatemala ajoutent une étincelle vive et aromatique.",
@@ -163,7 +163,7 @@ const PRODUCTS = [
     tagline: 'Jasmin lumineux, chocolat blanc fondant et santal crémeux, dans une gourmandise solaire et addictive.',
     keyNotes: 'Jasmin · Chocolat blanc · Santal', families: ['Gourmand', 'Floral'],
     pack: 'hot-sand-pack', card: 'hot-sand-1', pack30: 'hot-sand-pack30', scene: 'hot-sand-1',
-    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'marque-trio', 'hot-sand-1', 'hot-sand-mod', 'camp-blanche', 'hero-portrait'],
+    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'ecrin-hot-sand', 'hot-sand-1', 'hot-sand-mod', 'camp-blanche', 'hero-portrait'],
     description: [
       "Hot Sand capture la douceur aérienne d’une gourmandise d’été, où le sable encore tiède caresse la peau dorée par le soleil.",
       "En tête, l’eau de jasmin et l’orchidée flottent comme un souffle léger et lumineux, tandis que la ganache de chocolat blanc, la crème chantilly et le lait d’amande fondent en un cœur délicieusement crémeux. En fond, le cèdre, le santal crémeux et le musc blanc enveloppent la peau d’une chaleur douce et réconfortante, comme le souvenir tendre d’une journée au soleil.",
@@ -215,7 +215,7 @@ const PRODUCTS = [
     tagline: 'Abricot doré, safran et osmanthus, puis rose, iris et jasmin, sur un fond d’ambre, de cuir et de santal.',
     keyNotes: 'Abricot · Iris · Cuir · Ambre', families: ['Ambré', 'Floral'],
     pack: 'ambert-sunset-pack', card: 'ambert-sunset-1', pack30: 'ambert-sunset-pack30', scene: 'ambert-sunset-1',
-    gallery: ['ambert-sunset-pack', 'ambert-sunset-pack30', 'marque-ambert', 'ambert-sunset-1', 'ambert-sunset-2', 'ambert-sunset-mod', 'hero-collection'],
+    gallery: ['ambert-sunset-pack', 'ambert-sunset-pack30', 'ambert-sunset-1', 'ambert-sunset-2', 'ambert-sunset-mod', 'hero-collection'],
     description: [
       "Ambert Sunset s’ouvre comme le dernier souffle d’un jour d’été, lorsque le ciel se pare de teintes dorées et que l’air devient plus doux, presque tangible.",
       "Dès l’ouverture, l’abricot velouté, le safran épicé et l’osmanthus lumineux esquissent les premiers rayons d’un coucher de soleil. Au cœur, la rose, l’iris pallida poudré et le jasmin composent une partition florale noble et vibrante, presque crépusculaire. En fond, le cuir, l’ambre et le santal s’entrelacent en un sillage riche, sophistiqué et profondément sensuel.",
@@ -322,7 +322,7 @@ const COLLECTIONS = {
     ]
   },
   'coffrets': {
-    mosaic: [['summer-fenetre', 'La campagne'], ['prune-vanille', 'Vanilla Plum'], ['camp-trente', 'La bibliothèque']],
+    mosaic: [['ecrin-ouvert', 'L’écrin, qui s’ouvre comme un livre'], ['prune-vanille', 'Vanilla Plum'], ['camp-trente', 'La bibliothèque']],
     title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
     hero: 'hero-collection',
     epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',
