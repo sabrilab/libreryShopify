@@ -55,7 +55,7 @@ const Lock = () => (
 );
 
 /** navigateur : `y` = défilement en pixels CSS du site (largeur 1440) */
-export const Browser = ({ w, src, y = 0, siteW = 1440, path = '', dark, fit, style }) => (
+export const Browser = ({ w, src, y = 0, siteW = 1440, path = '', dark, fit, style, children }) => (
   <div style={{ position: 'absolute', width: w, fontSize: (w / 1000) * 16, borderRadius: '.75em', overflow: 'hidden', background: '#fff',
     boxShadow: dark ? '0 3.5em 6em -2.5em rgba(0,0,0,.8)' : '0 3em 6em -2.5em rgba(40,28,18,.45), 0 1em 2em -1.4em rgba(40,28,18,.25)', ...style }}>
     <div style={{ height: '2.25em', background: dark ? '#3a2e25' : '#e6e0d6', display: 'flex', alignItems: 'center', gap: '.44em', padding: '0 .9em', position: 'relative' }}>
@@ -66,18 +66,18 @@ export const Browser = ({ w, src, y = 0, siteW = 1440, path = '', dark, fit, sty
       </span>
     </div>
     <div style={{ height: w * 0.625, overflow: 'hidden', position: 'relative', background: C.paper }}>
-      <Img src={staticFile(src)} style={fit ? { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' } : { width: '100%', display: 'block', transform: `translateY(${(-y * w) / siteW}px)` }} />
+      {children || <Img src={staticFile(src)} style={fit ? { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' } : { width: '100%', display: 'block', transform: `translateY(${(-y * w) / siteW}px)` }} />}
     </div>
   </div>
 );
 
 /** iPhone graphite : `w` = largeur de l'écran ; `y` = défilement en pixels CSS (largeur 390) */
-export const Phone = ({ w, src, y = 0, siteW = 390, fit, style }) => (
+export const Phone = ({ w, src, y = 0, siteW = 390, fit, style, children }) => (
   <div style={{ position: 'absolute', width: w, height: (w * 844) / 390, padding: '.5625em', boxSizing: 'content-box', fontSize: (w / 290) * 16, borderRadius: '3.25em',
     background: 'linear-gradient(150deg, #3b3632 0%, #121110 45%, #2a2623 100%)',
     boxShadow: 'inset 0 0 0 .1em rgba(255,255,255,.16), inset 0 0 0 .19em #0c0b0a, 0 3em 5em -2.2em rgba(10,6,4,.6), 0 1.2em 2em -1.4em rgba(10,6,4,.4)', ...style }}>
     <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '2.75em', overflow: 'hidden', background: '#f8f5ef' }}>
-      <Img src={staticFile(src)} style={fit ? { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' } : { width: '100%', display: 'block', transform: `translateY(${(-y * w) / siteW}px)` }} />
+      {children || <Img src={staticFile(src)} style={fit ? { width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' } : { width: '100%', display: 'block', transform: `translateY(${(-y * w) / siteW}px)` }} />}
       <span style={{ position: 'absolute', top: '.7em', left: '50%', transform: 'translateX(-50%)', width: '31%', height: '1.7em', borderRadius: '1.25em', background: '#050505' }} />
     </div>
   </div>
