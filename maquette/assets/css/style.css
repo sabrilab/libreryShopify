@@ -1071,3 +1071,29 @@ html.lecteur-ouvert { overflow: hidden; scrollbar-gutter: stable; }
   .book__cta .btn { flex: 1 1 100%; text-align: center; }
 }
 
+
+/* Lettre de la maison : bandeau pleine largeur avant le pied de page (10 % de bienvenue, retour de Rafiq le 15/10).
+   Ordinateur : l'écrin vu de dessus en fond, le texte dans le vide crème à gauche. Mobile : l'image au-dessus, le texte dessous. */
+.nl { position: relative; background: #f4ede2; overflow: hidden; }
+.nl__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 78% 50%; }
+.nl__in { position: relative; min-height: clamp(520px, 42vw, 680px); display: flex; align-items: center; }
+.nl__box { width: min(460px, 40%); padding: 72px 0; }
+.nl__kick { display: block; font-family: var(--sans); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+.nl__t { font-family: var(--serif-d); font-weight: 400; font-size: clamp(38px, 3.6vw, 56px); line-height: 1.04; letter-spacing: -.01em; margin: 0; }
+.nl__t em { display: block; font-style: italic; }
+.nl__p { margin: 20px 0 30px; font-size: 17px; line-height: 1.55; color: var(--grey); max-width: 38ch; }
+.nl__form { display: flex; gap: 0; background: #fff; border: 1px solid var(--ink); }
+.nl__form input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 0 18px; height: 56px; font-size: 16px; outline: none; }
+.nl__form .btn { height: 56px; border: 0; padding: 0 24px; }
+.nl__small { margin: 14px 0 0; font-family: var(--sans); font-size: 12px; line-height: 1.5; color: var(--grey); }
+.nl__ok { margin: 0; padding: 18px 20px; background: #fff; border: 1px solid var(--gold); font-size: 17px; line-height: 1.5; }
+@media (max-width: 800px) {
+  .nl__img { position: relative; aspect-ratio: 4 / 3; }
+  .nl__img img { object-position: 82% 50%; }
+  .nl__in { min-height: 0; display: block; }
+  .nl__box { width: auto; padding: 36px 0 56px; }
+  .nl__p { font-size: 16px; margin: 16px 0 24px; }
+  .nl__form { flex-direction: column; background: transparent; border: 0; gap: 10px; }
+  .nl__form input { flex: none; background: #fff; border: 1px solid var(--ink); }
+  .nl__form .btn { width: 100%; }
+}

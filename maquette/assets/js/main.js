@@ -189,12 +189,17 @@
   function renderFooter() {
     const host = $('#site-footer'); if (!host) return;
     host.innerHTML = `
+      ${$('main form[data-news]') ? '' : `<section class="nl" aria-labelledby="nl-t">
+        <div class="nl__img">${pic('ecrin-contenu', 'L’écrin LIBRERY ouvert sur papier de soie, ruban doré', '100vw')}</div>
+        <div class="wrap nl__in"><div class="nl__box">
+          <span class="nl__kick">Lettre de la maison</span>
+          <h2 class="nl__t" id="nl-t">10&nbsp;% offerts <em>sur tout le site</em></h2>
+          <p class="nl__p">Inscrivez-vous : votre code de bienvenue arrive aussitôt par e-mail. Puis, avant tout le monde, les nouveaux chapitres de la maison.</p>
+          <form class="nl__form" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail" autocomplete="email"><button class="btn">Recevoir mon code</button></form>
+          <p class="nl__small">Un code par personne, non cumulable avec le code du Coffret Découverte. Désinscription en un clic.</p>
+        </div></div></section>`}
       <section class="block" aria-label="Services"><div class="wrap">
         ${page === 'services' ? '' : `<div class="services">${SERVICES.map(x => `<a href="/services">${icon(x.i)}<b>${x.t}</b><span>${x.d}</span></a>`).join('')}</div>`}
-        ${$('main form[data-news]') ? '' : `<div class="letter"${page === 'services' ? '' : ' style="margin-top:56px"'}>
-          <div><h2 class="h2">Lettre de la maison</h2><p>Les nouveaux chapitres avant tout le monde, et 10 % sur tout le site : votre code de bienvenue arrive dès l’inscription.</p></div>
-          <form class="field-line" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail"><button>S’inscrire</button></form>
-        </div>`}
       </div></section>
       <footer class="footer"><div class="wrap">
         <div class="footer__top">
@@ -418,7 +423,7 @@
     $$('.acc > button', root).forEach(b => { if (b.dataset.bound) return; b.dataset.bound = 1; b.addEventListener('click', () => { const o = b.parentElement.classList.toggle('is-open'); b.setAttribute('aria-expanded', o); }); });
   }
   function newsletters() {
-    $$('form[data-news]').forEach(f => { if (f.dataset.bound) return; f.dataset.bound = 1; f.addEventListener('submit', e => { e.preventDefault(); f.insertAdjacentHTML('afterend', `<p class="ok">${f.closest('.letter')?.querySelector('h2')?.textContent === 'Lettre de la maison' ? 'Merci. Votre code de bienvenue de 10 % vous attend dans votre boîte mail.' : 'Merci, à très bientôt.'}</p>`); f.remove(); }); });
+    $$('form[data-news]').forEach(f => { if (f.dataset.bound) return; f.dataset.bound = 1; f.addEventListener('submit', e => { e.preventDefault(); f.insertAdjacentHTML('afterend', f.classList.contains('nl__form') ? '<p class="ok nl__ok">Merci. Votre code de bienvenue de 10&nbsp;% vous attend dans votre boîte mail.</p>' : '<p class="ok">Merci, à très bientôt.</p>'); f.remove(); }); });
   }
 
   /* Mise en page éditoriale au défilement (mosaïques, images de campagne, préface, parfumeur).
