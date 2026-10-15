@@ -96,7 +96,7 @@ const PRODUCTS = [
     notes: { tete: 'Prune, Cannelle', coeur: 'Lait, Cuir de Grasse, Myrrhe, Vanille de Tahiti', fond: 'Vanille Planifolia de Madagascar, Ambre, Benjoin Siam' },
     materials: {
       title: 'Entre douceur et profondeur',
-      list: { tete: 'Cannelle SFE, Prune séchée STT, Amande', coeur: 'Lait, Cuir de Grasse, Vanille Tahitensis (infusion)', fond: 'Vanille Planifolia Madagascar SFE, Benjoin Siam, Tonka' },
+      list: { tete: 'Cannelle CO₂, Prune séchée STT, Amande', coeur: 'Lait, Cuir de Grasse, Vanille Tahitensis (infusion)', fond: 'Vanille Planifolia Madagascar CO₂, Benjoin Siam, Tonka' },
       text: [
         "Au cœur de Vanilla Plum, deux vanilles d’exception révèlent deux facettes complémentaires de la précieuse gousse. La vanille de Tahiti apporte une expression délicate, poudrée, amandée et subtilement florale ; douce et raffinée, elle prolonge naturellement la note d’amande.",
         "À l’inverse, la vanille Planifolia de Madagascar, extraite par SFE — extraction au CO₂ supercritique —, révèle une expression plus riche et plus profonde. Ce procédé capte avec une précision remarquable les facettes naturelles de la gousse et lui donne chaleur, profondeur et densité.",
@@ -122,7 +122,7 @@ const PRODUCTS = [
     notes: { tete: 'Poire, Sauge sclarée, Sésame', coeur: 'Néroli, Tubéreuse, Jasmin Sambac, Ylang-ylang, Fleur d’oranger', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
     materials: {
       title: 'L’attraction des fleurs blanches',
-      list: { tete: 'Poire, Sauge sclarée, Sésame SFE', coeur: 'Néroli, Tubéreuse, Jasmin Sambac Inde Abs, Ylang Ess, Fleur d’oranger Abs', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
+      list: { tete: 'Poire, Sauge sclarée, Sésame CO₂', coeur: 'Néroli, Tubéreuse, Jasmin Sambac Inde Abs, Ylang Ess, Fleur d’oranger Abs', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
       text: [
         "Magnetic Flowers se construit sur la tension entre la fraîcheur, les facettes vertes et l’opulence crémeuse des fleurs blanches.",
         "En ouverture, la poire apporte une fraîcheur juteuse et lumineuse. Elle rencontre la sauge sclarée, qui introduit une dimension verte et aromatique, tandis que le sésame SFE révèle des facettes toastées, céréalières et gourmandes.",

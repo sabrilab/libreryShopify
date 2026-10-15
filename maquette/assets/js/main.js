@@ -1668,7 +1668,7 @@
   /* L'horloge du sillage : la vaporisation, heure par heure            */
   /* (Shopify : snippet sillage.liquid, notes lues dans les métachamps)  */
   /* ------------------------------------------------------------------ */
-  const cleanNote = n => n.replace(/\s+(STT|SFE|Ess|NP|FirAbs|Abs)\b/g, '').replace(/®/g, '').replace(/\s*\([^)]*\)/g, '').trim();
+  const cleanNote = n => n.replace(/\s+(STT|SFE|CO₂|Ess|NP|FirAbs|Abs)(?=[\s,]|$)/g, '').replace(/®/g, '').replace(/\s*\([^)]*\)/g, '').trim();
   const notesOf = p => p.materials ? p.materials.list : p.notes;
   const clockTime = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ' ' + String(m % 60).padStart(2, '0') : ''}`;
   // le curseur suit sa règle (Vaporisation · 1 h · 2 h · 4 h · 8 h, à intervalles égaux) : position 0 → 480, minutes non linéaires
