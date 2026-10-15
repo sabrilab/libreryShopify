@@ -10,6 +10,8 @@ fs.mkdirSync(OUT, { recursive: true });
   const mk = (m, dpr) => b.newPage(m ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: dpr, isMobile: true, hasTouch: true } : { viewport: { width: 1440, height: 900 }, deviceScaleFactor: dpr });
   const full = async (m, u, name, maxH) => {
     const p = await mk(m, m ? 2 : 1.5);
+    // CAPDIR : dossier local des images de films (_cap), servi à la place du site (utile pour le site en ligne)
+    if (process.env.CAPDIR) await p.route('**/_cap/*', r => r.fulfill({ path: path.join(process.env.CAPDIR, r.request().url().split('/').pop()) }));
     await p.goto(B + u, { waitUntil: 'networkidle' });
     await p.evaluate(async () => {
       const w = ms => new Promise(r => setTimeout(r, ms));

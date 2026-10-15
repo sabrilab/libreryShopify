@@ -235,9 +235,9 @@ const Weekend = ({ dur }) => {
   const lines = ['Le format d’avant, avec moins d’animations.', 'Le film Skin Obsession de retour en accueil.', 'Le nouveau film, au bouchon doré, dans Summer Vibes.'];
   if (!ready) return (
     <Paper>
-      <Side kick="En ligne ce week-end" title={['Le site,', 'version *simplifiée.*']} lines={lines} />
+      <Side kick="En ligne depuis le 15 octobre" title={['Le site,', 'version *simplifiée.*']} lines={lines} />
       <div style={{ position: 'absolute', left: 760, top: 300, width: 1000, height: 500, border: `1px dashed ${C.gold}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: sans, fontSize: 18, letterSpacing: '.16em', textTransform: 'uppercase', color: C.gold }}>Captures du site du week-end · à venir</div>
-      <Hud n="04" label="Le site de ce week-end" at={20} />
+      <Hud n="04" label="Le site en ligne" at={20} />
     </Paper>
   );
   // une capture par temps : ordinateur à gauche, iPhone à droite quand il existe
@@ -247,13 +247,13 @@ const Weekend = ({ dur }) => {
   const o = Math.min(ramp(t, 0, 14, io), k === WE.length - 1 ? 1 : 1 - ramp(t, per - 10, per, io));
   return (
     <Paper>
-      <Side kick="En ligne ce week-end" title={['Le site,', 'version *simplifiée.*']} lines={lines} />
+      <Side kick="En ligne depuis le 15 octobre" title={['Le site,', 'version *simplifiée.*']} lines={lines} />
       <div style={{ position: 'absolute', left: 640, top: 150, opacity: o }}>
         <Browser w={s.m ? 860 : 1190} src={`recap/we/${s.d}`} y={kf(t, [[0, 0], [60, 0], [per, s.y || 0]])} siteW={1440} />
         {s.m && <div style={{ position: 'absolute', left: 900, top: -30 }}><Phone w={300} src={`recap/we/${s.m}`} y={kf(t, [[0, 0], [60, 0], [per, s.ym || 0]])} /></div>}
         <div style={{ position: 'absolute', left: 0, top: (s.m ? 860 : 1190) * 0.625 + 80, width: 860, fontFamily: serif, fontSize: 26, color: C.ink }}>{s.label}</div>
       </div>
-      <Hud n="04" label="Le site de ce week-end" at={20} />
+      <Hud n="04" label="Le site en ligne" at={20} />
     </Paper>
   );
 };
@@ -265,7 +265,7 @@ const Visuels = ({ dur }) => {
   return (
     <Paper alt>
       <div style={{ position: 'absolute', left: 90, top: 80, width: 1700 }}>
-        <Kick at={2}>Proposition · pas encore en ligne</Kick>
+        <Kick at={2}>En ligne · galeries, coffrets, sommaire</Kick>
         <Words lines={['Les visuels de *marque.*']} at={8} size={72} color={C.ink} style={{ marginTop: 22 }} />
         <div style={{ fontFamily: serif, fontSize: 25, color: C.grey, marginTop: 16, opacity: ramp(f, 30, 50) }}>L’écrin, le fourreau et le flacon, sur fond ivoire, d’après vos photos du coffret Magnetic Flowers.</div>
       </div>

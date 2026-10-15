@@ -124,7 +124,7 @@ page(f'''
     <p class="kick">Site internet · 15 octobre 2026</p>
     <div class="cover__mark">{LOGO}</div>
     <p class="cover__sub">Depuis le<br>12 octobre.</p>
-    <p class="cover__lead">Vos derniers retours appliqués, la 3D que nous avons préparée<br>(masquée pour l’instant), et le site de ce week-end.</p>
+    <p class="cover__lead">Vos derniers retours appliqués, la 3D que nous avons préparée<br>(masquée pour l’instant), et le site, désormais en ligne.</p>
   </div>
   {browser(S['we-home'], 640, 205, 830)}
   {phone(S['we-home-m'], 1290, 300, 236)}''', 'dark', num=False)
@@ -132,7 +132,7 @@ page(f'''
 # ---------------------------------------------------------------- sommaire
 TOC = ['Les notes de Skin Obsession', 'Le code recrédité', 'Les points de vente', 'Les moyens de paiement',
        'La fiche produit au nombre d’or', 'Le chevet, rendu dans Blender', 'Le cadran du sillage', 'L’effet feuille',
-       'Le site de ce week-end'] + (['Visuels de marque'] if VIS else []) + ['La suite']
+       'Le site en ligne'] + (['Visuels de marque'] if VIS else []) + ['La suite']
 page(f'''
   <div class="glance">
     <div>
@@ -140,7 +140,7 @@ page(f'''
       <h1>Depuis le PDF<br>du 12 octobre.</h1>
       <p class="lead">Vos retours du 12 au 14 octobre sont appliqués. Nous avons aussi préparé la 3D de l’accueil et des fiches :
       elle est prête, mais masquée sur le site pour l’instant, comme convenu.</p>
-      <p class="lead muted">Le site qui part en ligne ce week-end reprend le format d’avant, avec moins d’animations.</p>
+      <p class="lead muted">Le site en ligne depuis le 15 octobre reprend le format d’avant, avec moins d’animations, et accueille les nouveaux visuels de marque.</p>
     </div>
     <ol class="toc">{''.join(f'<li{" class=sep" if i in (5, 8) else ""}><span>{i + 1:02d}</span><div>{t}</div></li>' for i, t in enumerate(TOC))}</ol>
   </div>''')
@@ -201,7 +201,7 @@ page(head('08', 'L’effet feuille', 'Les photos se posent comme des tirages sur
   </div>''', 'paper2')
 
 # ---------------------------------------------------------------- le site du week-end
-page(head('09', 'Le site de ce week-end', 'Le format d’avant, avec moins d’animations.') + f'''
+page(head('09', 'Le site en ligne', 'Depuis le 15 octobre : le format d’avant, avec moins d’animations.') + f'''
   <div class="ch">
     <aside class="ch__side">{done(['Le film Skin Obsession de retour en ouverture de l’accueil',
       'Le nouveau film, au bouchon doré, en tête de la collection Summer Vibes',
@@ -215,14 +215,14 @@ page(head('09', 'Le site de ce week-end', 'Le format d’avant, avec moins d’a
   </div>''')
 
 if VIS:
-    por = ''.join(shot(VIS[k]) for k in ('01', '03', '04', '05', '07') if k in VIS)
-    lan = ''.join(shot(VIS[k]) for k in ('06', '08') if k in VIS)
+    por = ''.join(shot(VIS[k]) for k in ('01', '02', '03', '04', '05') if k in VIS)   # en ligne ; 07 et 08 restent en réserve
+    lan = ''.join(shot(VIS[k]) for k in ('06',) if k in VIS)
     page(head('10', 'Visuels de marque', 'L’écrin, le fourreau et le flacon, sur fond ivoire.') + f'''
   <div class="ch">
     <aside class="ch__side">{done(['Créés d’après vos photos du coffret Magnetic Flowers et nos packshots',
       'L’objet complet : écrin, fourreau, carte et flacon, sur un fond épuré ivoire, cadré au nombre d’or',
-      'Ils prendront place par petites touches : galeries des fiches, mosaïque des coffrets, sommaire',
-      'Avec vos photos des packagings, nous compléterons la série'])}<p class="hid">Proposition, pas encore en ligne</p></aside>
+      'En ligne par petites touches : galeries de Tonka Love, Vanilla Plum, Hot Sand et Magnetic Flowers, mosaïque de la page Coffrets, sommaire de l’accueil',
+      'Avec vos photos des packagings, nous compléterons la série'])}<p class="hid hid--on">En ligne</p></aside>
     <div class="ch__main vm"><div class="vm__por">{por}</div><div class="vm__lan">{lan}</div></div>
   </div>''', 'paper2')
 
