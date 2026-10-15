@@ -106,7 +106,7 @@ async function monter(canvas, fond, track, PH, ctl) {
   }
 
   function resize() {
-    dpr = Math.min(devicePixelRatio || 1, 2);
+    dpr = Math.min(devicePixelRatio || 1, 3);
     cw = Math.max(1, canvas.clientWidth); ch = Math.max(1, canvas.clientHeight);
     canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
     g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';

@@ -10,7 +10,7 @@ référence : la caméra en est relevée image par image).
 | 1. Relever la caméra et la scène dans le navigateur (site local sur le port 4173) | `node capture.mjs 1440 900 120 desktop glb` puis `node capture.mjs 390 844 120 mobile` | `out/camera-*.json`, `out/chevet-scene.glb` |
 | 2. Construire les 8 flacons (matières Cycles de `3d/scripts/rendu.py`) | `python flacons.py palmeira ambert-sunset …` | `blend/flacon-*.blend` |
 | 3. Rendre la séquence (du grossier au fin) | `PY=python ./lancer.sh` enchaîne 3 à 5 (ou `python chevet_scene.py desktop 0-120 --samples 48`) | `rendus/*.exr` |
-| 3 bis. L'ombre au sol seule, pour l'effacer en fin de mouvement (u > ,45) | `python chevet_scene.py desktop 54-120 --ombre --samples 12` (même `--echelle` que le rendu) | `rendus/*-ombre.exr` |
+| 3 bis. L'ombre au sol seule, pour l'effacer en fin de mouvement (u > ,45) | `python chevet_scene.py desktop 54-120 --ombre --samples 8` (même `--echelle` que le rendu) | `rendus/*-ombre.exr` |
 | 4. Développer (Neutral, clair-obscur, vignetage, papier) | `python post.py desktop 0-120` et `python post.py mobile 0-120` | `seq/*.webp` |
 | 5. Publier dans le site | `python publier.py` | `maquette/assets/3d/chevet/seq/{paysage,portrait}/` + affiches |
 
@@ -20,4 +20,5 @@ Le catalogue 3D (`CATALOGUE_3D`, par défaut `~/Projects/librery-catalogue-3d`) 
 Réglages de la scène (en tête de `chevet_scene.py`) : la recette « caravage » du prototype (projecteur principal
 ambré à l'avant gauche de chaque niche, contre-jour, projecteur du velours, soleil de la pièce arrêté par un drapeau),
 velours noir chaud avec la lueur de réglette au pied, laque des étagères, bandes de studio vues seulement dans le verre,
-le jus et l'or. Durée : ~90 s par image (4 cœurs, 48 échantillons, débruitage OIDN), 242 images en tout.
+le jus et l'or. Définition : iPhone ×3 (1310 × 2634 px avec la marge), ordinateur ×2 (3226 × 1855 px), 24 échantillons + débruitage
+OIDN. Durée sur 4 cœurs : ~150 s par image iPhone, ~260 s par image ordinateur, 242 images en tout.
