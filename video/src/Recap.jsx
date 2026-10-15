@@ -258,6 +258,31 @@ const Weekend = ({ dur }) => {
   );
 };
 
+// ---------------------------------------------------------------- 5 bis. visuels de marque
+const Visuels = ({ dur }) => {
+  const f = useCurrentFrame();
+  const V = DATA.visuels;
+  return (
+    <Paper alt>
+      <div style={{ position: 'absolute', left: 90, top: 80, width: 1700 }}>
+        <Kick at={2}>Proposition · pas encore en ligne</Kick>
+        <Words lines={['Les visuels de *marque.*']} at={8} size={72} color={C.ink} style={{ marginTop: 22 }} />
+        <div style={{ fontFamily: serif, fontSize: 25, color: C.grey, marginTop: 16, opacity: ramp(f, 30, 50) }}>L’écrin, le fourreau et le flacon, sur fond ivoire, d’après vos photos du coffret Magnetic Flowers.</div>
+      </div>
+      <div style={{ position: 'absolute', left: 90, right: 90, top: 330, display: 'flex', gap: 22, height: 640 }}>
+        {V.map((v, i) => {
+          const p = ramp(f, 30 + i * 10, 60 + i * 10);
+          const wide = v.startsWith('06');
+          return <div key={v} style={{ flex: wide ? 2.2 : 1, overflow: 'hidden', opacity: p, transform: `translateY(${(1 - p) * 40}px)` }}>
+            <Img src={staticFile(`recap/vm/${v}`)} style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${1.04 + (f / dur) * 0.04})` }} />
+          </div>;
+        })}
+      </div>
+      <Hud n="05" label="Visuels de marque" at={20} />
+    </Paper>
+  );
+};
+
 // ---------------------------------------------------------------- 6. et ensuite
 const Suite = () => {
   const f = useCurrentFrame();
@@ -305,7 +330,7 @@ const Fin = ({ dur }) => {
 export const RSCENES = [
   ['ouverture', 165, Ouverture], ['notes', 165, Notes], ['code', 210, Code], ['stores', 150, Stores], ['paiement', 165, Paiement],
   ['fiche', 165, Fiche], ['titre3d', 120, Titre3D], ['chevet', 300, Chevet], ['sillage', 255, Sillage], ['feuille', 330, Feuille],
-  ['carton', 150, Carton], ['weekend', WE.length ? 165 * WE.length + 20 : 180, Weekend], ['suite', 210, Suite], ['fin', 150, Fin],
+  ['carton', 150, Carton], ['weekend', WE.length ? 165 * WE.length + 20 : 180, Weekend], ...(DATA.visuels?.length ? [['visuels', 180, Visuels]] : []), ['suite', 210, Suite], ['fin', 150, Fin],
 ];
 export const RTOTAL = RSCENES.reduce((s, [, d]) => s + d, 0);
 const FADES = { ouverture: [0, 8], fin: [8, 0] };

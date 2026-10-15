@@ -18,3 +18,9 @@
 .we { display: grid; gap: 22px; height: 100%; }
 .we__row { display: grid; grid-template-columns: 1fr 150px; gap: 18px; min-height: 0; }
 .we__row .sh__img img { max-height: 300px; }
+.vm { justify-content: flex-start !important; gap: 18px !important; }
+.vm__por { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.vm__por .sh__img img, .vm__lan .sh__img img { box-shadow: none; }
+.vm__por .sh__img img { max-height: 330px; }
+.vm__lan { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.vm__lan .sh__img img { max-height: 290px; }

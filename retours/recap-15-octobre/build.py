@@ -47,9 +47,27 @@ S = {
 }
 # le chevet : la planche des images déjà rendues et trois images en haute définition
 CH = SHARED / 'chevet-blender/hd'
-S['planche'] = img(CH / 'planche-iphone-hd-2.jpg', 'chevet-planche')
-for k in ('000', '064', '082'):
-    S[f'ch{k}'] = img(CH / f'iphone-hd-{k}.jpg', f'chevet-{k}', maxw=900)
+SEQ = sorted((CH / 'iphone').glob('*.jpg')) if (CH / 'iphone').is_dir() else []
+if len(SEQ) >= 100:   # la séquence iPhone complète : trois images clés et une planche d'une image sur six
+    for k, i in (('000', 0), ('064', 64), ('082', 120)):
+        S[f'ch{k}'] = img(SEQ[i], f'chevet-{k}', maxw=900)
+    tiles = [Image.open(f).convert('RGB') for f in SEQ[::6]]
+    tw, th = 230, round(230 * tiles[0].height / tiles[0].width); cols = 11; rows = -(-len(tiles) // cols)
+    sheet = Image.new('RGB', (cols * tw, rows * th), (247, 244, 238))
+    for i, t in enumerate(tiles): sheet.paste(t.resize((tw, th), Image.LANCZOS), ((i % cols) * tw, (i // cols) * th))
+    sheet.save(root / 'img/chevet-planche-src.jpg', quality=90)
+    S['planche'] = img(root / 'img/chevet-planche-src.jpg', 'chevet-planche')
+    CH_LBL = ('Image 1', 'Image 65', 'Image 121', 'La séquence iPhone, une image sur six')
+else:
+    S['planche'] = img(CH / 'planche-iphone-hd-2.jpg', 'chevet-planche')
+    for k in ('000', '064', '082'):
+        S[f'ch{k}'] = img(CH / f'iphone-hd-{k}.jpg', f'chevet-{k}', maxw=900)
+    CH_LBL = ('Image 1', 'Image 65', 'Image 83', 'La séquence iPhone, du chevet au catalogue')
+# visuels de marque (fil « Visuels de marque ») : la sélection pour le PDF, si elle est là
+VM = SHARED / 'visuels-marque/selection-pdf'
+VIS = {}
+if VM.is_dir():
+    for f in sorted(VM.glob('0*.jpg')): VIS[f.name[:2]] = img(f, 'vm-' + f.stem, maxw=1200)
 # le cadran du sillage : vaporisation, 2 h, 8 h
 SIL = sorted((CAP / 'sillage-magnetic-flowers').glob('*.jpg'))
 for i, k in ((0, 'v'), (len(SIL) // 2, 'm'), (len(SIL) - 1, 'f')):
@@ -114,7 +132,7 @@ page(f'''
 # ---------------------------------------------------------------- sommaire
 TOC = ['Les notes de Skin Obsession', 'Le code recrédité', 'Les points de vente', 'Les moyens de paiement',
        'La fiche produit au nombre d’or', 'Le chevet, rendu dans Blender', 'Le cadran du sillage', 'L’effet feuille',
-       'Le site de ce week-end', 'La suite']
+       'Le site de ce week-end'] + (['Visuels de marque'] if VIS else []) + ['La suite']
 page(f'''
   <div class="glance">
     <div>
@@ -161,8 +179,8 @@ page(head('06', 'Le chevet, rendu dans Blender', 'Une séquence d’images qui s
       'La séquence s’anime au défilement : plus on descend, plus la caméra avance vers le catalogue. Plus fluide sur téléphone, net sur écran Retina',
       'Le flacon en clair-obscur, le plateau en noyer, le catalogue posé dessus',
       '121 images par format ; la version iPhone se termine aujourd’hui, la version ordinateur suit'])}{hidden()}</aside>
-    <div class="ch__main chevm"><div class="chev">{shot(S['ch000'], 'Image 1')}{shot(S['ch064'], 'Image 65')}{shot(S['ch082'], 'Image 83')}</div>
-      {shot(S['planche'], 'La séquence iPhone, du chevet au catalogue', cls='sh--plain')}</div>
+    <div class="ch__main chevm"><div class="chev">{shot(S['ch000'], CH_LBL[0])}{shot(S['ch064'], CH_LBL[1])}{shot(S['ch082'], CH_LBL[2])}</div>
+      {shot(S['planche'], CH_LBL[3], cls='sh--plain')}</div>
   </div>''', 'paper2')
 
 page(head('07', 'Le cadran du sillage', 'De la vaporisation à 8 h, sur chaque fiche parfum et dans le Lexique.') + f'''
@@ -195,6 +213,18 @@ page(head('09', 'Le site de ce week-end', 'Le format d’avant, avec moins d’a
       <div class="we__row">{shot(S['we-summer'], 'Summer Vibes')}{shot(S['we-summer-m'], '')}</div>
     </div></div>
   </div>''')
+
+if VIS:
+    por = ''.join(shot(VIS[k]) for k in ('01', '03', '04', '05', '07') if k in VIS)
+    lan = ''.join(shot(VIS[k]) for k in ('06', '08') if k in VIS)
+    page(head('10', 'Visuels de marque', 'L’écrin, le fourreau et le flacon, sur fond ivoire.') + f'''
+  <div class="ch">
+    <aside class="ch__side">{done(['Créés d’après vos photos du coffret Magnetic Flowers et nos packshots',
+      'L’objet complet : écrin, fourreau, carte et flacon, sur un fond épuré ivoire, cadré au nombre d’or',
+      'Ils prendront place par petites touches : galeries des fiches, mosaïque des coffrets, sommaire',
+      'Avec vos photos des packagings, nous compléterons la série'])}<p class="hid">Proposition, pas encore en ligne</p></aside>
+    <div class="ch__main vm"><div class="vm__por">{por}</div><div class="vm__lan">{lan}</div></div>
+  </div>''', 'paper2')
 
 page(f'''
   <div class="ready">
