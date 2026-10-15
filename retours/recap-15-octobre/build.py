@@ -155,10 +155,10 @@ page(f'''<div class="div3d"><p class="kick">Chapitre suivant</p><h1>La 3D,<br>pr
   <p class="cover__lead">Ce que nous avons préparé ces derniers jours. Rien de cela n’est visible sur le site pour l’instant :
   tout est gardé et se réactive d’un simple interrupteur, quand nous l’aurons perfectionné ensemble.</p></div>''', 'dark', num=False)
 
-page(head('06', 'Le chevet, rendu dans Blender', 'L’accueil : des images figées en haute définition, jouées au défilement.') + f'''
+page(head('06', 'Le chevet, rendu dans Blender', 'Une séquence d’images qui s’anime au défilement.') + f'''
   <div class="ch">
-    <aside class="ch__side">{done(['Le chevet de l’accueil n’est plus calculé en 3D dans le navigateur : chaque image est rendue dans Blender, en haute définition',
-      'Les images défilent avec la page, avec le même mouvement de caméra : plus fluide sur téléphone, net sur écran Retina',
+    <aside class="ch__side">{done(['Ce ne sera plus de la 3D calculée dans le navigateur : une séquence d’images rendues dans Blender, en haute définition',
+      'La séquence s’anime au défilement : plus on descend, plus la caméra avance vers le catalogue. Plus fluide sur téléphone, net sur écran Retina',
       'Le flacon en clair-obscur, le plateau en noyer, le catalogue posé dessus',
       '121 images par format ; la version iPhone se termine aujourd’hui, la version ordinateur suit'])}{hidden()}</aside>
     <div class="ch__main chevm"><div class="chev">{shot(S['ch000'], 'Image 1')}{shot(S['ch064'], 'Image 65')}{shot(S['ch082'], 'Image 83')}</div>

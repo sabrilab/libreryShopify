@@ -161,7 +161,7 @@ const Chevet = ({ dur }) => {
   const e = ramp(f, 0, 40, io);
   return (
     <Dark>
-      <Side dark kick="L’accueil · le chevet" title={['Le chevet,', 'rendu dans *Blender.*']} lines={['Des images figées en haute définition, jouées au défilement, à la place de la 3D en temps réel.', 'Plus fluide sur téléphone, net sur écran Retina.']} />
+      <Side dark kick="L’accueil · le chevet" title={['Le chevet,', 'rendu dans *Blender.*']} lines={['Plus de 3D dans le navigateur : une séquence d’images en haute définition.', 'Elle s’anime au défilement de la page.', 'Plus fluide sur téléphone, net sur écran Retina.']} />
       <div style={{ position: 'absolute', left: 900, top: 70, opacity: e, transform: `translateY(${(1 - e) * 80}px)` }}>
         <Phone w={430} src="">
           <Img src={staticFile(`recap/chevet/${fr[i]}`)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
