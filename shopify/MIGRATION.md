@@ -58,8 +58,10 @@ renvoient vers `/pages/bibliotheque`. `/labo` et `/parfum/` (visionneuse) ne pas
 **Accès** (à Nolwenn, propriétaire de la boutique) :
 - un compte collaborateur ou employé pour Sabri avec les droits Thèmes, Produits, Pages, Navigation, Préférences,
   Applications (pour créer l'application privée) ;
-- une **application personnalisée** (Admin → Paramètres → Applications → Développer des applications) avec les
-  autorisations listées dans `shopify/import/README.md` ; son jeton d'accès Admin va dans `SHOPIFY_ADMIN_TOKEN` ;
+- une **application** pour l'import, avec les autorisations listées dans `shopify/import/README.md`. Shopify ne
+  permet plus d'en créer de nouvelles depuis l'admin : soit un jeton `shpat_…` d'une application personnalisée qui
+  existe déjà (`SHOPIFY_ADMIN_TOKEN`), soit une application du Dev Dashboard installée sur la boutique, dans la même
+  organisation (`SHOPIFY_CLIENT_ID` + `SHOPIFY_CLIENT_SECRET`, échangés par le script contre un jeton de 24 h) ;
 - l'application **Theme Access** (gratuite, Shopify) pour un mot de passe de thème → `SHOPIFY_CLI_THEME_TOKEN`.
   Jamais de jeton dans le chat ni dans un fichier : variables d'environnement seulement.
 
