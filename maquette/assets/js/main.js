@@ -1325,6 +1325,13 @@
     // le cadre se prépare à l'avance hors champ : à sa vraie taille (un cadre masqué se croirait large de 0), rendu suspendu ;
     // le catalogue attend « ouvert » pour son entrée et sa musique. Ouvert à froid, il ne se charge qu'une fois le glissement
     // fini (charger = false) : là où le cadre partage le fil de la page (iPhone), son chargement figerait le glissement.
+    // Un cadre déjà chargé ne change jamais d'adresse : il est remplacé par un cadre neuf (son premier chargement
+    // n'ajoute rien à l'historique). Un src réaffecté (ou location.replace) laisse dans l'historique conjoint l'adresse
+    // d'avant : Précédent, Retour et Échap (history.back) reculeraient dans le cadre caché au lieu de retirer #feuilleter.
+    const aller = url => {
+      if (vue._nav) { const n = vue.cloneNode(false); n.removeAttribute('src'); vue.replaceWith(n); vue = n; }
+      if (url) { vue._nav = true; vue.src = url; }
+    };
     const creer = (charger = true) => {
       if (!panneau) {
         body.insertAdjacentHTML('beforeend', `
@@ -1336,14 +1343,14 @@
         $('.lecteur__retour', panneau).addEventListener('click', demander);
         placer();
       }
-      if (charger && !vue.dataset.mode) { pret = false; vue.dataset.mode = 'livre'; vue.src = CAT + '?embed=1'; }
+      if (charger && !vue.dataset.mode) { pret = false; vue.dataset.mode = 'livre'; aller(CAT + '?embed=1'); }
     };
     const ouvrir = (depuis, direct) => {
       if (ouvert) return;
       if (etatChevet) { dire('ferme'); finChevet(); }            // fermeture du chevet en cours : achevée d'un coup
       // préparé en décor chevet : vidé (le cadre glisse vide, sur le fond brun), le catalogue habituel se charge ensuite
       if (vue?.dataset.mode === 'chevet') {
-        pret = false; delete vue.dataset.mode; vue.src = 'about:blank';
+        pret = false; delete vue.dataset.mode; aller(null);
         panneau.classList.remove('lecteur--chevet', 'is-vu'); panneau.inert = false; delete panneau.dataset.etat; panneau.classList.add('is-veille');
       }
       ouvert = true; creer(false);
@@ -1368,7 +1375,9 @@
     // focale), plateau sous le livre, vignetage, papier — mesurés dans la page, en fractions du cadre.
     // Ouverture : la page à l'image clé (défilement doux s'il le faut, rendu affiné), le cadre à sa place sans glissement,
     // invisible (opacité 0 : il dessine, à sa vraie taille) et sans pointeur, les textes de la section s'effacent ; à
-    // « pret » (image complète) ou « revenu » (cadre préparé d'avance, recadré), fondu de 180 ms. Retour, Échap,
+    // « pret » (image complète) ou « revenu » (cadre préparé d'avance, recadré), fondu de 180 ms. Préparé d'avance en
+    // approchant de la section (plus bas, prechargerChevet) ; cliqué avant qu'il soit prêt, l'image clé reste avec ses
+    // textes et le bouton dit « Ouverture… » jusqu'à « pret » (10 s au plus, puis le lecteur habituel). Retour, Échap,
     // Précédent : « revenir » (le livre se referme, la caméra revient à l'image clé), à « revenu » le fondu inverse, puis
     // les textes et l'en-tête tels qu'on les a quittés. Sans 3D (repli, mouvement réduit) : le lecteur habituel.
     const flip = livre?.closest('.flip'), fondChevet = flip && $('.flip__chevet', flip);
@@ -1377,7 +1386,10 @@
     // ou il l'annonce lui-même, « pret » portant decors) — sinon, depuis la section aussi, le lecteur habituel : un
     // catalogue sans ce décor ne répond jamais en mode chevet
     let decorChevet = CATALOGUE_DECOR_CHEVET || CAT !== CATALOGUE_URL;
-    const depuisChevet = () => decorChevet && chevetVivant();
+    // économie de données ou connexion lente (2G, 3G) : rien ne se charge d'avance (le catalogue, 1 Mo et plus ; en décor
+    // chevet, près de 6 Mo) et, depuis la section aussi, le lecteur habituel — le décor n'y serait jamais prêt à temps
+    const cx = navigator.connection, lent = !!cx && (cx.saveData || /2g|3g/.test(cx.effectiveType || ''));
+    const depuisChevet = () => decorChevet && !lent && chevetVivant();
     const avancee = () => { const r = flip.getBoundingClientRect(); return -r.top / (r.height - innerHeight); };
     const surCle = () => { const p = avancee(); return p >= CHEVET.fondu && p <= CHEVET.livre; };
     // la page à l'image clé : défilement doux s'il le faut, puis l'arrêt et le rendu affiné du chevet (2,5 s au plus) ;
@@ -1396,10 +1408,14 @@
       };
       setTimeout(voir, 60);
     });
-    // l'image clé mesurée, en fractions du cadre (à sa place sous l'en-tête, même préparé hors champ)
+    // l'image clé mesurée, en fractions du cadre (à sa place sous l'en-tête, même préparé hors champ). Livre fermé
+    // (P ≤ CHEVET.livre), section épinglée ou pas encore : livre et canevas sont dans le bloc épinglé, mesurés là où il
+    // se posera (dy : son écart à sa place épinglée, nul à l'image clé) — le cadre se prépare avant d'y arriver
     const r6 = v => +v.toFixed(6);
     const cadreChevet = () => {
-      const k = fondChevet.chevet.cle(), B = $('.flip__leaf', flip).getBoundingClientRect(), C = $('canvas', fondChevet).getBoundingClientRect();
+      const st = $('.flip__sticky', flip), dy = st ? st.getBoundingClientRect().top - (parseFloat(getComputedStyle(st).top) || 0) : 0;
+      const k = fondChevet.chevet.cle(), b = $('.flip__leaf', flip).getBoundingClientRect(), c = $('canvas', fondChevet).getBoundingClientRect();
+      const B = { left: b.left, top: b.top - dy, width: b.width, height: b.height }, C = { left: c.left, top: c.top - dy, width: c.width, height: c.height };
       const v = vue.getBoundingClientRect(), tr = getComputedStyle(panneau).transform, m = tr && tr !== 'none' ? new DOMMatrixReadOnly(tr) : null;
       const I = { left: v.left - (m ? m.m41 : 0), top: v.top - (m ? m.m42 : 0), width: v.width, height: v.height };
       const F = Math.tan(k.fov * Math.PI / 360), co = Math.cos(k.pose.ry), si = Math.sin(k.pose.ry);
@@ -1412,13 +1428,24 @@
       };
     };
     const signe = c => [c.cadre, c.optique, c.table].join('|');
-    const chargerChevet = c => { pret = false; vue.dataset.mode = 'chevet'; chargeAvec = signe(c); vue.src = CAT + '?' + new URLSearchParams({ embed: '1', decor: 'chevet', ...c }).toString().replace(/%2C/g, ','); };
+    const chargerChevet = c => { pret = false; vue.dataset.mode = 'chevet'; chargeAvec = signe(c); aller(CAT + '?' + new URLSearchParams({ embed: '1', decor: 'chevet', ...c }).toString().replace(/%2C/g, ',')); };
     // etatChevet : '' (lecteur habituel, ou fermé), 'attente' (invisible, le catalogue se prépare), 'ouvert', 'retour'
     // (le catalogue revient à l'image clé), 'fondu' (le fondu de sortie) ; chargeAvec : l'image clé que le cadre a reçue ;
     // enteteCache : l'en-tête, masqué au défilement à l'image clé, l'est de nouveau au retour
     let etatChevet = '', chargeAvec = '', fondu = null, garde = 0, enRoute = false, enteteCache = false, tAttente = 0, tTextes = 0;
     const TEXTES = 350;   // les textes de la section s'effacent avant la bascule (style.css, html.lecteur-chevet)
     const poser = e => { etatChevet = e; panneau.dataset.etat = e; html.classList.toggle('lecteur-attente', e === 'attente'); };
+    // cliqué avant que le catalogue soit prêt : l'image clé reste, textes compris, et le bouton de la section dit
+    // « Ouverture… » sur un filet d'or qui va et vient (style.css, html.lecteur-patience) ; même largeur, rien ne bouge
+    const bouton = flip && $('.flip__cta a[data-lecteur]', flip);
+    let patience = false;
+    const patienter = oui => {
+      if (patience === oui) return;
+      patience = oui; html.classList.toggle('lecteur-patience', oui); panneau?.setAttribute('aria-busy', oui);
+      if (!bouton) return;
+      if (oui) { bouton.style.minWidth = bouton.getBoundingClientRect().width + 'px'; bouton.dataset.texte = bouton.textContent; bouton.textContent = 'Ouverture…'; }
+      else { if (bouton.dataset.texte) bouton.textContent = bouton.dataset.texte; delete bouton.dataset.texte; bouton.style.minWidth = ''; }
+    };
     async function ouvrirChevet(depuis) {
       if (ouvert || enRoute) return;
       if (etatChevet) return reprendre();
@@ -1428,7 +1455,7 @@
       if (ouvert || !ok || !chevetVivant()) return;       // parti ailleurs entre-temps : rien
       ouvert = true; creer(false);
       retourFocus = depuis; y = scrollY; enteteCache = !!header?.classList.contains('is-hidden');
-      clearTimeout(tTextes); html.classList.remove('lecteur-retour'); html.classList.add('lecteur-ouvert', 'lecteur-chevet');
+      clearTimeout(tTextes); html.classList.remove('lecteur-retour'); html.classList.add('lecteur-ouvert');
       const an = $('#announce');
       if (header && an && body.classList.contains('page-home')) header.style.top = Math.max(0, an.getBoundingClientRect().bottom) + 'px';
       panneau.classList.add('lecteur--chevet'); panneau.classList.remove('is-veille', 'is-vu'); panneau.hidden = false; panneau.inert = false; placer();
@@ -1439,9 +1466,12 @@
       poser('attente'); tAttente = performance.now();
       const c = cadreChevet();
       if (vue.dataset.mode !== 'chevet') chargerChevet(c);
-      else if (pret) { chargeAvec = signe(c); dire('revenir', c); }      // préparé d'avance : recadré, il répondra « revenu »
-      // catalogue muet (réseau lent, décor absent) : au bout de 3 s, le lecteur habituel plutôt qu'une page figée
-      clearTimeout(garde); garde = setTimeout(secours, 3000);
+      // préparé d'avance et prêt : recadré, il répondra « revenu » ; les textes s'effacent pendant ce temps
+      if (pret) { chargeAvec = signe(c); dire('revenir', c); html.classList.add('lecteur-chevet'); }
+      else patienter(true);           // il se charge encore : les textes ne s'effaceront qu'à son « pret »
+      // catalogue muet (réseau lent, décor absent) : le lecteur habituel plutôt qu'une page figée — au bout de 3 s s'il
+      // n'avait qu'à se recadrer, de 10 s s'il se charge encore (≈ 6 Mo : 2 à 3 s sur la fibre, 6 à 7 s en 4G)
+      clearTimeout(garde); garde = setTimeout(secours, pret ? 3000 : 10000);
     }
     // secours : le lecteur habituel, qui glisse depuis la droite avec son propre écran de chargement (le cadre préparé
     // en décor chevet est vidé par ouvrir) ; l'entrée #feuilleter déjà poussée reste la nôtre
@@ -1476,7 +1506,7 @@
       fondu.finished.then(() => { if (etatChevet === 'fondu') { dire('ferme'); finChevet(); } }, () => {});
     }
     function finChevet() {
-      clearTimeout(garde); fin();
+      clearTimeout(garde); patienter(false); fin();
       if (enteteCache) header.classList.add('is-hidden');      // l'image clé telle qu'on l'a quittée
       if (html.classList.contains('lecteur-chevet')) {          // les textes reviennent en fondu
         html.classList.replace('lecteur-chevet', 'lecteur-retour');
@@ -1534,6 +1564,9 @@
           // page a changé depuis son adresse). Déjà montré par le délai de garde : il apprend qu'il est vu (en plein
           // fondu, « ouvert » viendra à sa fin) ; sur le retour, il est déjà sur l'image clé
           if (etatChevet === 'attente') {
+            // attendu (cliqué avant qu'il soit prêt) : les textes s'effacent maintenant, le fondu suit (3 s de garde à
+            // nouveau, pour un éventuel recadrage) ; le bouton garde « Ouverture… » en s'effaçant, finChevet le rétablit
+            if (patience) { html.classList.replace('lecteur-patience', 'lecteur-chevet'); panneau.setAttribute('aria-busy', false); tAttente = performance.now(); clearTimeout(garde); garde = setTimeout(secours, 3000); }
             const c = chevetVivant() ? cadreChevet() : null;
             if (!c || signe(c) === chargeAvec) basculer(); else { chargeAvec = signe(c); dire('revenir', c); }
           } else if (panneau.dataset.etat === 'ouvert') { dire('ouvert'); if ([panneau, vue, body].includes(document.activeElement)) viser(); }
@@ -1550,27 +1583,44 @@
 
     // préchargement : survol à la souris ou focus au clavier d'un lien, livre de l'accueil à l'écran (après une pause
     // du défilement, pour que le chargement ne saccade pas le feuilletage). Pas au toucher : le doigt « survole »
-    // au moment même du clic, et sur téléphone le cadre partage souvent le fil de la page. Depuis la section du chevet,
-    // le cadre se prépare en décor chevet, mesuré section épinglée et livre fermé (sinon : au prochain arrêt).
+    // au moment même du clic, et sur téléphone le cadre partage souvent le fil de la page.
+    // Depuis la section du chevet, le cadre se prépare en décor chevet (≈ 6 Mo, « pret » en 2 à 3 s sur la fibre, 6 à 7 s
+    // en 4G : chargé au clic seulement, il arrivait trop tard), mesuré là où la section s'épinglera, livre fermé : à la
+    // souris, dès que la 3D de la section est en place et le visiteur à trois écrans d'elle (au premier moment libre) ;
+    // au toucher, le mouvement fini (image clé à l'écran), à l'arrêt du défilement. Jamais le catalogue habituel
+    // d'abord sur l'accueil quand le décor chevet est prévu : il serait chargé pour rien. Rien en économie de données
+    // ni sur une connexion lente (lent, plus haut).
     const prechargerChevet = () => {
       if (ouvert || etatChevet || !depuisChevet()) return false;
       if (vue?.dataset.mode === 'chevet') return true;
-      const p = avancee(); if (p < 0 || p > CHEVET.livre) return false;
+      if (avancee() > CHEVET.livre) return false;            // livre ouvert : sa couverture n'est plus mesurable
       creer(false); preparer(); chargerChevet(cadreChevet()); return true;
     };
     const accueil = el => decorChevet && el.closest?.('#catalogue') && flip?.classList.contains('flip--chevet');   // 3D prévue (montée ou en route)
     const prechauffer = e => { if (e.type === 'focus' ? e.target.matches(':focus-visible') : e.pointerType === 'mouse') accueil(e.currentTarget) ? prechargerChevet() : creer(); };
-    // rien d'avance en économie de données ou sur une connexion lente (2G, 3G) : le catalogue (1 Mo et plus) se charge
-    // au clic seulement
-    const cx = navigator.connection, lent = !!cx && (cx.saveData || /2g|3g/.test(cx.effectiveType || ''));
     if (!lent) liens.forEach(a => ['pointerenter', 'focus'].forEach(t => a.addEventListener(t, prechauffer)));
-    if (livre && !lent) {
+    if (livre && !lent && 'IntersectionObserver' in window) {
       livre.addEventListener('pointerenter', prechauffer);
-      let t = 0; const repos = () => { clearTimeout(t); t = setTimeout(() => { if (accueil(livre) ? prechargerChevet() : (creer(), true)) removeEventListener('scroll', repos); }, 500); };
-      if ('IntersectionObserver' in window && matchMedia('(hover: hover)').matches) {
-        const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { io.disconnect(); addEventListener('scroll', repos, { passive: true }); repos(); } });
-        io.observe(livre.closest('#catalogue'));
-      }
+      const sec = livre.closest('#catalogue'), souris = matchMedia('(hover: hover)').matches;
+      let t = 0, proche = false, fait = false;
+      // décor chevet (3D prévue) : dès qu'il se peut, comme dit plus haut ; sinon (3D absente ou en repli), le catalogue
+      // habituel, à la souris, section à l'écran et défilement arrêté, comme avant
+      const tenter = () => {
+        if (fait) return;
+        if (accueil(livre)) fait = chevetVivant() && (souris || avancee() >= CHEVET.vol) && prechargerChevet();
+        else if (souris) { const r = sec.getBoundingClientRect(); fait = r.top < innerHeight && r.bottom > 0 && (creer(), true); }
+        if (fait) { removeEventListener('scroll', repos); io.disconnect(); mo.disconnect(); }
+      };
+      const repos = () => { clearTimeout(t); t = setTimeout(tenter, 500); };
+      const libre = () => 'requestIdleCallback' in window ? requestIdleCallback(tenter, { timeout: 1000 }) : setTimeout(tenter, 200);
+      const io = new IntersectionObserver(([en]) => {
+        proche = en.isIntersecting;
+        if (proche) { addEventListener('scroll', repos, { passive: true }); libre(); } else removeEventListener('scroll', repos);
+      }, { rootMargin: '300% 0px' });
+      // la 3D de la section arrive (is-3d) ou se replie : on réessaie aussitôt à la souris ; au toucher, à l'arrêt du
+      // défilement (les classes de la section changent aussi en plein geste, au passage de CHEVET.vol)
+      const mo = new MutationObserver(() => { if (proche) (souris ? libre : repos)(); });
+      io.observe(sec); if (flip) mo.observe(flip, { attributes: true, attributeFilter: ['class'] });
     }
     // lien direct (ou rechargement, retour d'une autre page) : ouvert d'emblée, sans glissement ; l'entrée est peut-être la nôtre
     if (location.hash === ANCRE) { pousse = !!history.state?.lecteur; ouvrir(null, true); }
@@ -1917,7 +1967,7 @@
   }
 
   function initGifts() {
-    $$('[data-gift]').forEach(el => {
+    $$('.grid[data-gift]').forEach(el => {   // les questions du portrait (h2.quiz__q) portent aussi data-gift : leur formulation « cadeau »
       el.innerHTML = el.dataset.gift.split(',').map(t => {
         if (t === 'quiz') return quizTile();
         const [h, f] = t.split('@'); const p = byHandle(h); if (!p) return '';

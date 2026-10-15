@@ -10,9 +10,10 @@ const IMG = '/assets/img/v2/';
 const CATALOGUE_URL = 'https://librery-catalogue-3d.vercel.app/';
 const CATALOGUE_PDF = 'https://librery-catalogue-3d.vercel.app/telechargements/LIBRERY-catalogue-doubles-pages.pdf';
 // Le catalogue en ligne reprend-il l'image clé du chevet de l'accueil (décor « chevet », docs/chevet.md du dépôt
-// librery-catalogue-3d) ? Pas encore déployé : depuis la section, le lecteur habituel. À passer à true une fois le décor
-// en ligne — ou le catalogue l'annonce lui-même (« pret » portant decors: ['chevet'], main.js : initLecteur).
-const CATALOGUE_DECOR_CHEVET = false;
+// librery-catalogue-3d) ? Oui, déployé (librery-catalogue-3d 88e3c77) : depuis la section, le catalogue s'ouvre dans le
+// même décor. À repasser à false pour revenir au lecteur habituel partout — le catalogue peut aussi l'annoncer lui-même
+// (« pret » portant decors: ['chevet'], main.js : initLecteur).
+const CATALOGUE_DECOR_CHEVET = true;
 
 /* Visuels produit : pack = flacon détouré sur fond clair (grille façon D'orsay),
    pack / pack30 = packshots studio à échelle commune (flacon ≈ 40 % du cadre),

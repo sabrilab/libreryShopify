@@ -934,7 +934,7 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
   .flip__hint, .flip__bar { display: none; }
   .flip__cta { margin-top: 14px; }
 }
-.flip .flip__book[data-lecteur] { cursor: pointer; }
+.flip .flip__book[data-lecteur] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 /* Le chevet 3D (main.js, chevet ; assets/js/chevet3d.js) : la section s'allonge — d'un seul mouvement, la caméra
    monte, se tourne et glisse jusqu'à poser le catalogue (immobile sur le plateau) à la place du livre fermé ; le livre prend le
    relais et se feuillette comme avant, le plateau dessous, décalé à droite. Le plateau remplace la bande de noyer,
@@ -998,9 +998,13 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
    plus qu'eux) et reviennent de même après le retour */
 html:is(.lecteur-chevet, .lecteur-retour) .flip--chevet :is(.flip__cap, .flip__cta) { transition: opacity .35s ease; }
 html.lecteur-chevet .flip--chevet :is(.flip__cap, .flip__cta) { opacity: 0; }
-/* le catalogue se prépare (téléphone surtout : rien n'y est chargé d'avance) : un filet d'or court va et vient sous l'en-tête */
-html.lecteur-attente .header::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 22%; height: 1px; background: var(--gold); animation: lecteur-attente 1.1s ease-in-out infinite alternate; }
+/* le catalogue se prépare : un filet d'or court va et vient sous l'en-tête — sous le bouton de la section quand on l'y
+   attend, l'image clé restée à l'écran (main.js, patienter : le bouton dit « Ouverture… ») */
+html.lecteur-attente:not(.lecteur-patience) .header::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 22%; height: 1px; background: var(--gold); animation: lecteur-attente 1.1s ease-in-out infinite alternate; }
 @keyframes lecteur-attente { to { transform: translateX(354.5%); } }
+html.lecteur-patience .flip--chevet .flip__cta .btn { position: relative; cursor: progress; }
+html.lecteur-patience .flip--chevet .flip__cta .btn::after { content: ""; position: absolute; left: 0; bottom: -9px; width: 30%; height: 1px; background: var(--gold); animation: lecteur-patience 1.1s ease-in-out infinite alternate; }
+@keyframes lecteur-patience { to { transform: translateX(233.33%); } }
 /* ouvert : la page ne défile plus (position conservée ; la place de la barre de défilement est gardée, l'en-tête ne saute pas) ;
    l'en-tête reste plein et visible, même sur l'image d'accueil ; le menu déroulé d'où l'on vient se replie (main.js) */
 html.lecteur-ouvert { overflow: hidden; scrollbar-gutter: stable; }
