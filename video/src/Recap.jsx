@@ -249,9 +249,9 @@ const Weekend = ({ dur }) => {
     <Paper>
       <Side kick="En ligne ce week-end" title={['Le site,', 'version *simplifiée.*']} lines={lines} />
       <div style={{ position: 'absolute', left: 640, top: 150, opacity: o }}>
-        <Browser w={s.m ? 860 : 1190} src={`recap/we/${s.d}`} y={kf(t, [[0, 0], [per, s.y || 0]])} siteW={1440} />
-        {s.m && <div style={{ position: 'absolute', left: 900, top: -30 }}><Phone w={300} src={`recap/we/${s.m}`} y={kf(t, [[0, 0], [per, s.ym || 0]])} /></div>}
-        <div style={{ position: 'absolute', left: 0, top: (s.m ? 860 : 1190) * 0.625 + 80, fontFamily: serif, fontSize: 26, color: C.ink }}>{s.label}</div>
+        <Browser w={s.m ? 860 : 1190} src={`recap/we/${s.d}`} y={kf(t, [[0, 0], [60, 0], [per, s.y || 0]])} siteW={1440} />
+        {s.m && <div style={{ position: 'absolute', left: 900, top: -30 }}><Phone w={300} src={`recap/we/${s.m}`} y={kf(t, [[0, 0], [60, 0], [per, s.ym || 0]])} /></div>}
+        <div style={{ position: 'absolute', left: 0, top: (s.m ? 860 : 1190) * 0.625 + 80, width: 860, fontFamily: serif, fontSize: 26, color: C.ink }}>{s.label}</div>
       </div>
       <Hud n="04" label="Le site de ce week-end" at={20} />
     </Paper>
@@ -305,7 +305,7 @@ const Fin = ({ dur }) => {
 export const RSCENES = [
   ['ouverture', 165, Ouverture], ['notes', 165, Notes], ['code', 210, Code], ['stores', 150, Stores], ['paiement', 165, Paiement],
   ['fiche', 165, Fiche], ['titre3d', 120, Titre3D], ['chevet', 300, Chevet], ['sillage', 255, Sillage], ['feuille', 330, Feuille],
-  ['carton', 150, Carton], ['weekend', WE.length ? 120 * WE.length + 20 : 180, Weekend], ['suite', 210, Suite], ['fin', 150, Fin],
+  ['carton', 150, Carton], ['weekend', WE.length ? 165 * WE.length + 20 : 180, Weekend], ['suite', 210, Suite], ['fin', 150, Fin],
 ];
 export const RTOTAL = RSCENES.reduce((s, [, d]) => s + d, 0);
 const FADES = { ouverture: [0, 8], fin: [8, 0] };
