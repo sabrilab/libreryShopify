@@ -1802,6 +1802,7 @@
     const perfumes = PRODUCTS.filter(x => !x.type);
     const related = PRODUCTS.filter(x => x.handle !== p.handle && x.collection === p.collection).concat(PRODUCTS.filter(x => x.collection !== p.collection && !x.type)).slice(0, 3);
     const acc = (t, c) => `<div class="acc"><button type="button" aria-expanded="false">${t}</button><div class="acc__panel">${c}</div></div>`;
+    const stLabel = () => isSoon(p, current) ? SOON_SHORT : `Ajouter — <span id="st-price">${eur(current.price)}</span>`;
     const cta = () => isSoon(p, current) ? `${current.label} — ${SOON_LABEL.toLowerCase()}` : p.builder && picks.length < p.builder ? `Choisissez encore ${p.builder - picks.length} parfum${p.builder - picks.length > 1 ? 's' : ''}` : `Ajouter au panier — ${eur(current.price)}`;
     const story = p.description.slice(0, 2), more = p.description.slice(2);
     // une seule pyramide : si la « lecture des matières » (catalogue) existe, elle fait foi
@@ -1826,7 +1827,7 @@
           ${p.keyNotes && isPerfume ? `<p class="pdp__notes-line">${esc(p.keyNotes.replace(/ · /g, ', '))}</p>` : ''}
           ${p.families && isPerfume ? `<p class="pdp__fams">Famille ${p.families.map(f => `<a href="/bibliotheque?famille=${encodeURIComponent(f)}#familles">${f}</a>`).join(' · ')}</p>` : ''}
           <p class="pdp__desc">${p.tagline}</p>
-          ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${isSoon(p, f) ? SOON_LABEL : eur(f.price)}</small></button>`).join('')}</div>` : ''}
+          ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${isSoon(p, f) ? SOON_SHORT : eur(f.price)}</small></button>`).join('')}</div>` : ''}
           ${p.builder ? `<div class="builder"><div class="builder__head"><span>Vos parfums</span><b id="b-count">0 / ${p.builder}</b></div>
             <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><span class="builder__thumb">${packPic(x.pack, '', '(max-width: 800px) 30vw, 9vw', '', true)}</span><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
           <button class="btn btn--block" id="add" ${p.builder || isSoon(p, current) ? 'disabled' : ''}>${cta()}</button>
@@ -1875,7 +1876,7 @@
         <div class="grid grid--rail">${related.map(card).join('')}</div>
       </div></section>`;
     // barre d'achat collante : hors de <main>, que le glissement du lecteur (transformation de <main>) ne l'emporte pas
-    $('main').insertAdjacentHTML('afterend', `<div class="sticky-buy" id="sticky" aria-hidden="true"><div class="wrap"><span class="n">${nm(p.name)}<span id="st-var">${esc(current.label)}</span></span><button class="btn" id="st-add"${isSoon(p, current) ? ' disabled' : ''}>Ajouter — <span id="st-price">${isSoon(p, current) ? SOON_LABEL.toLowerCase() : eur(current.price)}</span></button></div></div>`);
+    $('main').insertAdjacentHTML('afterend', `<div class="sticky-buy" id="sticky" aria-hidden="true"><div class="wrap"><span class="n">${nm(p.name)}<span id="st-var">${esc(current.label)}</span></span><button class="btn" id="st-add"${isSoon(p, current) ? ' disabled' : ''}>${stLabel()}</button></div></div>`);
 
     const shown = () => $$('#gallery figure:not([hidden])');
     const count = () => { const g = $('#gallery'), n = shown().length; $('#gcount').textContent = `${Math.min(n, Math.round(g.scrollLeft / (g.clientWidth || 1)) + 1)} / ${n}`; };
@@ -1896,7 +1897,7 @@
     const setFormat = id => {
       current = fmts.find(f => f.id === id) || current;
       $$('#sizes button').forEach(x => x.classList.toggle('is-active', x.dataset.f === current.id));
-      $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-price').textContent = isSoon(p, current) ? SOON_LABEL.toLowerCase() : eur(current.price);
+      $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-add').innerHTML = stLabel();
       if (p.soon) { const soon = isSoon(p, current); $('#add').disabled = soon; $('#st-add').disabled = soon; $('#soon').hidden = !soon; }
       showPack(p.fmtImages ? current.id : current.id === '30' ? '30' : '100');
     };

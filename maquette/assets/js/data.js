@@ -45,10 +45,11 @@ const FORMATS = [
   { id: '2', label: '2 ml', price: 7 }
 ];
 /* Format pas encore en stock : `soon: ['100']` sur le produit (Skin Obsession, retour de Rafiq le 15/10).
-   Le format reste affiché mais ne s'ajoute pas au panier ; la date viendra dans SOON_NOTE quand elle sera fixée.
+   Le format reste affiché mais ne s'ajoute pas au panier ; sortie confirmée par Sabri : 30 octobre 2026.
    Shopify : variante 100 ml en « continuer à vendre » = non, avec le même message (métachamp ou bloc du thème). */
-const SOON_LABEL = 'Bientôt disponible';
-const SOON_NOTE = 'Le 100 ml arrive très bientôt : les précommandes ouvriront prochainement. En attendant, le 30 ml et l’échantillon 2 ml sont disponibles.';
+const SOON_LABEL = 'Disponible le 30 octobre';
+const SOON_SHORT = 'Le 30 octobre';   // sous « 100 ml », dans le sélecteur de format
+const SOON_NOTE = 'Le 100 ml sort le 30 octobre et les précommandes ouvrent très bientôt. En attendant, le 30 ml et l’échantillon 2 ml sont disponibles.';
 
 const PERFUMERS = {
   'chris-maurice': {
