@@ -357,6 +357,8 @@ span.gold > img { position: absolute; inset: 0; width: 100%; height: 100%; objec
    --dr (0 → 1) trace chaque trait depuis son origine. Sans le volume (animations réduites) : le plan de face seul, tracé. */
 .ed-grid, .ed-pl { position: absolute; inset: 0; pointer-events: none; transform-style: preserve-3d; }
 .ed-g { position: absolute; left: 0; top: 0; display: block; background: rgba(47, 43, 40, .13); }
+/* (hors de l'écran, le quadrillage est retiré : ses ~80 traits en 3D étaient autant de calques permanents, sur toute la page) */
+.ed-3d:not(.ed-live) .ed-grid { display: none; }
 .ed-g--h { height: 1px; transform-origin: var(--o, 0%) 50%; scale: var(--dr, 1) 1; }
 .ed-g--v { width: 1px; transform-origin: 50% 0; scale: 1 var(--dr, 1); }
 .ed-g--au { background: rgba(183, 145, 106, .78); }
@@ -909,6 +911,7 @@ body:has(#sticky.is-on) { padding-bottom: 68px; }
 .flip .flip__book::after { content: ""; position: absolute; left: calc(50% - 18px); top: 0; width: 36px; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,0,0,.08) 45%, rgba(0,0,0,.14) 50%, rgba(0,0,0,.08) 55%, transparent); transform: translateZ(9px); pointer-events: none; }
 .flip .flip__book.is-closed::after { opacity: 0; }
 .flip .flip__leaf { position: absolute; top: 0; left: 50%; width: var(--pw); height: var(--ph); transform-origin: left center; transform-style: preserve-3d; }
+.flip.is-loin .flip__leaf { display: none; }   /* loin de l'écran : pas de calques 3D pour rien (main.js, initFlip) */
 .flip .flip__flat { position: absolute; inset: 0; transform-style: preserve-3d; display: none; }
 .flip .flip__flat > i { position: absolute; inset: 0; background: #fff center / cover no-repeat; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .flip .flip__flat > i.b { transform: rotateY(180deg); }

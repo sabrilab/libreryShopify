@@ -163,7 +163,10 @@
     // en-tête transparent sur l'image d'accueil, masqué en descendant ;
     // l'ouverture au défilement de l'accueil (.entete, initEntete) règle elle-même la transparence : tant que le film couvre le haut de l'écran
     const header = $('#header'); const over = body.classList.contains('page-home'), entete = $('.entete');
-    let lastY = 0;
+    let lastY = 0, survol = false;
+    // (le sous-menu ouvert au survol garde l'en-tête : suivi par la souris plutôt que par « :hover » relu à chaque
+    // défilement — cette lecture forçait un recalcul des styles de toute la page à chaque image)
+    $$('.has-sub', header).forEach(el => { el.addEventListener('mouseenter', () => survol = true); el.addEventListener('mouseleave', () => survol = false); });
     const onScroll = () => {
       const y = window.scrollY, hero = $('.s-hero');
       if (!entete) {
@@ -171,7 +174,7 @@
         header.classList.toggle('is-top', !!top);
         header.classList.toggle('is-solid', over && !top);
       }
-      header.classList.toggle('is-hidden', y > 500 && y > lastY + 4 && !$('.has-sub:hover'));
+      header.classList.toggle('is-hidden', y > 500 && y > lastY + 4 && !survol);
       if (y < lastY - 4) header.classList.remove('is-hidden');
       lastY = y;
     };
@@ -957,7 +960,7 @@
   }
 
   /* Écran de chargement : attend le film d'ouverture, les pages du catalogue, les tirages de l'ouverture (décodés), les
-     polices et la page ; à l'accueil, sur ordinateur, le chevet 3D aussi s'il peut être prêt à temps (initPrechauffe).
+     polices et la page ; à l'accueil, les premières images du chevet aussi (initPrechauffe).
      3 s au plus depuis l'ouverture de la page (la feuille de style l'efface d'elle-même à 6 s, sans JavaScript).
      Le reste (scènes 3D, images plus bas) se prépare derrière lui : initPrechauffe */
   let ecranFini, essentielFini;
@@ -984,24 +987,9 @@
       $$('.entete-pr img').forEach(i => i.decode && add(i.decode()));
       const limite = vers(Math.max(2750, performance.now() + 1500));   // + 250 ms : l'écran s'efface à 3 s au plus
       Promise.race([Promise.all(tasks), limite]).then(essentielFini);
-      // puis le chevet 3D, sur une connexion rapide : l'écran attend la scène montée, jusqu'à 2,4 s — textures envoyées à
-      // la carte, reflets calculés, shaders compilés derrière lui plutôt que pendant l'ouverture qu'on fait défiler.
-      // Rapide : au débit de ce qu'il vient de recevoir (octets / temps où l'un au moins se chargeait), les 4 Mo du chevet
-      // (partis à l'instant même) arrivent en 1,2 s au plus — mesuré : 0,7 s en local, 2,8 s en 4G —, et ils arrivent
-      // en effet dans la seconde. Sinon, il ne l'attend pas : la scène se monte ensuite, l'affiche tient sa place.
-      // Octets rendus disponibles, pas transférés : servis par le cache ou revalidés (nouvel onglet, deuxième visite),
-      // transferSize n'en compte que les en-têtes — l'écran se croyait sur une connexion lente et partait avant la scène
-      if (chevetEcran) add(essentiel.then(() => {
-        let o = 0, t = 0, c = null;
-        performance.getEntriesByType('resource').map(e => [e, e.encodedBodySize || e.transferSize]).filter(([e, n]) => n > 0 && e.responseEnd > 0)
-          .sort(([a], [b]) => a.fetchStart - b.fetchStart).forEach(([e, n]) => {
-            o += n;
-            if (!c || e.fetchStart > c[1]) { if (c) t += c[1] - c[0]; c = [e.fetchStart, e.responseEnd]; } else c[1] = Math.max(c[1], e.responseEnd);
-          });
-        if (c) t += c[1] - c[0];
-        if (!o || 4.3e6 * t / o > 1200) return false;
-        return Promise.race([chevetEcran.fichiers.then(() => true), new Promise(r => setTimeout(r, 1000))]);
-      }).then(a => a && Promise.race([chevetEcran.monte, vers(2400)])));
+      // puis le chevet : l'écran attend ses premières images (une sur 8 de la plongée, décodée celle du départ),
+      // jusqu'à 2,6 s — sur une connexion lente, il ne les attend pas : l'affiche tient leur place
+      if (chevetEcran) add(essentiel.then(() => Promise.race([chevetEcran.monte, vers(2600)])));
       Promise.race([Promise.all(tasks), limite]).then(() => setTimeout(fin, 250));
     });
   }
@@ -1010,14 +998,8 @@
      pour qu'en descendant rien ne se fasse attendre ni ne saccade. Rien ne part avant la fin du chargement de la page
      (event load) ni avant que l'écran de chargement ait reçu ce qu'il attend d'abord (film, polices, tirages de l'ouverture,
      pages du catalogue) : partis plus tôt, ces fichiers lui prendraient la bande passante et l'allongeraient (mesuré en 4G).
-     · Le chevet de l'accueil (chevet() le monte de lui-même dès la page chargée) : tous ses modules d'un coup (sans cela,
-       trois vagues l'une après l'autre : chevet3d.js, Three.js et ses modules, leurs dépendances) et, sous Chromium, tous
-       ses fichiers d'un coup (sans cela, trois vagues encore : modèles et studio, textures du plateau, étiquettes), ceux-ci
-       en priorité basse, comme les images des écrans suivants, qu'on verra avant lui (4 Mo : en 4G, à priorité égale avec
-       elles, plutôt que devant). Préchargement (link preload) : la demande du module, même faite
-       pendant le préchargement, est servie par lui — un seul téléchargement (mesuré). Ailleurs (Safari, Firefox), ce
-       partage n'est pas vérifié : les fichiers partent à leur tour, comme avant. Sur ordinateur, si ces fichiers arrivent
-       vite, l'écran de chargement attend la scène montée (initLoader).
+     · Le chevet de l'accueil (chevet() le monte de lui-même dès la page chargée) : son module (chevet-seq.js), qui
+       demande ensuite ses images lui-même ; l'écran de chargement attend les premières (initLoader).
      · Les images des écrans suivants (grilles, mosaïques : huit écrans, douze images au plus), en priorité basse, chargées
        sans attendre leur approche et décodées hors du fil principal, deux à la fois, aux moments libres.
      · Sur une fiche ou au Lexique, le cadran (sundial()) : modules et fichiers en priorité basse, ceux-ci lus jusqu'au bout
@@ -1027,9 +1009,9 @@
        monte à son approche, comme avant.
      · Les autres pages du site : au survol d'un lien (Chrome, règles de spéculation), la page se charge avant le clic.
      Modules : modulepreload, adresses lues dans la carte d'import (les mêmes que l'import()). Fichiers : aux adresses mêmes
-     de chevet3d.js et sillage3d.js — à tenir à jour avec eux (une adresse oubliée se charge simplement à son tour).
+     de sillage3d.js — à tenir à jour avec lui (une adresse oubliée se charge simplement à son tour).
      Rien de tout cela en économie de données ou sur une connexion lente (2G, 3G) ; sur un écran tactile dont la mémoire est
-     inconnue ou de moins de 4 Go (téléphones), l'écran n'attend pas le chevet et le cadran se monte à son approche.
+     inconnue ou de moins de 4 Go (téléphones), le cadran se monte à son approche.
      Essais : window.__prechauffe = { depart, chevet, fichiers, cadran, images, monte } (en ms depuis l'ouverture). */
   const aMonter = [];          // lancements de scènes 3D qu'on peut avancer (sundial) ; chacun ne part qu'une fois
   function initPrechauffe() {
@@ -1062,28 +1044,19 @@
     const depart = Promise.all([charge, essentiel]).then(() => note('depart'));
     // Three.js vient du CDN (carte d'import) : sa connexion (DNS, TLS) s'ouvre dès maintenant, pas au départ des modules
     const cdn = carte.three && new URL(carte.three, location.href).origin;
-    if (cdn && cdn !== location.origin && $('.flip--chevet .flip__chevet, [data-clock] .clock__stage')) {
+    if (cdn && cdn !== location.origin && $('[data-clock] .clock__stage')) {
       const l = document.createElement('link'); l.rel = 'preconnect'; l.href = cdn; l.crossOrigin = 'anonymous'; document.head.append(l);
     }
-    // le chevet de l'accueil, tel que chevet() l'a mis en place (3D possible) ; MOBILE : la règle de chevet3d.js
-    const chevet = $('.flip--chevet'), C = '/assets/3d/chevet/', mobile = matchMedia('(pointer: coarse)').matches || innerWidth < 800;
-    const chromium = !!navigator.userAgentData;                  // préchargement partagé avec fetch() : vérifié sous Chromium
+    // le chevet de l'accueil, tel que chevet() l'a mis en place (séquence d'images, chevet-seq.js) : son module tout de
+    // suite ; ses images, il les demande lui-même une fois monté (une sur 8 d'abord, en priorité haute). L'écran de
+    // chargement attend ces premières images, partout (2,6 s au plus depuis l'ouverture) : la plongée est lisible dès
+    // le premier défilement, le reste de la séquence arrive derrière lui
+    const chevet = $('.flip--chevet');
     if (chevet && $('.flip__chevet', chevet)) {
-      const chevetFichiers = depart.then(() => {
-        ['chevet3d', 'chevet-photo', 'three', ...['loaders/GLTFLoader', 'loaders/RGBELoader', 'utils/BufferGeometryUtils', 'postprocessing/TAARenderPass', 'postprocessing/SSAARenderPass', 'postprocessing/GTAOPass',
-          'postprocessing/Pass', 'shaders/GTAOShader', 'shaders/PoissonDenoiseShader', 'shaders/CopyShader', 'math/SimplexNoise', 'math/ConvexHull'].map(m => `three/addons/${m}.js`)]
-          .forEach(s => module(s, 'auto'));
-        if (!chromium) return;                                     // ailleurs : les fichiers à leur tour
-        return precharges([C + 'ClassicNightstand_01_1k.gltf', C + 'ClassicNightstand_01.bin', ...['diff', 'arm', 'nor_gl'].map(t => `${C}textures/ClassicNightstand_01_${t}_1k.jpg`),
-          '/parfum/flacon-100ml.glb', '/parfum/parfums.json', '/parfum/studio.hdr', C + 'plateau.glb',
-          `${C}plateau-noyer-${mobile ? '2k' : '4k'}.webp`, C + 'plateau-noyer-normale-2k.webp', C + 'plateau-noyer-rugosite-2k.webp', C + 'emblem-gravure.webp',
-          C + 'caustiques.json', C + 'caustiques.png',
-          ...['palmeira', 'ambert-sunset', 'mango-wave', 'hot-sand', 'sun-ice', 'vanilla-plum', 'tonka-love', 'magnetic-flowers'].map(h => `${C}labels/${h}.webp`)]);
-      }).then(() => chromium && note('chevet'));
-      // l'écran de chargement : la scène montée — ou abandonnée (retour à la section d'avant) ; sur un ordinateur solide
-      // seulement (souris, 8 cœurs, 8 Go et plus) : ailleurs, sa mise en place pourrait le figer au-delà de ses 3 s
-      if (chromium && !matchMedia('(pointer: coarse)').matches && navigator.hardwareConcurrency >= 8 && navigator.deviceMemory >= 8) chevetEcran = { fichiers: chevetFichiers, monte: new Promise(r => {
+      module('chevet-seq', 'high');
+      chevetEcran = { monte: new Promise(r => {
         const fait = () => chevet.classList.contains('is-3d') || !chevet.classList.contains('flip--chevet');
+        if (fait()) return r();
         const mo = new MutationObserver(() => { if (fait()) { mo.disconnect(); r(); } });
         mo.observe(chevet, { attributes: true, attributeFilter: ['class'] });
       }) };
@@ -1152,40 +1125,51 @@
         }
         spread.appendChild(el); leaves.push({ el, strips });
       }
-      draw();
+      draw(true);
     };
-    const draw = () => {
+    // (fluidité : rien n'est écrit quand rien ne change — la section loin de l'écran, ou une feuille posée à plat ; chaque
+    // propriété n'est réécrite que si sa valeur change : 7 feuilles × 20 bandes, c'était 400 écritures de style par image,
+    // et un recalcul de toute la section, à chaque défilement, même en haut de la page)
+    const put = (el, k, v) => { if (el['_' + k] !== v) { el['_' + k] = v; k === 'transform' ? el.style.transform = v : el.style.setProperty(k, v); } };
+    const txt = (el, v) => { if (el && el._txt !== v) el.textContent = el._txt = v; };
+    let proche = true, derniere = '';
+    // (loin de l'écran, les feuilles sont retirées : leurs 140 bandes en 3D faisaient autant de calques permanents)
+    new IntersectionObserver(([e]) => { proche = e.isIntersecting; track.classList.toggle('is-loin', !proche); if (proche) draw(); }, { rootMargin: '100% 0px' }).observe(track);
+    const draw = (force) => {
+      if (!proche && force !== true) return;
       const r = track.getBoundingClientRect(), P = clamp(-r.top / (r.height - innerHeight));
+      const cle = P.toFixed(5) + track.className + leaves.length;
+      if (cle === derniere && force !== true) return; derniere = cle;
       // avec le chevet 3D, le livre ne s'ouvre qu'après le relais (CHEVET.livre) ; sinon, dès le début de la section
       const ch = track.classList.contains('flip--chevet'), prog = ch ? clamp((P - CHEVET.livre) / (1 - CHEVET.livre)) : P, p = prog * leaves.length;
       if (ch) {     // textes quand le plateau a glissé vers la droite, livre CSS en fondu sur le catalogue 3D
         const txt = clamp((P - CHEVET.txt) / (CHEVET.vol - CHEVET.txt)), livre = clamp((P - CHEVET.vol) / (CHEVET.fondu - CHEVET.vol));
-        track.style.setProperty('--chevet-txt', txt.toFixed(3)); track.style.setProperty('--chevet-livre', livre.toFixed(3));
+        put(track, '--chevet-txt', txt.toFixed(3)); put(track, '--chevet-livre', livre.toFixed(3));
         track.classList.toggle('is-txt-off', !txt); track.classList.toggle('is-livre-off', !livre);
       }
       const t0 = still ? (p > .5 ? 1 : 0) : ease(clamp(p));
-      spread.style.transform = `translateX(${(-25 * (1 - t0)).toFixed(2)}%)`;   // de face, bien droit
-      spread.style.setProperty('--ouvre', t0.toFixed(4));   // la page de droite a glissé de t0 demi-page (ombre coupée au bois, chevet3d.js)
-      spread.querySelector('.flip__l').style.opacity = t0 > .5 ? 1 : 0;
+      put(spread, 'transform', `translateX(${(-25 * (1 - t0)).toFixed(2)}%)`);   // de face, bien droit
+      put(spread, '--ouvre', t0.toFixed(4));   // la page de droite a glissé de t0 demi-page (ombre coupée au bois, chevet-seq.js)
+      put(spread.querySelector('.flip__l'), 'opacity', t0 > .5 ? '1' : '0');
       spread.classList.toggle('is-closed', t0 < .5);
       leaves.forEach(({ el, strips }, i) => {
         const t = still ? (p > i + .5 ? 1 : 0) : ease(clamp(p - i)), lift = Math.sin(t * Math.PI);
         const bend = 95 * lift * (t < .5 ? 1 : .8), base = -180 * t - bend * .35;
         const z = (t > .5 ? 1 + i * .8 : 1 + (leaves.length - i) * .8) + lift * 14;
-        el.style.transform = `translateZ(${z.toFixed(2)}px) rotateY(${base.toFixed(2)}deg)`;
+        put(el, 'transform', `translateZ(${z.toFixed(2)}px) rotateY(${base.toFixed(2)}deg)`);
         el.classList.toggle('is-flat', lift < .002);
         let acc = base, prev = 0;
         strips.forEach((st, j) => {
           const step = j === 0 ? 0 : bend * W[j] / WS * N / (N - 1) * .9;
-          st.style.transform = `rotateY(${step.toFixed(2)}deg)`; acc += step;
+          put(st, 'transform', `rotateY(${step.toFixed(2)}deg)`); acc += step;
           const c = Math.cos(acc * Math.PI / 180), sh = lift * (.04 + .2 * (1 - Math.abs(c)));
-          st.style.setProperty('--sa', (j ? prev : sh).toFixed(3)); st.style.setProperty('--sb', sh.toFixed(3)); prev = sh;
+          put(st, '--sa', (j ? prev : sh).toFixed(3)); put(st, '--sb', sh.toFixed(3)); prev = sh;
         });
       });
       const k = Math.min(CH.length - 1, Math.round(p));
-      $('[data-flip-n]').textContent = k ? `Pages ${2 * k} – ${2 * k + 1}` : 'Le catalogue · 56 pages';
-      $('[data-flip-t]').textContent = CH[k];
-      $('[data-flip-bar]').style.width = (prog * 100).toFixed(1) + '%';
+      txt($('[data-flip-n]'), k ? `Pages ${2 * k} – ${2 * k + 1}` : 'Le catalogue · 56 pages');
+      txt($('[data-flip-t]'), CH[k]);
+      put($('[data-flip-bar]'), 'width', (prog * 100).toFixed(1) + '%');
     };
     let raf = 0;
     addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); }); }, { passive: true });
@@ -1194,19 +1178,19 @@
     chevet(track, draw);
   }
 
-  /* Le chevet en 3D sous le catalogue (assets/js/chevet3d.js, Three.js). Phases, en fraction du défilement de la
-     section : d'un seul mouvement (0 → vol, retours du 13/10), la caméra monte, se tourne de face et glisse jusqu'à
-     poser le catalogue — qui ne bouge pas du plateau — sur la couverture du livre, à sa place habituelle, à droite (les
-     textes viennent de txt à vol, sur le papier libéré) ; le livre CSS apparaît par-dessus (vol → fondu), puis se
-     feuillette (livre → 1). Le mouvement tient ~2,5 écrans de défilement, le feuilletage ~2 (style.css).
-     Sans WebGL 2, mouvement réduit, économie de données, ou si le chargement échoue : la section d'avant (bande de
-     noyer, livre seul). Chargé à 3 écrans de la section, au premier moment libre après le chargement de la page
-     (l'écran de chargement ne l'attend jamais) ; l'affiche (vue de trois quarts) tient la place jusqu'à la première image. */
+  /* Le chevet sous le catalogue : une séquence d'images rendues dans Blender (assets/js/chevet-seq.js, 15/10 — elle
+     remplace la 3D en temps réel de chevet3d.js, dont elle reprend le mouvement image par image). Phases, en fraction
+     du défilement de la section : d'un seul mouvement (0 → vol, retours du 13/10), la caméra monte, se tourne de face
+     et glisse jusqu'à poser le catalogue — qui ne bouge pas du plateau — sur la couverture du livre, à sa place
+     habituelle, à droite (les textes viennent de txt à vol, sur le papier libéré) ; le livre CSS apparaît par-dessus
+     (vol → fondu), puis se feuillette (livre → 1). Le mouvement tient ~2,5 écrans de défilement, le feuilletage ~2.
+     Mouvement réduit, économie de données, ou si le chargement échoue : la section d'avant (bande de noyer, livre
+     seul). Les premières images (une sur 8) arrivent pendant l'écran de chargement (initPrechauffe), le reste derrière
+     lui ; l'affiche (la première image) tient la place jusque-là. */
   const CHEVET = { txt: .43, vol: .535, fondu: .562, livre: .581 };
   function chevet(track, draw) {
     const fond = $('.flip__chevet', track); if (!fond) return;
-    const gl = () => { try { const c = document.createElement('canvas').getContext('webgl2'); c?.getExtension('WEBGL_lose_context')?.loseContext(); return !!c; } catch (e) { return false; } };
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData || !('IntersectionObserver' in window && 'ResizeObserver' in window) || !gl()) { fond.remove(); return; }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData || !('IntersectionObserver' in window && 'ResizeObserver' in window && 'createImageBitmap' in window)) { fond.remove(); return; }
     track.classList.add('flip--chevet'); draw();
     // repli en cours de route : la section d'avant, au même point du feuilletage (la section raccourcit)
     const repli = () => {
@@ -1228,7 +1212,7 @@
       if (!e.isIntersecting) return; io.disconnect(); track.classList.add('is-proche');
       new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r, { once: true }))
         .then(() => new Promise(r => 'requestIdleCallback' in window ? requestIdleCallback(r, { timeout: 1200 }) : setTimeout(r, 200)))
-        .then(() => import('chevet3d')).then(m => m.mount(fond, track, { ...CHEVET, perdu: repli }))
+        .then(() => import('chevet-seq')).then(m => m.mount(fond, track, { ...CHEVET, perdu: repli }))
         .then(() => {
           // la 3D arrive en pleine plongée : l'affiche (trois quarts, au départ) n'est plus la vue — coupe franche,
           // plutôt qu'un fondu de 0,6 s entre deux images différentes ; une fois l'affiche effacée (textes en place,
@@ -1414,7 +1398,7 @@
     const r6 = v => +v.toFixed(6);
     const cadreChevet = () => {
       const st = $('.flip__sticky', flip), dy = st ? st.getBoundingClientRect().top - (parseFloat(getComputedStyle(st).top) || 0) : 0;
-      const k = fondChevet.chevet.cle(), b = $('.flip__leaf', flip).getBoundingClientRect(), c = $('canvas', fondChevet).getBoundingClientRect();
+      const k = fondChevet.chevet.cle(), b = $('.flip__leaf', flip).getBoundingClientRect(), c = fondChevet.chevet.optique?.() || $('canvas', fondChevet).getBoundingClientRect();
       const B = { left: b.left, top: b.top - dy, width: b.width, height: b.height }, C = { left: c.left, top: c.top - dy, width: c.width, height: c.height };
       const v = vue.getBoundingClientRect(), tr = getComputedStyle(panneau).transform, m = tr && tr !== 'none' ? new DOMMatrixReadOnly(tr) : null;
       const I = { left: v.left - (m ? m.m41 : 0), top: v.top - (m ? m.m42 : 0), width: v.width, height: v.height };

@@ -72,7 +72,7 @@ for f in sorted((root / 'src').glob('[!_]*.html')):
            + '<div id="site-header"></div>\n<main>\n' + body.rstrip() + '\n</main>\n<div id="site-footer"></div>\n'
            + meta.get('scripts', '').replace('\\n', '\n')
            + js + '</body>\n</html>\n')
-    for m in ('chevet3d.js', 'chevet-photo.js'):      # modules du chevet (carte d'import), versionnés eux aussi
+    for m in ('chevet-seq.js',):                      # module du chevet (carte d'import), versionné lui aussi
         out = out.replace('"/assets/js/%s"' % m, '"/assets/js/%s?v=%s"' % (m, ver('/assets/js/' + m)))
     (root / f.name).write_text(out, encoding='utf8')
     print('ok', f.name)
