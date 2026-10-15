@@ -1,7 +1,10 @@
 # LIBRERY — refonte du site (notes pour les sessions Claude Code)
 
 Branche de travail : `claude/zen-sagan-nuppbn`. Faire `git pull` avant de commencer et `git push` en fin de tâche :
-la session cloud et la session locale (Mac) travaillent sur cette même branche.
+la session cloud et la session locale (Mac) travaillent sur cette même branche. Chaque push publie sur Vercel :
+Sabri valide d'abord en local (captures, vidéos, http://localhost:4173), puis dit « publie ».
+
+**Dossier de passation complet : `PASSATION.md`** (état au 15/10/2026, décisions validées, architecture, 3D, pièges).
 
 ## Projet
 Refonte du site de parfums LIBRERY (Paris). Maquette statique validée avant le passage sur Shopify.
@@ -35,6 +38,9 @@ Refonte du site de parfums LIBRERY (Paris). Maquette statique validée avant le 
 - Retours de Nolwenn du 12/10 : traités et en ligne (liste et décisions dans `retours/2026-10-12-nolwenn.md`,
   réponses à ses questions dans `retours/questions-nolwenn.md`, PDF avant/après dans `retours/pdf/`).
   En attente côté cliente : photos packagings/coffrets/discovery, photos des mosaïques, contenu Bougies, validations du PDF.
+- 13-15/10 (en ligne, `ead6a58` + catalogue `88e3c77`) : en-tête A1, chevet 3D de l'accueil, « Feuilleter » dans le même
+  décor, cadran du sillage à onde colorée, cascade 3D des photos, nombre d'or des packshots, images de Nolwenn du 13/10,
+  logos de paiement. Reste à faire et points ouverts : `PASSATION.md` §5.
 - Produits / collections « en pause » : `paused: true` (produit) et `hidden: true` (collection) dans `data.js`.
 - Passage sur Shopify dès réception des accès (thème caché, prévisualisation, puis publication).
 - Agents WhatsApp : piste VPS OVH + API WhatsApp Cloud (numéro de test Meta pour commencer) ; rien d'installé.
