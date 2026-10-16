@@ -44,6 +44,12 @@ const FORMATS = [
   { id: '30', label: '30 ml', price: 90 },
   { id: '2', label: '2 ml', price: 7 }
 ];
+/* Format pas encore en stock : `soon: ['100']` sur le produit (Skin Obsession, retour de Rafiq le 15/10).
+   Le format reste affiché mais ne s'ajoute pas au panier ; sortie confirmée par Sabri : 30 octobre 2026.
+   Shopify : variante 100 ml en « continuer à vendre » = non, avec le même message (métachamp ou bloc du thème). */
+const SOON_LABEL = 'Disponible le 30 octobre';
+const SOON_SHORT = 'Le 30 octobre';   // sous « 100 ml », dans le sélecteur de format
+const SOON_NOTE = 'Le 100 ml sort le 30 octobre et les précommandes ouvrent très bientôt. En attendant, le 30 ml et l’échantillon 2 ml sont disponibles.';
 
 const PERFUMERS = {
   'chris-maurice': {
@@ -80,11 +86,11 @@ const PERFUMERS = {
 const PRODUCTS = [
   /* ============ Skin Obsession — Collection II (nouveauté) ============ */
   {
-    handle: 'vanilla-plum', folio: 39, name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    handle: 'vanilla-plum', folio: 39, name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une douceur que l’on veut retenir.',
     keyNotes: 'Prune · Cuir · Vanille', families: ['Gourmand', 'Ambré'],
     pack: 'vanilla-plum-pack', card: 'vanilla-plum-1', pack30: 'vanilla-plum-pack30', scene: 'vanilla-plum-2',
-    gallery: ['vanilla-plum-pack', 'vanilla-plum-pack30', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres', 'vanilla-plum-1'],
+    gallery: ['vanilla-plum-pack', 'vanilla-plum-pack30', 'ecrin-vanilla-plum', 'vanilla-plum-2', 'vanilla-plum-mod', 'prune-livres', 'vanilla-plum-1'],
     description: [
       "Il y a les parfums que l’on découvre. Et il y a ceux vers lesquels on se surprend à revenir.",
       "Vanilla Plum est né du désir de retrouver une sensation : celle d’un fruit mûr enveloppé dans une étreinte chaude, crémeuse et réconfortante.",
@@ -96,7 +102,7 @@ const PRODUCTS = [
     notes: { tete: 'Prune, Cannelle', coeur: 'Lait, Cuir de Grasse, Myrrhe, Vanille de Tahiti', fond: 'Vanille Planifolia de Madagascar, Ambre, Benjoin Siam' },
     materials: {
       title: 'Entre douceur et profondeur',
-      list: { tete: 'Cannelle SFE, Prune séchée STT, Amande', coeur: 'Lait, Cuir de Grasse, Vanille Tahitensis (infusion)', fond: 'Vanille Planifolia Madagascar SFE, Benjoin Siam, Tonka' },
+      list: { tete: 'Cannelle CO₂, Prune séchée STT, Amande', coeur: 'Lait, Cuir de Grasse, Vanille Tahitensis (infusion)', fond: 'Vanille Planifolia Madagascar CO₂, Benjoin Siam, Tonka' },
       text: [
         "Au cœur de Vanilla Plum, deux vanilles d’exception révèlent deux facettes complémentaires de la précieuse gousse. La vanille de Tahiti apporte une expression délicate, poudrée, amandée et subtilement florale ; douce et raffinée, elle prolonge naturellement la note d’amande.",
         "À l’inverse, la vanille Planifolia de Madagascar, extraite par SFE — extraction au CO₂ supercritique —, révèle une expression plus riche et plus profonde. Ce procédé capte avec une précision remarquable les facettes naturelles de la gousse et lui donne chaleur, profondeur et densité.",
@@ -106,11 +112,11 @@ const PRODUCTS = [
     }
   },
   {
-    handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une attraction florale.',
     keyNotes: 'Sésame · Tubéreuse · Santal', families: ['Floral', 'Fruité'],
     pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', pack30: 'magnetic-flowers-pack30', scene: 'magnetic-flowers-1',
-    gallery: ['magnetic-flowers-pack', 'magnetic-flowers-pack30', 'magnetic-flowers-1', 'magnetic-flowers-mod', 'poire-livres', 'magnetic-flowers-30'],
+    gallery: ['magnetic-flowers-pack', 'magnetic-flowers-pack30', 'ecrin-magnetic-flowers', 'magnetic-flowers-1', 'magnetic-flowers-mod', 'ecrin-contenu', 'poire-livres', 'magnetic-flowers-30'],
     description: [
       "Certaines fleurs sont admirées pour leur beauté. D’autres possèdent un pouvoir d’attraction presque instinctif.",
       "Magnetic Flowers est né de cette fascination : un bouquet de fleurs blanches, lumineux et opulent, dont les facettes se dévoilent lentement sur la peau.",
@@ -122,7 +128,7 @@ const PRODUCTS = [
     notes: { tete: 'Poire, Sauge sclarée, Sésame', coeur: 'Néroli, Tubéreuse, Jasmin Sambac, Ylang-ylang, Fleur d’oranger', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
     materials: {
       title: 'L’attraction des fleurs blanches',
-      list: { tete: 'Poire, Sauge sclarée, Sésame SFE', coeur: 'Néroli, Tubéreuse, Jasmin Sambac Inde Abs, Ylang Ess, Fleur d’oranger Abs', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
+      list: { tete: 'Poire, Sauge sclarée, Sésame CO₂', coeur: 'Néroli, Tubéreuse, Jasmin Sambac Inde Abs, Ylang Ess, Fleur d’oranger Abs', fond: 'Santal d’Australie, Ambre, Muscs blancs' },
       text: [
         "Magnetic Flowers se construit sur la tension entre la fraîcheur, les facettes vertes et l’opulence crémeuse des fleurs blanches.",
         "En ouverture, la poire apporte une fraîcheur juteuse et lumineuse. Elle rencontre la sauge sclarée, qui introduit une dimension verte et aromatique, tandis que le sésame SFE révèle des facettes toastées, céréalières et gourmandes.",
@@ -132,11 +138,11 @@ const PRODUCTS = [
     }
   },
   {
-    handle: 'tonka-love', folio: 43, name: 'Tonka Love', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
+    handle: 'tonka-love', folio: 43, name: 'Tonka Love', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
     tagline: 'L’irrésistible chaleur de la tonka.',
     keyNotes: 'Cardamome · Tonka · Cèdre', families: ['Gourmand', 'Boisé'],
     pack: 'tonka-love-pack', card: 'tonka-love-1', pack30: 'tonka-love-pack30', scene: 'tonka-love-1',
-    gallery: ['tonka-love-pack', 'tonka-love-pack30', 'tonka-love-1', 'tonka-love-mod', 'tonka-capot', 'tonka-love-2'],
+    gallery: ['tonka-love-pack', 'tonka-love-pack30', 'ecrin-tonka-love', 'tonka-love-1', 'tonka-love-mod', 'tonka-capot', 'tonka-love-2'],
     description: [
       "Certains ingrédients ont une présence qui s’attarde dans la mémoire. La tonka est de ceux-là. Chaude, veloutée, naturellement addictive, elle est au cœur de Tonka Love.",
       "Le parfum s’ouvre sur l’amande grillée, à la facette chaude et toastée, éclairée par la bergamote d’Italie. Le poivre et la cardamome du Guatemala ajoutent une étincelle vive et aromatique.",
@@ -163,7 +169,7 @@ const PRODUCTS = [
     tagline: 'Jasmin lumineux, chocolat blanc fondant et santal crémeux, dans une gourmandise solaire et addictive.',
     keyNotes: 'Jasmin · Chocolat blanc · Santal', families: ['Gourmand', 'Floral'],
     pack: 'hot-sand-pack', card: 'hot-sand-1', pack30: 'hot-sand-pack30', scene: 'hot-sand-1',
-    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'hot-sand-1', 'hot-sand-mod', 'camp-blanche', 'hero-portrait'],
+    gallery: ['hot-sand-pack', 'hot-sand-pack30', 'ecrin-hot-sand', 'hot-sand-1', 'hot-sand-mod', 'camp-blanche', 'hero-portrait'],
     description: [
       "Hot Sand capture la douceur aérienne d’une gourmandise d’été, où le sable encore tiède caresse la peau dorée par le soleil.",
       "En tête, l’eau de jasmin et l’orchidée flottent comme un souffle léger et lumineux, tandis que la ganache de chocolat blanc, la crème chantilly et le lait d’amande fondent en un cœur délicieusement crémeux. En fond, le cèdre, le santal crémeux et le musc blanc enveloppent la peau d’une chaleur douce et réconfortante, comme le souvenir tendre d’une journée au soleil.",
@@ -234,7 +240,7 @@ const PRODUCTS = [
     tagline: 'Une préface à la collection.',
     description: [
       "La maison LIBRERY vous invite à parcourir sa bibliothèque olfactive. Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml. Chaque fragrance révèle un souvenir, une émotion, un chapitre à explorer au fil de votre lecture sensorielle.",
-      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. À usage unique et valable 30 jours, il s’utilise uniquement sur un parfum 100 ml."
+      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. À usage unique et valable 30 jours, il s’utilise uniquement sur un parfum 100 ml et n’est pas cumulable avec un autre code (dont celui de bienvenue de 10 %)."
     ]
   },
   {
@@ -303,6 +309,8 @@ const COLLECTIONS = {
     title: 'Summer Vibes', folio: 14, number: '02', chapter: 'Collection I', kicker: 'Collection',
     tiles: 'grid',
     hero: 'hero-summer',
+    // le film LIBRERY (bouchon doré, envoyé par Sabri le 15/10) : en tête de l'onglet Summer Vibes (retour de Nolwenn, 15/10)
+    video: (LIBRERY_BASE + '/assets/video/film-librery.mp4'), videoMobile: (LIBRERY_BASE + '/assets/video/film-librery-m.mp4'),
     epigraph: 'Certains étés ne s’achèvent jamais vraiment. Ils persistent sous la peau, dans l’éclat des souvenirs, dans cette chaleur invisible que l’on croyait avoir laissée derrière soi.',
     intro: [
       "L’été a quelque chose de singulier. Pendant quelques semaines précieuses, le temps semble ralentir. Les jours s’étirent sous une lumière sans fin, les heures perdent de leur importance et le quotidien s’éloigne doucement.",
@@ -320,11 +328,11 @@ const COLLECTIONS = {
     ]
   },
   'coffrets': {
-    mosaic: [['summer-fenetre', 'La campagne'], ['prune-vanille', 'Vanilla Plum'], ['camp-trente', 'La bibliothèque']],
+    mosaic: [['ecrin-ouvert', 'L’écrin, qui s’ouvre comme un livre'], ['prune-vanille', 'Vanilla Plum'], ['camp-trente', 'La bibliothèque']],
     title: 'Coffrets Découverte', number: '—', chapter: 'Exclusivité site', kicker: 'Préface',
     hero: 'hero-collection',
     epigraph: 'Parcourir la bibliothèque avant d’y choisir son livre.',
-    intro: ["Nos coffrets ouvrent les premières pages de chaque collection. La valeur du Coffret Découverte 2 ml vous est recréditée sur l’achat d’un parfum 100 ml, pendant 30 jours."],
+    intro: ["Nos coffrets ouvrent les premières pages de chaque collection. La valeur du Coffret Découverte 2 ml vous est recréditée sur l’achat d’un parfum 100 ml, pendant 30 jours (code non cumulable)."],
     chapters: []
   },
   'bougies': {

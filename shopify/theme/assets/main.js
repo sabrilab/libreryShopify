@@ -15,9 +15,17 @@
   const byHandle = h => PRODUCTS.find(p => p.handle === h);
   const formatsOf = p => p.formats || FORMATS;
   const minPrice = p => Math.min(...formatsOf(p).map(f => f.price));
+  const isSoon = (p, f) => !!(p.soon && p.soon.includes(f.id));   // format pas encore en stock (data.js : soon)
   const FREE_SHIPPING = 100;
   const body = document.body;
   const page = body.dataset.page || '';
+
+  /* Version simplifiée (15/10, retour de Nolwenn et Rafiq : mise en ligne avec moins d'animations, retravaillées ensuite).
+     false : l'accueil d'avant (film Skin Obsession, livre du catalogue, mosaïques légendées), sans écran de chargement,
+     sans chevet 3D, catalogue feuilleté, cascade 3D, effet « feuille » ni cadran 3D du sillage.
+     Rien n'est supprimé : pour tout réactiver, passer ANIMATIONS à true ici et dans build.py, et reprendre
+     src/_anime/index.html et src/_anime/preface.html (le balisage animé) à la place de src/index.html et src/preface.html. */
+  const ANIMATIONS = false;
 
   /* Nom en deux temps : le second mot en italique (« Tonka Love ») */
   const nm = n => { const w = String(n).split(' '); return w.length > 1 ? `${esc(w[0])} <em>${esc(w.slice(1).join(' '))}</em>` : esc(n); };
@@ -181,12 +189,17 @@
   function renderFooter() {
     const host = $('#site-footer'); if (!host) return;
     host.innerHTML = `
+      ${$('main form[data-news]') ? '' : `<section class="nl" aria-labelledby="nl-t">
+        <div class="nl__img">${pic('ecrin-contenu', 'L’écrin LIBRERY ouvert sur papier de soie, ruban doré', '100vw')}</div>
+        <div class="wrap nl__in"><div class="nl__box">
+          <span class="nl__kick">Lettre de la maison</span>
+          <h2 class="nl__t" id="nl-t">10&nbsp;% offerts <em>sur tout le site</em></h2>
+          <p class="nl__p">Inscrivez-vous : votre code de bienvenue arrive aussitôt par e-mail. Puis, avant tout le monde, les nouveaux chapitres de la maison.</p>
+          <form class="nl__form" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail" autocomplete="email"><button class="btn">Recevoir mon code</button></form>
+          <p class="nl__small">Un code par personne, non cumulable avec le code du Coffret Découverte. Désinscription en un clic.</p>
+        </div></div></section>`}
       <section class="block" aria-label="Services"><div class="wrap">
         ${page === 'services' ? '' : `<div class="services">${SERVICES.map(x => `<a href="/pages/services">${icon(x.i)}<b>${x.t}</b><span>${x.d}</span></a>`).join('')}</div>`}
-        ${$('main form[data-news]') ? '' : `<div class="letter"${page === 'services' ? '' : ' style="margin-top:56px"'}>
-          <div><h2 class="h2">Lettre de la maison</h2><p>Les nouveaux chapitres avant tout le monde, et un 2 ml glissé dans votre première commande.</p></div>
-          <form class="field-line" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail"><button>S’inscrire</button></form>
-        </div>`}
       </div></section>
       <footer class="footer"><div class="wrap">
         <div class="footer__top">
@@ -332,7 +345,7 @@
       ? `<video class="card__scene" src="${p.video}" poster="${src(p.scene)}" muted loop playsinline preload="none"></video>`
       : p.scene ? packPic(p.scene, '', S_CARD, 'card__scene') : '';
     const prices = isPerfume
-      ? `<span class="card__fmts"><span>${f[0].label} — ${eur(f[0].price)}</span>${f30 && p.pack30 ? `<span class="card__f30" data-f30>${f30.label} — ${eur(f30.price)}</span>` : ''}</span>`
+      ? `<span class="card__fmts"><span>${f[0].label} — ${isSoon(p, f[0]) ? SOON_LABEL.toLowerCase() : eur(f[0].price)}</span>${f30 && p.pack30 ? `<span class="card__f30" data-f30>${f30.label} — ${eur(f30.price)}</span>` : ''}</span>`
       : `<span class="card__meta">${esc(p.subtitle || p.type)} — dès ${eur(minPrice(p))}</span>`;
     return `
       <a class="card" href="/products/${p.handle}">
@@ -385,6 +398,8 @@
      Le quadrillage (.ed-grid) est tracé par initEdito sur la mise en page mesurée. */
   const edLine = (html, i, cls = '') => `<span class="ed-l${cls}"><span class="ed-i" style="--i:${i}">${html}</span></span>`;
   const mosaic = key => { const c = COLLECTIONS[key]; if (!c || !c.mosaic) return '';
+    // version simplifiée : la mosaïque légendée d'avant, trois images côte à côte, sans mouvement
+    if (!ANIMATIONS) return `<div class="mosaic">${c.mosaic.map(([img, cap]) => `<figure>${pic(img, cap, '(max-width: 800px) 100vw, 40vw')}</figure>`).join('')}</div>`;
     const fig = ([img, cap], i) => `<figure class="ed-f ed-f--${'abc'[i]}"><div class="ed-fr">${pic(img, cap, i ? '(max-width: 800px) 62vw, 22vw' : '(max-width: 800px) 86vw, 36vw')}</div>
         <figcaption class="ed-cap"><span class="folio">0${i + 1}</span><i></i><span>${esc(cap)}</span></figcaption></figure>`;
     // au bout de la cascade, à côté de C : l'épigraphe de la collection (une phrase, deux si la première est brève)
@@ -410,7 +425,7 @@
     $$('.acc > button', root).forEach(b => { if (b.dataset.bound) return; b.dataset.bound = 1; b.addEventListener('click', () => { const o = b.parentElement.classList.toggle('is-open'); b.setAttribute('aria-expanded', o); }); });
   }
   function newsletters() {
-    $$('form[data-news]').forEach(f => { if (f.dataset.bound) return; f.dataset.bound = 1; f.addEventListener('submit', e => { e.preventDefault(); f.insertAdjacentHTML('afterend', '<p class="ok">Merci, à très bientôt.</p>'); f.remove(); }); });
+    $$('form[data-news]').forEach(f => { if (f.dataset.bound) return; f.dataset.bound = 1; f.addEventListener('submit', e => { e.preventDefault(); f.insertAdjacentHTML('afterend', f.classList.contains('nl__form') ? '<p class="ok nl__ok">Merci. Votre code de bienvenue de 10&nbsp;% vous attend dans votre boîte mail.</p>' : '<p class="ok">Merci, à très bientôt.</p>'); f.remove(); }); });
   }
 
   /* Mise en page éditoriale au défilement (mosaïques, images de campagne, préface, parfumeur).
@@ -433,6 +448,7 @@
      ligne de lecture atteint la ligne d'or de C (.is-end). Ce qui est tracé ou ouvert le reste : un élément ne se réarme qu'une
      fois sorti par le bas de l'écran (on remonte sans rien voir se défaire). */
   function initEdito() {
+    if (!ANIMATIONS) return;
     if (!('IntersectionObserver' in window && 'ResizeObserver' in window)) return;
     const narrow = matchMedia('(max-width: 800px)'), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const live = new Set(); let raf = 0, pend = 0;
@@ -499,7 +515,8 @@
       s._g = [...pl.f, ...pl.b, ...pl.w].map((a, i) => Object.assign(a[1], { el: els[i] }));
       // le voyage de chaque image : profondeur d'arrivée (dans le volume, devant le fond), avancée en sortant, côté vers lequel elle se tourne
       s._items.forEach((it, i) => { const b = B[i];
-        Object.assign(it, { fr: $('.ed-fr', it.el), side: b.x + b.w / 2 < W / 2 ? 1 : -1, zin: D * [.84, .96, .9][i % 3], zout: (sm ? 50 : 160) * [1, 1.2, .8][i % 3] }); });
+        const fr = $('.ed-fr', it.el), img = $('img', fr);
+        Object.assign(it, { fr, img, crop: img && (() => Feuille.coverCrop(fr, img)), side: b.x + b.w / 2 < W / 2 ? 1 : -1, zin: D * [.84, .96, .9][i % 3], zout: (sm ? 50 : 160) * [1, 1.2, .8][i % 3] }); });
       const C = B[B.length - 1]; if (q && C) { s._qy = C.y + C.h * .618034; s._qt = q.offsetTop; }   // l'épigraphe, sur la ligne d'or de C
     };
     // position de chaque cadre dans sa scène (hors transformations), relevée seulement quand la scène change de taille
@@ -528,6 +545,8 @@
         const ty = sm ? (it.top + it.h / 2 - oy) * Math.max(0, -z) / P * .75 : 0;
         const tf = `translate3d(0, ${ty.toFixed(1)}px, ${z.toFixed(1)}px) rotateX(${((sm ? 4 : 7) * e - 3 * x * x).toFixed(2)}deg) rotateY(${(it.side * (sm ? 6 : 11) * e).toFixed(2)}deg)`;
         if (it._tf !== tf) it.fr.style.transform = it._tf = tf;
+        // la feuille : plus marquée pendant le voyage en profondeur, présente aussi en place tant qu'on fait défiler
+        if (it.img) Feuille.drive(it.fr, it.img, .4 + .6 * Math.sin(Math.PI * e) + .4 * x, 0, 1, it.crop);
         const yt = o + (top + it.top + ty - o) * P / (P - z);              // haut apparent (la perspective le rapproche du point de fuite)
         flag(it.el, 'is-in', yt < vh * .94, yt, vh);
         flag(it.el, 'is-set', f < .2, top + it.top, vh);
@@ -670,7 +689,7 @@
     stage.insertAdjacentHTML('beforeend', MODS.map(([n, a]) => { const w = IMGW[n] || [670, 957];
       return `<figure class="entete-pr"><img src="${src(n)}" srcset="${src(n)} ${w[0]}w, ${src(n, 1)} ${w[1]}w" sizes="(max-width: 800px) 92vw, 31vw" alt="${esc(a)}" decoding="async"><i></i></figure>`; }).join(''));
     const els = $$('.entete-pr', stage), N = els.length;
-    els.forEach(f => { if (f.firstChild.decode) f.firstChild.decode().catch(() => {}); });
+    els.forEach(f => { if (f.firstChild.decode) f.firstChild.decode().catch(() => {}); Feuille.prepare(f, f.firstChild); });
     const W1 = (TS - T0) / (1 + (N - 1) * G), STEP = W1 * G;          // chaque arrivée chevauche la précédente (pas = durée / φ)
     const shF = sh.cloneNode(); sh.after(shF);                          // ombre du film à sa place finale
 
@@ -720,7 +739,10 @@
     function pwTo(el, cx, cy, w, h, r = 0, fy = .5) {
       const b = el._b, sx = w / b.w, sy = h / b.h, k = Math.max(w / b.iw, h / b.ih);
       el.style.transform = `translate3d(${px(cx - b.w / 2)}, ${px(cy - b.h / 2)}, 0) rotate(${r.toFixed(3)}deg) scale(${sx.toFixed(5)}, ${sy.toFixed(5)})`;
-      el.firstChild.style.transform = `translate3d(0, ${px((h - b.ih * k) * (fy - .5) / sy)}, 0) scale(${(k / sx).toFixed(5)}, ${(k / sy).toFixed(5)})`;
+      const ty = (h - b.ih * k) * (fy - .5) / sy, dw = b.iw * k / sx, dh = b.ih * k / sy;
+      el.firstChild.style.transform = `translate3d(0, ${px(ty)}, 0) scale(${(k / sx).toFixed(5)}, ${(k / sy).toFixed(5)})`;
+      // pour l'effet « feuille » : la partie de l'image visible dans la fenêtre, et l'agrandissement de la fenêtre
+      el._crop = [.5 - b.w / (2 * dw), .5 - (b.h / 2 + ty) / dh, b.w / dw, b.h / dh]; el._k = Math.max(sx, sy);
     }
 
     // la grille qui suit, mesurée en coordonnées de la scène (haut de la scène quand elle n'est plus tenue)
@@ -825,6 +847,9 @@
         ww = lerp(ww, fi.w, qi) * lift; hh = lerp(hh, fi.h, qi) * lift;
         pwTo(el, cx, cy, ww, hh, lerp(lerp(st.r * 3 + (i % 2 ? 6 : -6), st.r, ai), 0, qi), lerp(.5, fi.fy, qi));
         el.lastChild.style.opacity = Math.min(.28, d * .07 * (1 - qi)).toFixed(3);
+        // la feuille : elle ondule en montant, puis en partant vers sa colonne (sens du trajet à l'écran, y vers le haut)
+        const er = Math.sin(Math.PI * ai), ed = Math.sin(Math.PI * qi);
+        Feuille.drive(el, el.firstChild, Math.max(er, ed), ed > er ? fi.x + fi.w / 2 - st.cx : 0, ed > er ? st.cy - fi.y - fi.h / 2 : 1, el._crop, el._k);
       });
       caption(out(seg(P, CAP[0], CAP[0] + CAP[1])));
     }
@@ -949,7 +974,7 @@
       ${items.length ? `<section class="block"><div class="wrap">
           <div class="row-head"><div><h2 class="h2">Les parfums</h2></div><span class="ui muted">${items.length} ${items.length > 1 ? 'créations' : 'création'}</span></div>
           <div class="grid">${items.map(card).join('')}${tileInGrid ? trialTile() : ''}</div></div></section>` : ''}
-      ${col.mosaic ? `<section class="ed-sec"><div class="wrap">${mosaic(key)}</div></section>` : ''}
+      ${col.mosaic ? `<section class="${ANIMATIONS ? 'ed-sec' : 'block block--tight'}"><div class="wrap">${mosaic(key)}</div></section>` : ''}
       ${col.chapters.length ? `<section class="block"><div class="wrap chapters">
           ${col.chapters.map(ch => `<article class="split"><h2 class="h2">${ch.h}</h2><div class="prose">${ch.p.map(t => `<p>${t}</p>`).join('')}</div></article>`).join('')}
         </div></section>` : ''}
@@ -968,7 +993,7 @@
   let chevetEcran = null;      // le chevet, pour l'écran : { fichiers, monte } (promesses, initPrechauffe)
   const vers = ms => new Promise(r => setTimeout(r, Math.max(0, ms - performance.now())));   // à l'instant ms de la page
   function initLoader() {
-    const L = $('#loader'); if (!L) return (ecranFini(), essentielFini());
+    const L = $('#loader'); if (!L || !ANIMATIONS) return (L?.remove(), ecranFini(), essentielFini());
     // lien direct vers le catalogue (#feuilleter) : le catalogue a son propre écran de chargement
     if (document.documentElement.classList.contains('is-seen') || location.hash === '#feuilleter') { L.remove(); return (ecranFini(), essentielFini()); }
     const bar = $('.loader__bar i', L), tasks = [];
@@ -1035,6 +1060,7 @@
      Essais : window.__prechauffe = { depart, chevet, fichiers, cadran, images, monte } (en ms depuis l'ouverture). */
   const aMonter = [];          // lancements de scènes 3D qu'on peut avancer (sundial) ; chacun ne part qu'une fois
   function initPrechauffe() {
+    if (!ANIMATIONS) return;
     const c = navigator.connection, lent = !!c && (c.saveData || /2g|3g/.test(c.effectiveType || ''));
     if (lent) return;
     const mem = navigator.deviceMemory, tot = mem ? mem >= 4 : !matchMedia('(pointer: coarse)').matches;
@@ -1274,6 +1300,8 @@
       const u = new URL(a.href), ici = new URL(location.href); ici.hash = a.closest('#catalogue') ? 'catalogue' : '';
       u.searchParams.set('retour', ici.href); a.href = u.href; a.removeAttribute('target'); a.dataset.lecteur = '';
     });
+    // version simplifiée : le catalogue s'ouvre directement, dans le même onglet, avec l'adresse de retour (sans lecteur ni décor)
+    if (!ANIMATIONS) { liens.forEach(a => delete a.dataset.lecteur); return; }
     const livre = $('#catalogue [data-flip]');
     if (livre) { livre.dataset.lecteur = ''; Object.assign(livre, { tabIndex: 0 }); livre.setAttribute('role', 'button'); livre.setAttribute('aria-label', 'Feuilleter le catalogue'); }   // atteignable au clavier
     if (!liens.length && !livre && location.hash !== ANCRE) return;
@@ -1648,7 +1676,7 @@
   /* L'horloge du sillage : la vaporisation, heure par heure            */
   /* (Shopify : snippet sillage.liquid, notes lues dans les métachamps)  */
   /* ------------------------------------------------------------------ */
-  const cleanNote = n => n.replace(/\s+(STT|SFE|Ess|NP|FirAbs|Abs)\b/g, '').replace(/®/g, '').replace(/\s*\([^)]*\)/g, '').trim();
+  const cleanNote = n => n.replace(/\s+(STT|SFE|CO₂|Ess|NP|FirAbs|Abs)(?=[\s,]|$)/g, '').replace(/®/g, '').replace(/\s*\([^)]*\)/g, '').trim();
   const notesOf = p => p.materials ? p.materials.list : p.notes;
   const clockTime = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ' ' + String(m % 60).padStart(2, '0') : ''}`;
   // le curseur suit sa règle (Vaporisation · 1 h · 2 h · 4 h · 8 h, à intervalles égaux) : position 0 → 480, minutes non linéaires
@@ -1744,6 +1772,7 @@
   function sundial(el, now) {
     let fait; el.dial = new Promise(r => fait = r);          // résolue quand le cadran est à l'écran, ou qu'il n'y sera pas
     const stage = $('.clock__stage', el); if (!stage) return fait();
+    if (!ANIMATIONS) { stage.remove(); return fait(); }   // version simplifiée : l'horloge seule, sans le cadran 3D
     if (!('IntersectionObserver' in window && 'ResizeObserver' in window) || !hasGL2()) { stage.remove(); return fait(); }
     // monté à son approche, ou plus tôt, hors de l'écran, au premier calme après l'écran de chargement (initPrechauffe)
     let lance = false;
@@ -1780,7 +1809,8 @@
     const perfumes = PRODUCTS.filter(x => !x.type);
     const related = PRODUCTS.filter(x => x.handle !== p.handle && x.collection === p.collection).concat(PRODUCTS.filter(x => x.collection !== p.collection && !x.type)).slice(0, 3);
     const acc = (t, c) => `<div class="acc"><button type="button" aria-expanded="false">${t}</button><div class="acc__panel">${c}</div></div>`;
-    const cta = () => p.builder && picks.length < p.builder ? `Choisissez encore ${p.builder - picks.length} parfum${p.builder - picks.length > 1 ? 's' : ''}` : `Ajouter au panier — ${eur(current.price)}`;
+    const stLabel = () => isSoon(p, current) ? SOON_SHORT : `Ajouter — <span id="st-price">${eur(current.price)}</span>`;
+    const cta = () => isSoon(p, current) ? `${current.label} — ${SOON_LABEL.toLowerCase()}` : p.builder && picks.length < p.builder ? `Choisissez encore ${p.builder - picks.length} parfum${p.builder - picks.length > 1 ? 's' : ''}` : `Ajouter au panier — ${eur(current.price)}`;
     const story = p.description.slice(0, 2), more = p.description.slice(2);
     // une seule pyramide : si la « lecture des matières » (catalogue) existe, elle fait foi
     const notes = p.materials ? p.materials.list : p.notes;
@@ -1804,12 +1834,13 @@
           ${p.keyNotes && isPerfume ? `<p class="pdp__notes-line">${esc(p.keyNotes.replace(/ · /g, ', '))}</p>` : ''}
           ${p.families && isPerfume ? `<p class="pdp__fams">Famille ${p.families.map(f => `<a href="/pages/bibliotheque?famille=${encodeURIComponent(f)}#familles">${f}</a>`).join(' · ')}</p>` : ''}
           <p class="pdp__desc">${p.tagline}</p>
-          ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${eur(f.price)}</small></button>`).join('')}</div>` : ''}
+          ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${isSoon(p, f) ? SOON_SHORT : eur(f.price)}</small></button>`).join('')}</div>` : ''}
           ${p.builder ? `<div class="builder"><div class="builder__head"><span>Vos parfums</span><b id="b-count">0 / ${p.builder}</b></div>
             <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><span class="builder__thumb">${packPic(x.pack, '', '(max-width: 800px) 30vw, 9vw', '', true)}</span><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
-          <button class="btn btn--block" id="add" ${p.builder ? 'disabled' : ''}>${cta()}</button>
+          <button class="btn btn--block" id="add" ${p.builder || isSoon(p, current) ? 'disabled' : ''}>${cta()}</button>
+          ${p.soon ? `<p class="pdp__soon" id="soon"${isSoon(p, current) ? '' : ' hidden'}>${esc(SOON_NOTE)}</p>` : ''}
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
-          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, à usage unique et valable 30 jours sur un flacon 100 ml.`}</p>
+          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, à usage unique et valable 30 jours sur un flacon 100 ml, non cumulable avec un autre code.`}</p>
           <p class="pdp__small">Expédié sous 24 h ouvrées depuis Paris, livré ${eta()}. Deux échantillons offerts.</p>
           ${perf ? `<p class="pdp__by">Composé par <a href="#parfumeur">${esc(perf.name)}</a></p>` : ''}
           <div class="accordion">
@@ -1852,7 +1883,7 @@
         <div class="grid grid--rail">${related.map(card).join('')}</div>
       </div></section>`;
     // barre d'achat collante : hors de <main>, que le glissement du lecteur (transformation de <main>) ne l'emporte pas
-    $('main').insertAdjacentHTML('afterend', `<div class="sticky-buy" id="sticky" aria-hidden="true"><div class="wrap"><span class="n">${nm(p.name)}<span id="st-var">${esc(current.label)}</span></span><button class="btn" id="st-add">Ajouter — <span id="st-price">${eur(current.price)}</span></button></div></div>`);
+    $('main').insertAdjacentHTML('afterend', `<div class="sticky-buy" id="sticky" aria-hidden="true"><div class="wrap"><span class="n">${nm(p.name)}<span id="st-var">${esc(current.label)}</span></span><button class="btn" id="st-add"${isSoon(p, current) ? ' disabled' : ''}>${stLabel()}</button></div></div>`);
 
     const shown = () => $$('#gallery figure:not([hidden])');
     const count = () => { const g = $('#gallery'), n = shown().length; $('#gcount').textContent = `${Math.min(n, Math.round(g.scrollLeft / (g.clientWidth || 1)) + 1)} / ${n}`; };
@@ -1873,11 +1904,13 @@
     const setFormat = id => {
       current = fmts.find(f => f.id === id) || current;
       $$('#sizes button').forEach(x => x.classList.toggle('is-active', x.dataset.f === current.id));
-      $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-price').textContent = eur(current.price);
+      $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-add').innerHTML = stLabel();
+      if (p.soon) { const soon = isSoon(p, current); $('#add').disabled = soon; $('#st-add').disabled = soon; $('#soon').hidden = !soon; }
       showPack(p.fmtImages ? current.id : current.id === '30' ? '30' : '100');
     };
     $$('#sizes button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.f)));
     const add = () => {
+      if (isSoon(p, current)) return;
       if (p.builder) { if (picks.length !== p.builder) { $('.builder').scrollIntoView({ behavior: 'smooth', block: 'center' }); return toast(`Choisissez ${p.builder} parfums`); } return addToCart(p.handle, current.id, [...picks]); }
       addToCart(p.handle, current.id);
     };

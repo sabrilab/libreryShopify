@@ -223,10 +223,8 @@ def construire():
 
     # 6. écran de chargement (SVG du logo) : repris de la maquette
     loader = re.search(r'(<div class="loader" id="loader".*?</span></div>)', (MAQ / 'index.html').read_text(encoding='utf-8'), re.S)
-    if not loader:
-        ERREURS.append('écran de chargement introuvable dans index.html')
-    else:
-        (OUT / 'snippets' / 'librery-loader.liquid').write_text(loader.group(1) + '\n', encoding='utf-8')
+    # (la version simplifiée du 15/10 n'a plus d'écran de chargement : snippet vide dans ce cas)
+    (OUT / 'snippets' / 'librery-loader.liquid').write_text((loader.group(1) if loader else '') + '\n', encoding='utf-8')
 
     if ERREURS:
         print('ÉCHEC — la maquette a changé à un endroit que le thème retouche :', file=sys.stderr)
