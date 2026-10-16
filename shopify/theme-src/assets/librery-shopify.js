@@ -178,8 +178,8 @@
 .cadeau__kick{font-family:var(--sans);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 18px}
 .cadeau__t{font-family:var(--serif-d);font-weight:400;font-size:38px;line-height:1.08;margin:0 0 16px}
 .cadeau__p{font-family:var(--serif);font-size:16px;line-height:1.55;color:var(--grey);margin:0 0 28px}
-.cadeau__seal{width:118px;height:118px;margin:0 auto 22px;border-radius:50%;display:grid;place-items:center;color:#fff;background:radial-gradient(circle at 35% 30%,#e3c49b,#b7916a 55%,#8c6a47);box-shadow:0 14px 30px -12px rgba(140,106,71,.8),inset 0 0 0 5px rgba(255,255,255,.18);font-family:var(--serif-d);font-size:38px;line-height:1}
-.cadeau__seal small{display:block;font-family:var(--sans);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+.cadeau__seal{width:118px;height:118px;margin:0 auto 22px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding-top:4px;text-align:center;white-space:nowrap;color:#fff;background:radial-gradient(circle at 35% 30%,#e3c49b,#b7916a 55%,#8c6a47);box-shadow:0 14px 30px -12px rgba(140,106,71,.8),inset 0 0 0 5px rgba(255,255,255,.18);font-family:var(--serif-d);font-size:38px;line-height:1}
+.cadeau__seal small{display:block;font-family:var(--sans);font-size:9.5px;line-height:1;letter-spacing:.14em;text-indent:.14em;text-transform:uppercase}
 .cadeau__step{transition:opacity .4s ease,transform .5s ease}
 .cadeau__step[hidden]{display:none}
 .cadeau__step.is-new{opacity:0;transform:translateY(10px)}
