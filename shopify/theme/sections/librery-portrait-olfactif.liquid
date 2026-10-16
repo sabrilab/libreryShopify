@@ -1,0 +1,42 @@
+{%- comment -%} Généré par shopify/build_theme.py depuis maquette/portrait-olfactif.html — ne pas éditer ici. {%- endcomment -%}
+<section class="quiz" id="quiz">
+  <div class="quiz__media"><img src="{{ settings.base_medias }}/assets/img/v2/camp-livre-m.webp?v=34976707" srcset="{{ settings.base_medias }}/assets/img/v2/camp-livre-m.webp?v=34976707 600w, {{ settings.base_medias }}/assets/img/v2/camp-livre.webp?v=34976707 1066w" sizes="(max-width: 800px) 100vw, 42vw" alt="Un flacon LIBRERY posé sur un livre ouvert" fetchpriority="high" decoding="async"></div>
+  <div class="quiz__panel">
+    <div class="quiz__step is-on" data-step="0">
+      <h1 class="h1">Portrait olfactif</h1>
+      <p class="lede" style="margin:18px 0 30px">Quatre questions, comme on feuillette un livre au hasard. La bibliothèque vous ouvre ensuite trois pages.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-next data-for="moi">Pour moi</button><button class="btn btn--line" data-next data-for="offrir">Pour offrir</button></div>
+    </div>
+    <div class="quiz__step" data-step="1" data-q="souvenir">
+      <span class="folio">1 / 4</span><h2 class="h2 quiz__q" data-gift="Quel souvenir aimeriez-vous lui offrir ?">Quel souvenir aimeriez-vous retrouver ?</h2>
+      <div class="quiz__opts"><button data-v="Fruité,Gourmand">Un après-midi d’été, le sel sur la peau</button><button data-v="Gourmand">Une pâtisserie encore tiède</button><button data-v="Floral">Un bouquet de fleurs blanches</button><button data-v="Ambré,Boisé">Un soir d’hiver, près du feu</button></div>
+    </div>
+    <div class="quiz__step" data-step="2" data-q="matiere">
+      <span class="folio">2 / 4</span><h2 class="h2 quiz__q" data-gift="Quelle matière lui ressemble ?">Quelle matière vous attire ?</h2>
+      <div class="quiz__opts"><button data-v="Gourmand">La vanille, le caramel, la praline</button><button data-v="Fruité">Les fruits mûrs</button><button data-v="Floral">Le jasmin, la tubéreuse, la rose</button><button data-v="Ambré,Boisé">Les bois, l’ambre, le cuir</button></div>
+    </div>
+    <div class="quiz__step" data-step="3" data-q="moment">
+      <span class="folio">3 / 4</span><h2 class="h2 quiz__q" data-gift="À quel moment l’imaginez-vous le porter ?">Quand le porterez-vous ?</h2>
+      <div class="quiz__opts"><button data-v="Fruité,Floral">Le jour, en pleine lumière</button><button data-v="Ambré,Gourmand">Le soir</button><button data-v="Floral,Gourmand">Tout près de la peau, pour soi</button><button data-v="">À chaque instant</button></div>
+    </div>
+    <div class="quiz__step" data-step="4" data-q="palier">
+      <span class="folio">4 / 4</span><h2 class="h2 quiz__q" data-gift="Quel est son rapport au parfum ?">Quel lecteur êtes-vous ?</h2>
+      <div class="quiz__opts"><button data-v="summer-vibes">Je découvre l’art du parfum</button><button data-v="">Je reconnais les matières</button><button data-v="skin-obsession">Je cherche l’âme d’un parfum</button></div>
+    </div>
+    <div class="quiz__step" data-step="5">
+      <h2 class="h2" id="quiz-title">Votre portrait</h2>
+      <p class="muted" id="quiz-sub" style="margin:8px 0 0"></p>
+      <div class="quiz__results" id="quiz-results"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" href="/products/coffret-decouverte" id="quiz-cta">Les essayer en 2 ml</a><button class="btn btn--line" data-restart>Recommencer</button></div>
+    </div>
+    <div class="quiz__progress"><span id="quiz-bar"></span></div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Portrait olfactif",
+  "tag": "div",
+  "class": "librery-portrait-olfactif"
+}
+{% endschema %}

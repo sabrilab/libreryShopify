@@ -1,0 +1,62 @@
+{%- comment -%}
+  LIBRERY — mise en page commune (équivalent de maquette/src/_head.html + l'assemblage de maquette/build.py).
+  Fichier écrit à la main (shopify/theme-src/), recopié tel quel par shopify/build_theme.py.
+  « lp » = la page de la maquette que rend ce modèle Shopify (attributs <body>, scripts propres : snippets/librery-page.liquid).
+{%- endcomment -%}
+{%- liquid
+  assign lp = 'page'
+  case template.name
+    when 'index'
+      assign lp = 'index'
+    when 'product'
+      assign lp = 'produit'
+    when 'collection'
+      assign lp = 'collection'
+    when 'page'
+      if template.suffix != blank
+        assign lp = template.suffix
+      endif
+  endcase
+  assign base = settings.base_medias | default: '' | remove_last: '/'
+-%}
+<!doctype html>
+<html lang="{{ request.locale.iso_code | default: 'fr' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="{{ canonical_url }}">
+{%- render 'librery-seo' -%}
+<link rel="icon" type="image/png" href="{{ base }}/assets/img/v2/emblem-brun.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+{{ 'style.css' | asset_url | stylesheet_tag }}
+<script>window.LIBRERY_BASE = {{ base | json }};</script>
+{%- comment -%} modules chargés à la demande (cadran du sillage, chevet de l'accueil) : Three.js r170, comme la maquette {%- endcomment -%}
+<script type="importmap">{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+  "chevet3d": {{ 'chevet3d.js' | asset_url | json }},
+  "chevet-photo": {{ 'chevet-photo.js' | asset_url | json }},
+  "sillage3d": {{ 'sillage3d.js' | asset_url | json }}
+} }</script>
+<script>try{if(sessionStorage.getItem("librery-vu"))document.documentElement.classList.add("is-seen")}catch(e){}</script>
+{{ content_for_header }}
+</head>
+<body {% render 'librery-page', lp: lp, partie: 'body' %}>
+{%- render 'librery-loader' -%}
+<div id="site-header"></div>
+<main>
+{{ content_for_layout }}
+</main>
+<div id="site-footer"></div>
+{%- render 'librery-shop', lp: lp -%}
+{%- render 'librery-page', lp: lp, partie: 'scripts' -%}
+<script defer src="{{ 'logo.js' | asset_url }}"></script>
+<script defer src="{{ 'imgw.js' | asset_url }}"></script>
+<script defer src="{{ 'data.js' | asset_url }}"></script>
+<script defer src="{{ 'librery-shopify.js' | asset_url }}"></script>
+<script defer src="{{ 'paiement.js' | asset_url }}"></script>
+<script defer src="{{ 'main.js' | asset_url }}"></script>
+</body>
+</html>

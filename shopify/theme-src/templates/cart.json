@@ -1,0 +1,4 @@
+{
+  "sections": { "main": { "type": "librery-panier", "settings": {} } },
+  "order": ["main"]
+}

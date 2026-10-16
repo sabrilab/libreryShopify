@@ -1,0 +1,43 @@
+{%- comment -%} Généré par shopify/build_theme.py depuis maquette/bibliotheque.html — ne pas éditer ici. {%- endcomment -%}
+<section class="page-head"><div class="wrap">
+  <h1 class="h1">La Bibliothèque</h1>
+  <p class="lede">Chaque collection est un livre, chaque parfum un chapitre. Tous sont des extraits de parfum concentrés à 25 %, en 100 ml, 30 ml et 2 ml.</p>
+</div></section>
+<section style="padding-bottom:var(--block)"><div class="wrap">
+  <!-- SECTION : families — les cinq familles olfactives (métaobjets « famille ») -->
+  <div class="fams-head" id="familles"><h2 class="h2">Par famille <em>olfactive</em></h2><p>Cinq façons de lire la bibliothèque. Un parfum appartient souvent à deux familles.</p></div>
+  <div class="fams" id="lib-fams"></div>
+  <div class="filters">
+    <div class="filters__row">
+      <div class="tabs" id="lib-cols">
+        <button data-f="all" class="is-active">Tout</button>
+        <button data-f="skin-obsession">Skin Obsession</button>
+        <button data-f="summer-vibes">Summer Vibes</button>
+        <button data-f="coffrets">Coffrets</button>
+      </div>
+      <div class="tabs"><span class="ui" id="lib-count"></span>
+        <select id="lib-sort" aria-label="Trier"><option value="default">Par collection</option><option value="az">De A à Z</option><option value="asc">Prix croissant</option><option value="desc">Prix décroissant</option></select></div>
+    </div>
+    <p class="filters__desc" id="lib-desc"></p>
+  </div>
+  <div id="library"></div>
+</div></section>
+
+<!-- SECTION : faq -->
+<section class="block"><div class="wrap faq">
+  <div><h2 class="h2">Bien choisir</h2><p class="muted" style="margin-top:14px">Ou laissez-vous guider : <a class="tlink" href="/pages/portrait-olfactif">Portrait olfactif</a></p></div>
+  <div class="accordion">
+    <div class="acc"><button type="button">Qu’est-ce qu’un extrait de parfum ?</button><div class="acc__panel"><p>La forme la plus concentrée d’un parfum. Nos créations sont des extraits à 25 % : plus de tenue, un sillage plus riche, deux ou trois vaporisations suffisent.</p></div></div>
+    <div class="acc"><button type="button">100 ml, 30 ml ou 2 ml ?</button><div class="acc__panel"><p>Le 2 ml pour découvrir un parfum sur sa peau, le 30 ml pour voyager, le 100 ml pour en faire sa signature. Chaque flacon est accompagné d’un 2 ml du même parfum, pour l’essayer avant d’ouvrir.</p></div></div>
+    <div class="acc"><button type="button">Les familles olfactives</button><div class="acc__panel"><p><em>Gourmand</em> : vanille, caramel, praline. <em>Floral</em> : jasmin, tubéreuse, fleur d’oranger. <em>Fruité</em> : baies, mangue, abricot. <em>Ambré</em> : ambre, résines, benjoin. <em>Boisé</em> : santal, cèdre.</p></div></div>
+    <div class="acc"><button type="button">Comment fonctionnent les coffrets ?</button><div class="acc__panel"><p>Le Coffret Découverte vous fait découvrir nos parfums en 2 ml. Après commande, un code de sa valeur vous est envoyé, à usage unique et valable 30 jours sur un flacon 100 ml. Les coffrets 30 ml réunissent une collection entière.</p></div></div>
+  </div>
+</div></section>
+
+{% schema %}
+{
+  "name": "La Bibliothèque",
+  "tag": "div",
+  "class": "librery-bibliotheque"
+}
+{% endschema %}

@@ -1,0 +1,17 @@
+<section class="page-head"><div class="wrap"><h1 class="h1">Recherche</h1>
+  <form action="{{ routes.search_url }}" method="get" class="field-line" role="search">
+    <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="Un parfum, une note" aria-label="Rechercher">
+    <input type="hidden" name="type" value="product"><button>Chercher</button></form></div></section>
+{%- if search.performed -%}
+<section class="block"><div class="wrap"><div class="grid">
+  {%- for r in search.results -%}
+    <a class="card" href="{{ r.url }}"><div class="card__media">{% if r.featured_media %}{{ r.featured_media | image_url: width: 900 | image_tag: loading: 'lazy', alt: r.title }}{% endif %}</div><span class="card__name">{{ r.title }}</span></a>
+  {%- else -%}
+    <p>Aucun résultat pour « {{ search.terms | escape }} ».</p>
+  {%- endfor -%}
+</div></div></section>
+{%- endif -%}
+
+{% schema %}
+{ "name": "Recherche", "tag": "div", "class": "librery-recherche" }
+{% endschema %}

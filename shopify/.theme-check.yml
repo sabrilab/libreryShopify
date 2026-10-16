@@ -1,0 +1,11 @@
+# Theme Check pour le thème LIBRERY : shopify theme check --path theme --config .theme-check.yml
+extends: :recommended
+# Images de la maquette : leurs cadres sont dimensionnés en CSS (nombre d'or, aspect-ratio), pas par width/height.
+ImgWidthAndHeight:
+  enabled: false
+# Polices Google, Three.js (jsDelivr, version figée r170) et Leaflet : choisis par la maquette, servis hors Shopify.
+RemoteAsset:
+  enabled: false
+# Une seule langue (français) : les adresses /collections/… et /pages/… écrites en dur sont celles du site.
+HardcodedRoutes:
+  enabled: false

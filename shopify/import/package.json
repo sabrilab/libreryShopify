@@ -1,0 +1,15 @@
+{
+  "name": "librery-import-shopify",
+  "private": true,
+  "description": "Import du catalogue LIBRERY (maquette/assets/js/data.js) dans la boutique Shopify. Aucune dépendance.",
+  "type": "module",
+  "main": "importer.test.mjs",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node --test importer.test.mjs",
+    "essai": "node importer.mjs --essai",
+    "sauvegarder": "node importer.mjs --sauvegarder",
+    "preparation": "node importer.mjs --appliquer=preparation",
+    "bascule": "node importer.mjs --appliquer=bascule"
+  }
+}

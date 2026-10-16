@@ -1,0 +1,29 @@
+{%- comment -%}
+  Pont de données Shopify → scripts de la maquette.
+  La boutique fait foi pour ce qui se vend : variantes, prix, stock, panier. Les textes et visuels éditoriaux
+  restent ceux de assets/data.js (même source que la maquette) ; assets/librery-shopify.js fusionne les deux.
+  Les formats sont reconnus par le libellé de l'option « Format » (« 100 ml », « 30 ml », « 2 ml », « 8 × 2 ml »…),
+  exactement comme dans data.js (shopify/import/importer.mjs crée les variantes ainsi).
+{%- endcomment -%}
+<script>
+window.LIBRERY_CTX = {
+  page: {{ lp | json }},
+  product: {% if product %}{{ product.handle | json }}{% else %}null{% endif %},
+  collection: {% if collection %}{{ collection.handle | json }}{% else %}null{% endif %}
+};
+window.LIBRERY_SHOP = {
+  racine: {{ routes.root_url | json }},
+  caisse: {{ routes.root_url | append: '/checkout' | replace: '//', '/' | json }},
+  monnaie: {{ cart.currency.iso_code | default: shop.currency | json }},
+  panier: {{ cart.item_count | default: 0 }},
+  produits: {
+  {%- for p in collections.all.products limit: 50 -%}
+    {{ p.handle | json }}: { id: {{ p.id }}, titre: {{ p.title | json }}, dispo: {{ p.available | json }}, variantes: [
+      {%- for v in p.variants -%}
+        { id: {{ v.id }}, format: {{ v.option1 | json }}, prix: {{ v.price }}, dispo: {{ v.available | json }} }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ] }{% unless forloop.last %},{% endunless %}
+  {%- endfor -%}
+  }
+};
+</script>

@@ -1,0 +1,27 @@
+{%- comment -%} Généré par shopify/build_theme.py depuis maquette/contact.html — ne pas éditer ici. {%- endcomment -%}
+<section class="page-head"><div class="wrap">
+  <h1 class="h1">Contact</h1>
+  <p class="lede">Une question sur un parfum, une commande, une collaboration.</p>
+</div></section>
+<section style="padding-bottom:var(--block)"><div class="wrap contact">
+  <div class="contact__info">
+    <p><span class="ui muted">E-mail</span><br><a class="tlink" href="mailto:contact@libreryparfum.com">contact@libreryparfum.com</a></p>
+    <p><span class="ui muted">Maison</span><br>LIBRERY — Bey Industrie<br>58 avenue de Wagram, 75017 Paris</p>
+    <p><span class="ui muted">Revendeurs</span><br>Choisissez « Devenir revendeur » dans le formulaire.</p>
+  </div>
+  <form class="form" id="contact-form" method="post" action="{{ routes.root_url | append: '/contact' | replace: '//', '/' }}#contact-form"><input type="hidden" name="form_type" value="contact"><input type="hidden" name="utf8" value="✓">
+    <div class="row"><div class="field"><label for="c-name">Nom</label><input id="c-name" name="contact[name]" required autocomplete="name"></div>
+      <div class="field"><label for="c-mail">E-mail</label><input id="c-mail" name="contact[email]" type="email" required autocomplete="email"></div></div>
+    <div class="field"><label for="c-sub">Sujet</label><select id="c-sub" name="contact[Sujet]"><option>Une question sur un parfum</option><option>Ma commande</option><option>Devenir revendeur</option><option>Presse et collaboration</option><option>Autre</option></select></div>
+    <div class="field"><label for="c-msg">Message</label><textarea id="c-msg" name="contact[body]" required></textarea></div>
+    <div><button class="btn">Envoyer</button></div>
+  </form>
+</div></section>
+
+{% schema %}
+{
+  "name": "Contact",
+  "tag": "div",
+  "class": "librery-contact"
+}
+{% endschema %}

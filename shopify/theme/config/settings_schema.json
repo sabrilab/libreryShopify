@@ -1,0 +1,33 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "LIBRERY",
+    "theme_version": "1.0.0",
+    "theme_author": "LIBRERY",
+    "theme_documentation_url": "https://github.com/sabrilab/libreryShopify/blob/main/shopify/MIGRATION.md",
+    "theme_support_url": "https://github.com/sabrilab/libreryShopify"
+  },
+  {
+    "name": "LIBRERY",
+    "settings": [
+      {
+        "type": "text",
+        "id": "base_medias",
+        "label": "Hébergement des médias",
+        "info": "Adresse où sont servis les images, films et fichiers 3D de la maquette (dossiers /assets et /parfum). Par défaut, le site de la maquette sur Vercel.",
+        "default": "https://librery-refonte.vercel.app"
+      },
+      {
+        "type": "textarea",
+        "id": "description_defaut",
+        "label": "Description par défaut (moteurs de recherche)",
+        "default": "LIBRERY — la bibliothèque olfactive, où chaque fragrance se fait récit et chaque note, un souvenir. Extraits de parfum, Paris."
+      },
+      {
+        "type": "image_picker",
+        "id": "image_partage",
+        "label": "Image de partage (réseaux sociaux)"
+      }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "librery-bibliotheque",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

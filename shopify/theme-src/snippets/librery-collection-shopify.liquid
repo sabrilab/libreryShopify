@@ -1,0 +1,23 @@
+{%- comment -%}
+  Grille générique, rendue par Shopify : visible quand la collection n'existe pas dans data.js, et sans JavaScript.
+  « /collections/all » : la Bibliothèque est la page /pages/bibliotheque (adresse canonique), on y renvoie.
+{%- endcomment -%}
+{%- if collection.handle == 'all' -%}
+  <script>location.replace({{ routes.root_url | append: '/pages/bibliotheque' | replace: '//', '/' | json }} + location.search + location.hash);</script>
+{%- endif -%}
+{%- capture grille -%}
+<section class="page-head"><div class="wrap"><h1 class="h1">{{ collection.title }}</h1>
+  {%- if collection.description != blank %}<div class="lede">{{ collection.description }}</div>{% endif %}</div></section>
+<section class="block"><div class="wrap"><div class="grid">
+  {%- paginate collection.products by 24 -%}
+    {%- for p in collection.products -%}
+      <a class="card" href="{{ p.url }}"><div class="card__media">
+        {%- if p.featured_media %}{{ p.featured_media | image_url: width: 900 | image_tag: loading: 'lazy', widths: '450, 900', sizes: '(max-width: 800px) 50vw, 25vw', alt: p.title }}{% endif %}
+      </div><span class="card__name">{{ p.title }}</span><span class="card__meta">{% if p.price_varies %}dès {% endif %}{{ p.price_min | money }}</span></a>
+    {%- endfor -%}
+    {%- if paginate.pages > 1 %}{{ paginate | default_pagination }}{% endif -%}
+  {%- endpaginate -%}
+</div></div></section>
+{%- endcapture -%}
+<div id="collection-shopify" hidden>{{ grille }}</div>
+<noscript>{{ grille }}</noscript>

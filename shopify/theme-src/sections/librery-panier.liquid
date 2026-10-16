@@ -1,0 +1,29 @@
+{%- comment -%}
+  Page /cart de Shopify. Le panier du site est le tiroir (main.js) ; cette page sert aux lignes ajoutées hors du
+  tiroir (fiche générique) et aux retours depuis la caisse. Bouton : la caisse Shopify.
+{%- endcomment -%}
+<section class="page-head"><div class="wrap"><h1 class="h1">Panier</h1></div></section>
+<section class="block"><div class="wrap">
+  {%- if cart.item_count > 0 -%}
+    <form action="{{ routes.cart_url }}" method="post" class="form">
+      {%- for item in cart.items -%}
+        <div class="line">
+          <div><div class="line__name">{{ item.product.title }}</div><div class="line__var">{{ item.variant.title }}</div>
+            {%- for p in item.properties %}{% unless p.first contains '_' %}<div class="line__sel">{{ p.first }} : {{ p.last }}</div>{% endunless %}{% endfor -%}
+            <label class="ui" for="q-{{ forloop.index }}">Quantité</label>
+            <input id="q-{{ forloop.index }}" type="number" name="updates[]" value="{{ item.quantity }}" min="0"></div>
+          <div class="line__right"><span>{{ item.final_line_price | money }}</span><a href="{{ item.url_to_remove }}">Retirer</a></div>
+        </div>
+      {%- endfor -%}
+      <div class="cart__total"><span>Sous-total</span><span>{{ cart.total_price | money }}</span></div>
+      <button class="btn btn--line" type="submit" name="update">Mettre à jour</button>
+      <button class="btn" type="submit" name="checkout">Commander</button>
+    </form>
+  {%- else -%}
+    <p>Votre panier est vide.</p><a class="btn btn--line" href="{{ routes.root_url }}pages/bibliotheque">Voir les parfums</a>
+  {%- endif -%}
+</div></section>
+
+{% schema %}
+{ "name": "Panier", "tag": "div", "class": "librery-panier" }
+{% endschema %}
