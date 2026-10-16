@@ -1840,7 +1840,7 @@
           <button class="btn btn--block" id="add" ${p.builder || isSoon(p, current) ? 'disabled' : ''}>${cta()}</button>
           ${p.soon ? `<p class="pdp__soon" id="soon"${isSoon(p, current) ? '' : ' hidden'}>${esc(SOON_NOTE)}</p>` : ''}
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
-          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Un code de la valeur du coffret vous est envoyé, à usage unique et valable 30 jours sur un flacon 100 ml, non cumulable avec un autre code.`}</p>
+          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Après votre commande, saisissez le code <b>COFFRET40</b> au paiement d’un flacon 100 ml : 40&nbsp;€ déduits, une fois, pendant 30 jours, non cumulable avec un autre code.`}</p>
           <p class="pdp__small">Expédié sous 24 h ouvrées depuis Paris, livré ${eta()}. Deux échantillons offerts.</p>
           ${perf ? `<p class="pdp__by">Composé par <a href="#parfumeur">${esc(perf.name)}</a></p>` : ''}
           <div class="accordion">

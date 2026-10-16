@@ -240,7 +240,7 @@ const PRODUCTS = [
     tagline: 'Une préface à la collection.',
     description: [
       "La maison LIBRERY vous invite à parcourir sa bibliothèque olfactive. Pensé comme une préface à la collection, le Coffret Découverte ouvre les premières pages de nos créations à travers des formats de 2 ml. Chaque fragrance révèle un souvenir, une émotion, un chapitre à explorer au fil de votre lecture sensorielle.",
-      "À la suite de votre commande, un code d’une valeur équivalente à celle du coffret vous est envoyé par e-mail. À usage unique et valable 30 jours, il s’utilise uniquement sur un parfum 100 ml et n’est pas cumulable avec un autre code (dont celui de bienvenue de 10 %)."
+      "À la suite de votre commande, la valeur du coffret vous revient : saisissez le code COFFRET40 au paiement d’un parfum 100 ml. Il vaut 40 €, s’utilise une fois, pendant 30 jours, et n’est pas cumulable avec un autre code (dont celui de bienvenue de 10 %)."
     ]
   },
   {
