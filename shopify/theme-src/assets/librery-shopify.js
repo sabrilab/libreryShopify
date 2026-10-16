@@ -266,7 +266,10 @@
       });
     };
     let parti = false;
-    const go = () => { if (parti) return; parti = true; removeEventListener('scroll', auDefile); ouvrir(); };
+    // jamais par-dessus le bandeau des cookies de Shopify (il passerait devant la fenêtre) : on attend qu'il soit refermé
+    const bandeau = () => { const b = document.getElementById('shopify-pc__banner'); if (!b) return false; const r = b.getBoundingClientRect(), cs = getComputedStyle(b); return r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden'; };
+    const apresBandeau = () => { if (!bandeau()) return ouvrir(); const t = setInterval(() => { if (!bandeau()) { clearInterval(t); setTimeout(ouvrir, 1200); } }, 700); };
+    const go = () => { if (parti) return; parti = true; removeEventListener('scroll', auDefile); apresBandeau(); };
     const auDefile = () => { if (scrollY > (document.documentElement.scrollHeight - innerHeight) / 3) go(); };
     addEventListener('load', () => { setTimeout(go, 8000); addEventListener('scroll', auDefile, { passive: true }); });
   }
