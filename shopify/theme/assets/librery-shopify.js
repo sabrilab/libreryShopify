@@ -124,6 +124,9 @@
     Object.entries({ utf8: '✓', ...champs }).forEach(([k, v]) => { const i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = v; f.appendChild(i); });
     document.body.appendChild(f); f.submit();
   };
+  // code de bienvenue (remise BIENVENUE10 créée dans Shopify : 10 %, une fois par client, non cumulable) montré dès l'inscription
+  const CODE_BIENVENUE = 'BIENVENUE10';
+  const MERCI_LETTRE = `<p class="ok nl__ok">Merci. Votre code de bienvenue : <b>${CODE_BIENVENUE}</b>, 10&nbsp;% sur tout le site, à saisir au paiement (une fois par personne, non cumulable).</p>`;
   document.addEventListener('submit', e => {
     const f = e.target;
     if (f.matches('form[data-news]')) {
@@ -132,7 +135,7 @@
       const champs = { form_type: 'customer', 'contact[email]': mail, 'contact[tags]': 'newsletter', 'contact[accepts_marketing]': 'true' };
       poster(champs).then(r => {
         if (/challenge/.test(r.url)) return soumettreVraiment(champs);
-        f.insertAdjacentHTML('afterend', '<p class="ok">Merci, à très bientôt.</p>'); f.remove();
+        f.insertAdjacentHTML('afterend', MERCI_LETTRE); f.remove();
       }).catch(() => soumettreVraiment(champs));
     } else if (f.id === 'contact-form') {
       e.preventDefault(); e.stopImmediatePropagation();
@@ -146,5 +149,5 @@
   }, true);
   // retour d'un vrai envoi (après vérification) : Shopify ajoute ?contact_posted=true ou ?customer_posted=true
   if (/[?&](contact|customer)_posted=true/.test(location.search))
-    addEventListener('load', () => dire('Merci, votre message est bien parti.'));
+    addEventListener('load', () => dire(/customer_posted/.test(location.search) ? `Merci. Votre code de bienvenue : ${CODE_BIENVENUE} (10 % sur tout le site).` : 'Merci, votre message est bien parti.'));
 })();

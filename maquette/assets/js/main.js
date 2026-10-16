@@ -194,7 +194,7 @@
         <div class="wrap nl__in"><div class="nl__box">
           <span class="nl__kick">Lettre de la maison</span>
           <h2 class="nl__t" id="nl-t">10&nbsp;% offerts <em>sur tout le site</em></h2>
-          <p class="nl__p">Inscrivez-vous : votre code de bienvenue arrive aussitôt par e-mail. Puis, avant tout le monde, les nouveaux chapitres de la maison.</p>
+          <p class="nl__p">Inscrivez-vous : votre code de bienvenue s’affiche aussitôt. Puis, avant tout le monde, les nouveaux chapitres de la maison.</p>
           <form class="nl__form" data-news><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail" autocomplete="email"><button class="btn">Recevoir mon code</button></form>
           <p class="nl__small">Un code par personne, non cumulable avec le code du Coffret Découverte. Désinscription en un clic.</p>
         </div></div></section>`}
