@@ -317,7 +317,7 @@
           <p class="pdp__small" style="margin-top:24px">Vous hésitez ? <a class="tlink" href="/portrait-olfactif">Portrait olfactif</a></p></div>`;
     $('#cart-foot').innerHTML = items.length ? `
       <div class="cart__total"><span>Sous-total</span><span>${eur(total)}</span></div>
-      <small>Taxes incluses · paiement en 3 fois possible · retours offerts sous 30 jours</small>
+      <small>Taxes incluses · retours offerts sous 30 jours</small>
       <button class="btn btn--block" data-toast="Le paiement sera celui de Shopify">Commander</button>` : '';
 
     $$('#cart-items [data-q]').forEach(b => b.addEventListener('click', () => { const i = +b.dataset.i; cart[i].q += +b.dataset.q; if (cart[i].q < 1) cart.splice(i, 1); saveCart(); }));
