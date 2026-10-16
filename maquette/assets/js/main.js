@@ -10,7 +10,9 @@
 
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-  const eur = n => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: n % 1 ? 2 : 0 });
+  // sur Shopify, un visiteur hors zone euro voit les prix de la boutique dans sa monnaie (marché International) : on affiche donc cette monnaie
+  const MONNAIE = (window.LIBRERY_SHOP && window.LIBRERY_SHOP.monnaie) || 'EUR';
+  const eur = n => n.toLocaleString('fr-FR', { style: 'currency', currency: MONNAIE, minimumFractionDigits: n % 1 ? 2 : 0 });
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const byHandle = h => PRODUCTS.find(p => p.handle === h);
   const formatsOf = p => p.formats || FORMATS;
