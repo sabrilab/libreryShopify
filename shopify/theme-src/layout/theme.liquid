@@ -17,7 +17,7 @@
         assign lp = template.suffix
       endif
   endcase
-  assign base = settings.base_medias | default: '' | remove_last: '/'
+  assign base = settings.base_medias | default: '' | append: '#' | remove: '/#' | remove: '#'
 -%}
 <!doctype html>
 <html lang="{{ request.locale.iso_code | default: 'fr' }}">
