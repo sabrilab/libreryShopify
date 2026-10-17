@@ -97,8 +97,7 @@
       await json('/cart/add.js', { items });
       await json('/cart/update.js', { attributes });
       try { localStorage.setItem(ENVOI_KEY, String(Date.now())); } catch (e) {}
-      const cadeau = codeGagne();
-      location.href = (SHOP.caisse || route('/checkout')) + (cadeau ? '?discount=' + encodeURIComponent(cadeau) : '');
+      location.href = SHOP.caisse || route('/checkout');
     } catch (e) {
       console.error('[LIBRERY] caisse', e);
       bouton.disabled = false; bouton.textContent = texte;
@@ -127,14 +126,12 @@
     Object.entries({ utf8: '✓', ...champs }).forEach(([k, v]) => { const i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = v; f.appendChild(i); });
     document.body.appendChild(f); f.submit();
   };
-  // code de bienvenue (remise BIENVENUE10 créée dans Shopify : 10 %, une fois par client, non cumulable) montré dès l'inscription
-  const CODE_BIENVENUE = 'BIENVENUE10';
-  const MERCI_LETTRE = `<p class="ok nl__ok">Merci. Votre code de bienvenue : <b>${CODE_BIENVENUE}</b>, 10&nbsp;% sur tout le site, appliqué d’office à votre commande (une fois par personne, non cumulable).</p>`;
-  // l'inscrit garde son code : la fenêtre cadeau ne revient plus, et la caisse s'ouvre avec la remise (/checkout?discount=)
+  // le code de bienvenue (BIENVENUE10 : 10 %, une fois par client, non cumulable) part par l'e-mail de bienvenue de Shopify
+  const MERCI_LETTRE = `<p class="ok nl__ok">Merci. Votre code de 10&nbsp;% vous attend dans votre boîte mail.</p>`;
+  // l'inscrit est retenu : la fenêtre de la newsletter ne revient plus (la remise n'est plus appliquée d'office)
   const LETTRE_KEY = 'librery-lettre';
   function inscrit() {
-    try { localStorage.setItem(LETTRE_KEY, CODE_BIENVENUE); } catch (e) {}
-    fetch(route('/discount/' + CODE_BIENVENUE), { credentials: 'same-origin' }).catch(() => {});
+    try { localStorage.setItem(LETTRE_KEY, '1'); } catch (e) {}
   }
   function codeGagne() { try { return localStorage.getItem(LETTRE_KEY); } catch (e) { return null; } }
   document.addEventListener('submit', e => {
@@ -160,11 +157,10 @@
   // retour d'un vrai envoi (après vérification) : Shopify ajoute ?contact_posted=true ou ?customer_posted=true
   if (/[?&]customer_posted=true/.test(location.search)) inscrit();
   if (/[?&](contact|customer)_posted=true/.test(location.search))
-    addEventListener('load', () => dire(/customer_posted/.test(location.search) ? `Merci. Votre code de bienvenue : ${CODE_BIENVENUE} (10 % sur tout le site).` : 'Merci, votre message est bien parti.'));
-  /* ---------------- 5. Fenêtre cadeau : 10 % contre l'inscription à la lettre ---------------- */
+    addEventListener('load', () => dire(/customer_posted/.test(location.search) ? 'Merci. Votre code de 10 % vous attend dans votre boîte mail.' : 'Merci, votre message est bien parti.'));
+  /* ---------------- 5. Fenêtre de la lettre : 10 % contre l'inscription à la lettre ---------------- */
   // S'ouvre d'elle-même (8 s ou un tiers de page), une fois : pas pour un inscrit, ni avant 7 jours après « Plus tard ».
-  // Deux temps : le paquet fermé (« Un cadeau vous attend »), puis l'ouverture (« Vous avez gagné 10 % ») et l'adresse.
-  // Le code est ensuite montré et appliqué d'office à la caisse.
+  // Sobre (Rafiq et Sabri, 17/10) : l'adresse tout de suite ; le code part par e-mail, rien n'est « gagné » à l'écran.
   const PLUS_TARD_KEY = 'librery-cadeau-plus-tard', SEMAINE = 7 * 864e5;
   const dejaVu = () => { try { return codeGagne() || Date.now() - (+localStorage.getItem(PLUS_TARD_KEY) || 0) < SEMAINE; } catch (e) { return true; } };
   const pageCaisse = /^\/(cart|checkout|account|challenge)/.test(location.pathname.replace(/^\/[a-z]{2}(-[a-z]{2})?(?=\/)/, ''));
@@ -180,22 +176,17 @@
 .cadeau__kick{font-family:var(--sans);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 18px}
 .cadeau__t{font-family:var(--serif-d);font-weight:400;font-size:38px;line-height:1.08;margin:0 0 16px}
 .cadeau__p{font-family:var(--serif);font-size:16px;line-height:1.55;color:var(--grey);margin:0 0 28px}
-.cadeau__seal{width:118px;height:118px;margin:0 auto 22px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding-top:4px;text-align:center;white-space:nowrap;color:#fff;background:radial-gradient(circle at 35% 30%,#e3c49b,#b7916a 55%,#8c6a47);box-shadow:0 14px 30px -12px rgba(140,106,71,.8),inset 0 0 0 5px rgba(255,255,255,.18);font-family:var(--serif-d);font-size:38px;line-height:1}
-.cadeau__seal small{display:block;font-family:var(--sans);font-size:9.5px;line-height:1;letter-spacing:.14em;text-indent:.14em;text-transform:uppercase}
 .cadeau__step{transition:opacity .4s ease,transform .5s ease}
 .cadeau__step[hidden]{display:none}
 .cadeau__step.is-new{opacity:0;transform:translateY(10px)}
 .cadeau form{display:grid;gap:10px}
 .cadeau input[type=email]{height:48px;border:1px solid var(--line);background:#fff;padding:0 16px;font:15px var(--sans);color:var(--ink);text-align:center}
 .cadeau input[type=email]:focus{outline:1px solid var(--ink);outline-offset:0}
-.cadeau__code{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 14px;padding:16px;border:1px dashed var(--gold);background:#fff}
-.cadeau__code b{font-family:var(--sans);font-weight:500;font-size:22px;letter-spacing:.14em}
-.cadeau__code button{font:11px var(--sans);letter-spacing:.08em;text-transform:uppercase;border:0;background:none;color:var(--gold);cursor:pointer;padding:6px}
 .cadeau__small{font-family:var(--sans);font-size:11.5px;line-height:1.5;color:var(--grey);margin:14px 0 0}
 .cadeau__later{margin-top:14px;font:12px var(--sans);letter-spacing:.06em;color:var(--grey);background:none;border:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .cadeau__x{position:absolute;top:12px;right:12px;z-index:2;width:36px;height:36px;border:0;background:none;font:22px/1 var(--sans);color:var(--ink);cursor:pointer}
 .cadeau__err{font:12.5px var(--sans);color:#9a3b2c;margin:4px 0 0}
-@media (max-width:760px){.cadeau{place-items:end center;padding:0}.cadeau__box{grid-template-columns:1fr;width:100%;max-height:100%;overflow:auto;transform:translateY(40px)}.cadeau__img{min-height:0;height:34vh}.cadeau__txt{padding:30px 24px calc(26px + env(safe-area-inset-bottom))}.cadeau__t{font-size:31px}.cadeau__seal{width:96px;height:96px;font-size:31px;margin-bottom:16px;margin-top:-78px;position:relative;z-index:2}.cadeau__x{color:#fff}}
+@media (max-width:760px){.cadeau{place-items:end center;padding:0}.cadeau__box{grid-template-columns:1fr;width:100%;max-height:100%;overflow:auto;transform:translateY(40px)}.cadeau__img{min-height:0;height:34vh}.cadeau__txt{padding:30px 24px calc(26px + env(safe-area-inset-bottom))}.cadeau__t{font-size:31px}.cadeau__x{color:#fff}}
 @media (prefers-reduced-motion:reduce){.cadeau,.cadeau__box,.cadeau__step{transition:none}}`;
     const img = typeof IMG !== 'undefined' && typeof IMGW !== 'undefined' ? `${IMG}ecrin-contenu-m.webp?v=${(IMGW['ecrin-contenu'] || [])[2] || ''}` : '';
     const ouvrir = () => {
@@ -204,29 +195,20 @@
       const el = document.createElement('div'); el.className = 'cadeau'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'cadeau-t');
       el.innerHTML = `<div class="cadeau__box">
         <button class="cadeau__x" type="button" aria-label="Fermer">×</button>
-        <div class="cadeau__img" style="background-image:url('${img}')" role="img" aria-label="L’écrin LIBRERY, ruban doré"></div>
+        <div class="cadeau__img" style="background-image:url('${img}')" role="img" aria-label="L’écrin LIBRERY"></div>
         <div class="cadeau__txt">
-          <div class="cadeau__step" data-s="1">
-            <p class="cadeau__kick">Pour votre première visite</p>
-            <h2 class="cadeau__t" id="cadeau-t">Un cadeau<br><em>vous attend</em></h2>
-            <p class="cadeau__p">La maison a glissé quelque chose pour vous dans cet écrin.</p>
-            <button class="btn btn--block" type="button" data-ouvrir>Ouvrir mon cadeau</button>
-          </div>
-          <div class="cadeau__step is-new" data-s="2" hidden>
-            <div class="cadeau__seal">10&nbsp;%<small>offerts</small></div>
-            <p class="cadeau__kick">Félicitations</p>
-            <h2 class="cadeau__t">Vous avez gagné<br><em>10&nbsp;% sur tout le site</em></h2>
-            <p class="cadeau__p">Indiquez simplement où vous l’envoyer : votre code s’affiche aussitôt, et il est appliqué d’office à votre commande.</p>
-            <form novalidate><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail" autocomplete="email"><button class="btn btn--block">Recevoir mon cadeau</button><p class="cadeau__err" hidden>Il manque une adresse e-mail valide.</p></form>
-            <p class="cadeau__small">Une fois par personne, non cumulable. Vous recevrez aussi, avant tout le monde, les nouveaux chapitres de la maison. Désinscription en un clic.</p>
+          <div class="cadeau__step" data-s="2">
+            <p class="cadeau__kick">La newsletter</p>
+            <h2 class="cadeau__t" id="cadeau-t">Ne manquez<br><em>aucune exclusivité</em></h2>
+            <p class="cadeau__p">Inscrivez-vous à la newsletter de LIBRERY : les nouveaux parfums et les éditions limitées avant tout le monde. Votre code de 10&nbsp;% vous est envoyé par e-mail.</p>
+            <form novalidate><input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail" autocomplete="email"><button class="btn btn--block">S’inscrire</button><p class="cadeau__err" hidden>Il manque une adresse e-mail valide.</p></form>
+            <p class="cadeau__small">Code valable une fois par personne, non cumulable. Désinscription en un clic.</p>
           </div>
           <div class="cadeau__step is-new" data-s="3" hidden>
-            <div class="cadeau__seal">10&nbsp;%<small>à vous</small></div>
-            <p class="cadeau__kick">C’est à vous</p>
-            <h2 class="cadeau__t">Votre cadeau<br><em>est prêt</em></h2>
-            <div class="cadeau__code"><b>${CODE_BIENVENUE}</b><button type="button" data-copier>Copier</button></div>
-            <p class="cadeau__p" style="margin-bottom:22px">10&nbsp;% sur tout le site, déjà appliqués à votre prochaine commande.</p>
-            <button class="btn btn--block" type="button" data-fermer>Découvrir la bibliothèque</button>
+            <p class="cadeau__kick">Merci</p>
+            <h2 class="cadeau__t">Bienvenue<br><em>à la maison</em></h2>
+            <p class="cadeau__p" style="margin-bottom:22px">Votre code de 10&nbsp;% vous attend dans votre boîte mail.</p>
+            <button class="btn btn--block" type="button" data-fermer>Continuer</button>
           </div>
           <button class="cadeau__later" type="button" data-plus-tard>Plus tard</button>
         </div></div>`;
@@ -249,10 +231,7 @@
       document.addEventListener('keydown', clavier);
       el.addEventListener('click', e => {
         if (e.target === el || e.target.closest('.cadeau__x') || e.target.closest('[data-plus-tard]')) return fermer(!codeGagne());
-        if (e.target.closest('[data-ouvrir]')) return etape(2);
         if (e.target.closest('[data-fermer]')) return fermer(false);
-        const c = e.target.closest('[data-copier]');
-        if (c) { (navigator.clipboard ? navigator.clipboard.writeText(CODE_BIENVENUE) : Promise.reject()).then(() => { c.textContent = 'Copié'; }, () => {}); }
       });
       el.querySelector('form').addEventListener('submit', e => {
         e.preventDefault(); e.stopImmediatePropagation();
