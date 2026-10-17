@@ -81,8 +81,10 @@
     if (manque.length) return dire('Indisponible pour l’instant : ' + manque.join(', '));
     if (!items.length) return;
     const essai = [...new Set(lignes.filter(l => l.f === '100' || l.f === '30').map(l => nom(l.h)))];
+    // les deux échantillons offerts accompagnent un flacon (100 ml, 30 ml ou Coffret Collection), pas une commande d'échantillons
+    const flacon = lignes.some(l => l.f === '100' || l.f === '30' || l.h === 'coffret-collection');
     const attributes = {
-      'Échantillons offerts': (extras.samples || []).filter(Boolean).map(nom).join(', '),
+      'Échantillons offerts': flacon ? (extras.samples || []).filter(Boolean).map(nom).join(', ') : '',
       '2 ml pour essayer': essai.join(', ')
     };
     bouton.disabled = true; const texte = bouton.textContent; bouton.textContent = 'Ouverture de la caisse…';

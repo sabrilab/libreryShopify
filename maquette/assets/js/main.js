@@ -128,7 +128,7 @@
               </div>
               <a href="/preface" ${cur('preface')}>Préface</a>
               <a href="/lexique" ${cur('lexique')}>Lexique</a>
-              <a href="/points-de-vente" ${cur('carte')}>Carte</a>
+              <a href="/points-de-vente" ${cur('carte')}>Carte <span class="nav__aside">(nos points de vente)</span></a>
             </nav>
           </div>
           <a href="/" class="logo" aria-label="LIBRERY, accueil">${LOGO_SVG}</a>
@@ -152,7 +152,7 @@
           </div>
           <a href="/preface">Préface</a>
           <a href="/lexique">Lexique</a>
-          <a href="/points-de-vente">Carte</a>
+          <a href="/points-de-vente">Carte <span class="nav__aside">(nos points de vente)</span></a>
           <a href="/offrir">Offrir</a>
         </nav>
         <div class="drawer__foot"><a href="/services">Services</a><a href="/contact">Contact</a><span>LIBRERY, maison de parfum, Paris</span></div>
@@ -283,8 +283,10 @@
     $('#cart-ship').innerHTML = (left > 0 ? `Encore ${eur(left)} pour la livraison offerte` : 'Livraison offerte')
       + `<div class="bar"><span style="width:${Math.min(100, total / FREE_SHIPPING * 100)}%"></span></div>`;
 
+    // les deux échantillons offerts accompagnent un flacon (100 ml, 30 ml ou Coffret Collection), pas une commande d'échantillons
+    const flacon = items.some(i => ['100', '30'].includes(i.f) || i.h === 'coffret-collection');
     // échantillons présélectionnés parmi les parfums absents du panier
-    if (items.length && !extras.samples.every(Boolean)) {
+    if (flacon && !extras.samples.every(Boolean)) {
       const inCart = items.map(i => i.h);
       const pool = PRODUCTS.filter(p => !p.type && !inCart.includes(p.handle)).sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
       extras.samples = extras.samples.map((v, k) => v || (pool[k] ? pool[k].handle : ''));
@@ -309,9 +311,10 @@
         <div><div class="line__name">${nm(p.name)}, 2 ml</div><div class="line__var">Pour l’essayer avant d’ouvrir le flacon</div></div>
         <div class="line__right"><span>Offert</span></div>
       </div>`).join('') + `
-      <div class="cart__opts">
+      <div class="cart__opts">${flacon ? `
         <div class="cart__opt"><span class="ui">Vos deux échantillons offerts (modifiables)</span>
-          <div class="cart__selects"><select data-sample="0" aria-label="Premier échantillon">${opt(extras.samples[0])}</select><select data-sample="1" aria-label="Second échantillon">${opt(extras.samples[1])}</select></div></div>
+          <div class="cart__selects"><select data-sample="0" aria-label="Premier échantillon">${opt(extras.samples[0])}</select><select data-sample="1" aria-label="Second échantillon">${opt(extras.samples[1])}</select></div></div>` : `
+        <p class="pdp__small">Deux échantillons offerts, au choix, avec chaque flacon 100&nbsp;ml ou 30&nbsp;ml.</p>`}
       </div>`
       : `<div class="cart__empty"><p>Votre panier est vide.</p><a class="btn btn--line" href="/bibliotheque">Voir les parfums</a>
           <p class="pdp__small" style="margin-top:24px">Vous hésitez ? <a class="tlink" href="/portrait-olfactif">Portrait olfactif</a></p></div>`;
@@ -1841,7 +1844,7 @@
           ${p.soon ? `<p class="pdp__soon" id="soon"${isSoon(p, current) ? '' : ' hidden'}>${esc(SOON_NOTE)}</p>` : ''}
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
           <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Après votre commande, saisissez le code <b>COFFRET40</b> au paiement d’un flacon 100 ml : 40&nbsp;€ déduits, une fois, pendant 30 jours, non cumulable avec un autre code.`}</p>
-          <p class="pdp__small">Expédié sous 24 h ouvrées depuis Paris, livré ${eta()}. Deux échantillons offerts.</p>
+          <p class="pdp__small">Expédié sous 24 h ouvrées depuis Paris, livré ${eta()}. Deux échantillons offerts avec chaque flacon.</p>
           ${perf ? `<p class="pdp__by">Composé par <a href="#parfumeur">${esc(perf.name)}</a></p>` : ''}
           <div class="accordion">
             ${notes ? acc('Notes', `<dl class="notes-dl"><div><dt>Tête</dt><dd>${notes.tete}</dd></div><div><dt>Cœur</dt><dd>${notes.coeur}</dd></div><div><dt>Fond</dt><dd>${notes.fond}</dd></div></dl>`) : ''}
@@ -1960,7 +1963,7 @@
         <div class="store" data-i="${i}" role="button" tabindex="0">
           <div class="store__name">${esc(s.name)}</div>
           <div class="store__addr">${s.online ? `Boutique en ligne, ${esc(s.country)}` : `${esc(s.address)}, ${esc(s.city)}, ${esc(s.country)}`}${s.note ? ` · ${esc(s.note)}` : ''}</div>
-          <div class="store__links">${s.phone ? `<a href="tel:${s.phone.replace(/\s/g, '')}">${esc(s.phone)}</a>` : ''}${s.url ? `<a href="${s.url}" target="_blank" rel="noopener">Site</a>` : ''}${s.online ? '' : `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name + ' ' + s.address + ' ' + s.city)}" target="_blank" rel="noopener">Itinéraire</a>`}</div>
+          <div class="store__links">${s.url ? `<a href="${s.url}" target="_blank" rel="noopener">Site</a>` : ''}${s.online ? '' : `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name + ' ' + s.address + ' ' + s.city)}" target="_blank" rel="noopener">Itinéraire</a>`}</div>
         </div>`).join('') : '<p class="store muted">Aucune adresse ne correspond.</p>';
       $('#stores-count').textContent = items.length + ' adresses';
       markers.forEach((m, i) => { if (map && m) items.some(x => x.i === i) ? m.addTo(map) : m.remove(); });

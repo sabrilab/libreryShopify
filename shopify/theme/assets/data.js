@@ -35,7 +35,7 @@ const FAMILY_ART = { 'Gourmand': 'famille-gourmand', 'Floral': 'famille-floral',
 /* Services — promesses affichées partout (bandeau, fiche produit, panier) */
 const SERVICES = [
   { i: 'vial', t: 'Essayez-le avant de l’ouvrir', d: 'Un échantillon 2 ml du parfum glissé avec chaque flacon : testez-le d’abord, retour gratuit si le flacon reste scellé.' },
-  { i: 'vials', t: 'Deux échantillons offerts', d: 'À choisir dans la bibliothèque, avec chaque commande.' },
+  { i: 'vials', t: 'Deux échantillons offerts', d: 'À choisir dans la bibliothèque, avec chaque flacon.' },
   { i: 'parcel', t: 'Livraison offerte dès 100 €', d: 'Expédition soignée depuis Paris, retours gratuits sous 30 jours.' }
 ];
 
@@ -355,31 +355,33 @@ const SHELF = [
   { img: 'hot-sand-1', t: 'Le jasmin', h: 'hot-sand' }
 ];
 
-/* Points de vente — liste envoyée par LIBRERY le 12/10/2026 (13/10 : Imm Couture et Odor BXL retirés, Olfactions ajouté), géocodée avec OpenStreetMap (Nominatim).
+/* Points de vente — liste envoyée par LIBRERY le 12/10/2026 (13/10 : Imm Couture et Odor BXL retirés, Olfactions ajouté ; 17/10 : Sayhar et Maison Ephyr ajoutés, téléphones retirés), géocodée avec OpenStreetMap (Nominatim).
    Au niveau de la rue seulement : Les Passionnez, La Rouge, Kyomu, Amyris Essenze. `online` : sans adresse ni repère. */
 const STORES = [
-  { name: 'Maison Diaphane', address: '11 Rue des Lices', city: '49100 Angers', country: 'France', phone: '+33 2 41 09 15 70', url: 'https://maison-diaphane.com/', lat: 47.4686, lng: -0.5539 },
-  { name: 'Les Passionnez', address: '43 avenue Fortuné Ferrini', city: '13080 Aix-en-Provence', country: 'France', phone: '+33 6 83 22 24 45', url: 'https://lespassionnez.com/', lat: 43.4879, lng: 5.4236 },
-  { name: 'NF Senteurs', address: '30 Avenue Charles de Gaulle', city: '84130 Le Pontet', country: 'France', phone: '+33 6 82 49 50 45', lat: 43.9589, lng: 4.8527 },
-  { name: 'Parfumerie Basic', address: '39 Rue Jeanne-d’Arc', city: '51100 Reims', country: 'France', phone: '+33 7 67 77 67 05', url: 'https://www.parfumerie-basic.fr/', lat: 49.2548, lng: 4.025 },
+  { name: 'Maison Diaphane', address: '11 Rue des Lices', city: '49100 Angers', country: 'France', url: 'https://maison-diaphane.com/', lat: 47.4686, lng: -0.5539 },
+  { name: 'Les Passionnez', address: '43 avenue Fortuné Ferrini', city: '13080 Aix-en-Provence', country: 'France', url: 'https://lespassionnez.com/', lat: 43.4879, lng: 5.4236 },
+  { name: 'NF Senteurs', address: '30 Avenue Charles de Gaulle', city: '84130 Le Pontet', country: 'France', lat: 43.9589, lng: 4.8527 },
+  { name: 'Parfumerie Basic', address: '39 Rue Jeanne-d’Arc', city: '51100 Reims', country: 'France', url: 'https://www.parfumerie-basic.fr/', lat: 49.2548, lng: 4.025 },
   { name: 'Secret Garden', address: '90 Avenue Pasteur', city: '93260 Les Lilas', country: 'France', url: 'https://secretsgarden.fr', lat: 48.876, lng: 2.4153 },
-  { name: 'DSB Parfums', address: '186 Boulevard de Stalingrad', city: '94500 Champigny-sur-Marne', country: 'France', phone: '+33 1 80 91 22 16', url: 'https://dsb-parfums.fr/', lat: 48.8235, lng: 2.4968 },
+  { name: 'DSB Parfums', address: '186 Boulevard de Stalingrad', city: '94500 Champigny-sur-Marne', country: 'France', url: 'https://dsb-parfums.fr/', lat: 48.8235, lng: 2.4968 },
   { name: 'Olfactions', address: '10 Avenue Winston Churchill', city: '31100 Toulouse', country: 'France', url: 'https://olfactions.fr', lat: 43.5688, lng: 1.4013 },
   { name: 'Sillâge', address: '9 Rue aux Juifs', city: '76000 Rouen', country: 'France', url: 'https://sillage-parfums.fr/', lat: 49.4416, lng: 1.0939 },
-  { name: 'UNI/VERE Parfumerie', address: '30 Rue d’Aboukir', city: '75002 Paris', country: 'France', phone: '+33 9 86 47 67 13', lat: 48.867, lng: 2.3446 },
-  { name: 'Smell Fragrance', address: '26 Rue des Cordeliers', city: '64000 Pau', country: 'France', phone: '+33 6 59 67 00 91', url: 'https://smellfragrance.fr/', lat: 43.2972, lng: -0.3718 },
+  { name: 'Sayhar', address: '27 Rue de Marignan', city: '75008 Paris', country: 'France', url: 'https://sayhar.fr/', lat: 48.8695, lng: 2.3064 },
+  { name: 'UNI/VERE Parfumerie', address: '30 Rue d’Aboukir', city: '75002 Paris', country: 'France', lat: 48.867, lng: 2.3446 },
+  { name: 'Smell Fragrance', address: '26 Rue des Cordeliers', city: '64000 Pau', country: 'France', url: 'https://smellfragrance.fr/', lat: 43.2972, lng: -0.3718 },
   { name: 'BL Parfumerie', address: 'Avenue de Béthusy 38B', city: '1005 Lausanne', country: 'Suisse', lat: 46.5213, lng: 6.6461 },
   { name: 'Scent Split', address: '1800 Post Oak Blvd, Ste 6140', city: 'Houston, TX 77056', country: 'États-Unis', url: 'https://www.scentsplit.com', lat: 29.7472, lng: -95.4618 },
-  { name: 'Absolute Fragrance', address: '2150 W First St, Ste 3B', city: 'Fort Myers, FL 33901', country: 'États-Unis', phone: '+1 215-251-4466', url: 'https://www.absolutefragrances.com/', lat: 26.639, lng: -81.8777 },
+  { name: 'Absolute Fragrance', address: '2150 W First St, Ste 3B', city: 'Fort Myers, FL 33901', country: 'États-Unis', url: 'https://www.absolutefragrances.com/', lat: 26.639, lng: -81.8777 },
   { name: 'Scents Eternal', address: '9351 Warren Parkway', city: 'Frisco, TX 75035', country: 'États-Unis', url: 'https://scentseternal.com/', lat: 33.1092, lng: -96.8019 },
   { name: 'BeautyLIV', address: '', city: '', country: 'États-Unis', url: 'https://www.beautyliv.com', online: true },
-  { name: 'Parfum Exquis', address: '4956 Boulevard Décarie', city: 'Montréal, QC H3X 2H7', country: 'Canada', phone: '+1 438-930-5109', url: 'https://parfumexquis.com/', lat: 45.4827, lng: -73.6279 },
-  { name: 'Pua Pua Duftkonzept', address: 'Lammstraße 7', city: '76133 Karlsruhe', country: 'Allemagne', phone: '+49 721 96316088', url: 'https://puapua.de/', lat: 49.0092, lng: 8.4028 },
-  { name: 'La Rouge Perfumes', address: 'G5, Park View', city: 'Erbil 44001', country: 'Irak', phone: '+964 750 600 8000', url: 'http://larouge.vip/', lat: 36.2095, lng: 43.9822 },
-  { name: 'House of Merlo', address: 'Mokotowska 46', city: '00-543 Varsovie', country: 'Pologne', phone: '+48 531 015 416', url: 'https://houseofmerlo.pl', lat: 52.2247, lng: 21.0215 },
-  { name: 'Edulge', address: 'Berkeley Square House, 2e étage', city: 'Londres W1J 6BD', country: 'Royaume-Uni', phone: '+44 20 3397 6641', url: 'http://www.edulge.com/', lat: 51.5094, lng: -0.1443 },
-  { name: 'Kyomu', address: 'Calle Valle de Nocito 5', city: '28803 Alcalá de Henares', country: 'Espagne', phone: '+34 657 757 948', url: 'https://www.kyomu-brand.es/', lat: 40.4733, lng: -3.3723 },
-  { name: 'Amyris Essenze', address: 'Piazza Rosolino Pilo 27', city: '00152 Rome', country: 'Italie', phone: '+39 06 4549 6069', url: 'https://amyrisessenze.com/', lat: 41.8818, lng: 12.461 },
+  { name: 'Parfum Exquis', address: '4956 Boulevard Décarie', city: 'Montréal, QC H3X 2H7', country: 'Canada', url: 'https://parfumexquis.com/', lat: 45.4827, lng: -73.6279 },
+  { name: 'Maison Ephyr', address: '159 Yorkville Avenue', city: 'Toronto, ON M5R 1A9', country: 'Canada', url: 'https://ephyr.ca/', lat: 43.6703, lng: -79.3944 },
+  { name: 'Pua Pua Duftkonzept', address: 'Lammstraße 7', city: '76133 Karlsruhe', country: 'Allemagne', url: 'https://puapua.de/', lat: 49.0092, lng: 8.4028 },
+  { name: 'La Rouge Perfumes', address: 'G5, Park View', city: 'Erbil 44001', country: 'Irak', url: 'http://larouge.vip/', lat: 36.2095, lng: 43.9822 },
+  { name: 'House of Merlo', address: 'Mokotowska 46', city: '00-543 Varsovie', country: 'Pologne', url: 'https://houseofmerlo.pl', lat: 52.2247, lng: 21.0215 },
+  { name: 'Edulge', address: 'Berkeley Square House, 2e étage', city: 'Londres W1J 6BD', country: 'Royaume-Uni', url: 'http://www.edulge.com/', lat: 51.5094, lng: -0.1443 },
+  { name: 'Kyomu', address: 'Calle Valle de Nocito 5', city: '28803 Alcalá de Henares', country: 'Espagne', url: 'https://www.kyomu-brand.es/', lat: 40.4733, lng: -3.3723 },
+  { name: 'Amyris Essenze', address: 'Piazza Rosolino Pilo 27', city: '00152 Rome', country: 'Italie', url: 'https://amyrisessenze.com/', lat: 41.8818, lng: 12.461 },
   { name: 'ParfuMaria Parfumsalon', address: 'Tinbergenlaan 5', city: '3401 MT IJsselstein', country: 'Pays-Bas', note: 'Sur rendez-vous', lat: 52.0148, lng: 5.0605 },
   { name: 'Oligarch Perfumery', address: '765 Glen Huntly Rd', city: 'Caulfield VIC 3162', country: 'Australie', url: 'https://oligarch.com.au/', lat: -37.8866, lng: 145.0211 }
 ];
