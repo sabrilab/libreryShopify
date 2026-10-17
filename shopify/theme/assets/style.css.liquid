@@ -772,7 +772,8 @@ span.ed-r { display: block; }
 .store__links { display: flex; gap: 16px; margin-top: 8px; font-family: var(--sans); font-size: 12px; }
 .store__links a { text-decoration: underline; text-underline-offset: 3px; }
 .stores__map { position: relative; }
-#map { position: absolute; inset: 0; background: var(--paper-2); }
+/* la carte garde ses calques (Leaflet : 400 à 1000) pour elle : le menu (90) passe au-dessus */
+#map { position: absolute; inset: 0; z-index: 0; isolation: isolate; background: var(--paper-2); }
 .leaflet-container { font-family: var(--sans) !important; }
 .librery-tiles { filter: grayscale(1) sepia(.2) contrast(.92) brightness(1.04); }
 .librery-pin { width: 12px; height: 12px; background: var(--ink); border: 2px solid var(--paper); border-radius: 50%; }
