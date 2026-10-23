@@ -283,7 +283,7 @@ const COLLECTIONS = {
     mosaic: [['skin-livres', 'Skin Obsession, la collection'], ['skin-voiture', 'La campagne'], ['skin-cabriolet', 'Skin Obsession, la campagne']], wide: 'skin-trio',
     title: 'Skin Obsession', folio: 32, number: '03', chapter: 'Collection II', kicker: 'Nouvelle collection',
     hero: 'hero-skin', tiles: 'end',
-    video: (LIBRERY_BASE + '/assets/video/skin-obsession.mp4'), videoMobile: (LIBRERY_BASE + '/assets/video/skin-obsession-m.mp4'),
+    video: (LIBRERY_BASE + '/assets/video/skin-obsession-2.mp4'), videoMobile: (LIBRERY_BASE + '/assets/video/skin-obsession-2-m.mp4'),
     epigraph: 'La peau est le livre. Le parfum est l’histoire. L’obsession, le désir de le relire.',
     intro: [
       "Il est un instant, presque imperceptible, lors d’une première rencontre : un éveil qui trouble les sens. La découverte d’un monde soudain révélé, une matière qui intrigue, un accord qui émeut.",
