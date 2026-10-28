@@ -351,7 +351,7 @@
       : p.scene ? packPic(p.scene, '', S_CARD, 'card__scene') : '';
     const prices = isPerfume
       ? `<span class="card__fmts"><span>${f[0].label} — ${isSoon(p, f[0]) ? SOON_LABEL.toLowerCase() : eur(f[0].price)}</span>${f30 && p.pack30 ? `<span class="card__f30" data-f30>${f30.label} — ${eur(f30.price)}</span>` : ''}</span>`
-      : `<span class="card__meta">${esc(p.subtitle || p.type)} — dès ${eur(minPrice(p))}</span>`;
+      : `<span class="card__meta">${esc(p.subtitle || p.type)} — ${formatsOf(p).length > 1 ? 'dès ' : ''}${eur(minPrice(p))}</span>`;
     return `
       <a class="card" href="/products/${p.handle}">
         <div class="card__media">
