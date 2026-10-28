@@ -86,7 +86,7 @@ const PERFUMERS = {
 const PRODUCTS = [
   /* ============ Skin Obsession — Collection II (nouveauté) ============ */
   {
-    handle: 'vanilla-plum', folio: 39, name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
+    handle: 'vanilla-plum', folio: 39, name: 'Vanilla Plum', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une douceur que l’on veut retenir.',
     keyNotes: 'Prune · Cuir · Vanille', families: ['Gourmand', 'Ambré'],
     pack: 'vanilla-plum-pack', card: 'vanilla-plum-1', pack30: 'vanilla-plum-pack30', scene: 'vanilla-plum-2',
@@ -112,7 +112,7 @@ const PRODUCTS = [
     }
   },
   {
-    handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
+    handle: 'magnetic-flowers', folio: 41, name: 'Magnetic Flowers', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’obsession d’une attraction florale.',
     keyNotes: 'Sésame · Tubéreuse · Santal', families: ['Floral', 'Fruité'],
     pack: 'magnetic-flowers-pack', card: 'magnetic-flowers-1', pack30: 'magnetic-flowers-pack30', scene: 'magnetic-flowers-1',
@@ -138,7 +138,7 @@ const PRODUCTS = [
     }
   },
   {
-    handle: 'tonka-love', folio: 43, name: 'Tonka Love', collection: 'skin-obsession', isNew: true, soon: ['100'], perfumer: 'coralie-spicher',
+    handle: 'tonka-love', folio: 43, name: 'Tonka Love', collection: 'skin-obsession', isNew: true, perfumer: 'coralie-spicher',
     tagline: 'L’irrésistible chaleur de la tonka.',
     keyNotes: 'Cardamome · Tonka · Cèdre', families: ['Gourmand', 'Boisé'],
     pack: 'tonka-love-pack', card: 'tonka-love-1', pack30: 'tonka-love-pack30', scene: 'tonka-love-1',
@@ -257,19 +257,27 @@ const PRODUCTS = [
     ]
   },
   {
-    handle: 'coffret-collection', name: 'Coffret Collection', subtitle: 'Une collection · 30 ml', collection: 'coffrets', type: 'Coffret', exclusive: true,
-    card: 'discovery-sv-ouvert', scene: 'discovery-so-ouvert',
-    gallery: ['discovery-sv-ouvert', 'discovery-sv-ferme', 'discovery-so-ouvert', 'discovery-so-ferme', 'coffret-30ml', 'camp-coffrets'],
-    // la galerie suit la version choisie (packshots Nano Banana 2.1 d'après les photos de LIBRERY, 12/10)
-    fmtImages: { sv: ['discovery-sv-ouvert', 'discovery-sv-ferme'], so: ['discovery-so-ouvert', 'discovery-so-ferme'] },
-    formats: [
-      { id: 'sv', label: 'Summer Vibes · 5 × 30 ml', price: 430 },
-      { id: 'so', label: 'Skin Obsession · 3 × 30 ml', price: 250 }
-    ],
-    keyNotes: 'Extraits 30 ml · Une collection entière',
+    // le Coffret Collection (une seule fiche, deux versions) devient deux coffrets distincts (Sabri, 28/10) ; /products/coffret-collection redirige
+    handle: 'coffret-decouverte-skin-obsession', name: 'Coffret Découverte Skin Obsession', subtitle: 'Les trois extraits · 30 ml', collection: 'coffrets', type: 'Coffret', exclusive: true, setOf: 'skin-obsession',
+    card: 'discovery-so-ouvert', scene: 'discovery-so-ferme',
+    gallery: ['discovery-so-ouvert', 'discovery-so-ferme', 'coffret-30ml', 'camp-coffrets'],
+    formats: [{ id: '3x30', label: '3 × 30 ml', price: 250 }],
+    keyNotes: 'Extraits 30 ml · Toute la collection Skin Obsession',
     tagline: 'Un chapitre entier, à parcourir.',
     description: [
-      "Nos coffrets en extrait de parfum 30 ml réunissent les créations d’une même collection.",
+      "Vanilla Plum, Magnetic Flowers et Tonka Love, les trois extraits de Skin Obsession en 30 ml, réunis dans un même coffret.",
+      "Une immersion plus profonde dans chaque univers, pour parcourir ses chapitres, en saisir les subtilités, ressentir les émotions qu’il raconte et les souvenirs qu’il renferme — comme on feuillette un livre dont chaque page écrit un peu de votre propre histoire."
+    ]
+  },
+  {
+    handle: 'coffret-decouverte-summer-vibes', name: 'Coffret Découverte Summer Vibes', subtitle: 'Les cinq extraits · 30 ml', collection: 'coffrets', type: 'Coffret', exclusive: true, setOf: 'summer-vibes',
+    card: 'discovery-sv-ouvert', scene: 'discovery-sv-ferme',
+    gallery: ['discovery-sv-ouvert', 'discovery-sv-ferme', 'coffret-30ml', 'camp-coffrets'],
+    formats: [{ id: '5x30', label: '5 × 30 ml', price: 430 }],
+    keyNotes: 'Extraits 30 ml · Toute la collection Summer Vibes',
+    tagline: 'Un chapitre entier, à parcourir.',
+    description: [
+      "Sun Ice, Ambert Sunset, Mango Wave, Palmeira et Hot Sand, les cinq extraits de Summer Vibes en 30 ml, réunis dans un même coffret.",
       "Une immersion plus profonde dans chaque univers, pour parcourir ses chapitres, en saisir les subtilités, ressentir les émotions qu’il raconte et les souvenirs qu’il renferme — comme on feuillette un livre dont chaque page écrit un peu de votre propre histoire."
     ]
   }

@@ -283,8 +283,8 @@
     $('#cart-ship').innerHTML = (left > 0 ? `Encore ${eur(left)} pour la livraison offerte` : 'Livraison offerte')
       + `<div class="bar"><span style="width:${Math.min(100, total / FREE_SHIPPING * 100)}%"></span></div>`;
 
-    // les deux échantillons offerts accompagnent un flacon (100 ml, 30 ml ou Coffret Collection), pas une commande d'échantillons
-    const flacon = items.some(i => ['100', '30'].includes(i.f) || i.h === 'coffret-collection');
+    // les deux échantillons offerts accompagnent un flacon (100 ml, 30 ml ou coffret de 30 ml), pas une commande d'échantillons
+    const flacon = items.some(i => ['100', '30'].includes(i.f) || byHandle(i.h)?.setOf);
     // échantillons présélectionnés parmi les parfums absents du panier
     if (flacon && !extras.samples.every(Boolean)) {
       const inCart = items.map(i => i.h);
@@ -603,7 +603,8 @@
   /* ================================================================== */
   function initHome() {
     const so = $('#so-grid'), sv = $('#sv-grid'); if (!so) return;
-    so.innerHTML = PRODUCTS.filter(p => p.collection === 'skin-obsession').map(card).join('');
+    // le coffret Skin Obsession suit les trois parfums, pour qu'on le trouve dès l'accueil (Sabri, 28/10)
+    so.innerHTML = PRODUCTS.filter(p => p.collection === 'skin-obsession' || p.setOf === 'skin-obsession').map(card).join('');
     const svp = PRODUCTS.filter(p => p.collection === 'summer-vibes').map(card);
     sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + trialTile() + quizTile();
     $$('[data-mosaic]').forEach(el => { el.innerHTML = mosaic(el.dataset.mosaic); });
@@ -1843,7 +1844,7 @@
           <button class="btn btn--block" id="add" ${p.builder || isSoon(p, current) ? 'disabled' : ''}>${cta()}</button>
           ${p.soon ? `<p class="pdp__soon" id="soon"${isSoon(p, current) ? '' : ' hidden'}>${esc(SOON_NOTE)}</p>` : ''}
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
-          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.handle === 'coffret-collection' ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Après votre commande, saisissez le code <b>COFFRET40</b> au paiement d’un flacon 100 ml : 40&nbsp;€ déduits, une fois, pendant 30 jours, non cumulable avec un autre code.`}</p>
+          <p class="pdp__small">${isPerfume ? `<b>Essayez-le avant de l’ouvrir.</b> Un 2 ml de ${esc(p.name)} accompagne chaque flacon ; s’il ne vous ressemble pas, renvoyez le flacon scellé, le retour est offert.` : p.setOf ? `<b>Une collection entière.</b> Chaque parfum de la collection en extrait 30 ml, réunis dans un même coffret.` : `<b>Valeur recréditée.</b> Après votre commande, saisissez le code <b>COFFRET40</b> au paiement d’un flacon 100 ml : 40&nbsp;€ déduits, une fois, pendant 30 jours, non cumulable avec un autre code.`}</p>
           <p class="pdp__small">Expédié sous 24 h ouvrées depuis Paris, livré ${eta()}. Deux échantillons offerts avec chaque flacon.</p>
           ${perf ? `<p class="pdp__by">Composé par <a href="#parfumeur">${esc(perf.name)}</a></p>` : ''}
           <div class="accordion">

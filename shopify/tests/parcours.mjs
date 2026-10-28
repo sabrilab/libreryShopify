@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 const SORTIES = path.join(path.dirname(fileURLToPath(import.meta.url)), 'sorties');
-const PAGES = ['/', '/products/tonka-love', '/products/hot-sand', '/products/coffret-collection', '/collections/skin-obsession',
+const PAGES = ['/', '/products/tonka-love', '/products/hot-sand', '/products/coffret-decouverte-skin-obsession', '/collections/skin-obsession',
   '/collections/summer-vibes', '/collections/coffrets', '/pages/bibliotheque', '/pages/preface', '/pages/lexique',
   '/pages/points-de-vente', '/pages/portrait-olfactif', '/pages/offrir', '/pages/services', '/pages/contact',
   '/pages/conditions-generales-de-vente-cgv', '/products/bougie-essai', '/cart'];
