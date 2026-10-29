@@ -52,6 +52,9 @@ ERREURS = []
 FICHIERS_SHOPIFY = {
     '/assets/video/skin-obsession-2.mp4': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/skin-obsession-2.mp4?v=1792768202',
     '/assets/video/skin-obsession-2-m.mp4': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/skin-obsession-2-m.mp4?v=1792768202',
+    # emballage cadeau (29/10)
+    '/assets/img/cadeau/librery-emballage-cadeau-mains.jpg': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/librery-emballage-cadeau-mains.jpg',
+    '/assets/img/cadeau/librery-emballage-cadeau.jpg': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/librery-emballage-cadeau.jpg',
 }
 
 
@@ -146,8 +149,8 @@ MAIN_JS = [
     ("if (askedP && askedP !== p.handle && PAUSED_PRODUCTS.some(x => x.handle === askedP)) { const u = new URL(location.href); u.searchParams.set('p', p.handle); history.replaceState(null, '', u); }",
      "// Shopify : un produit en pause est un brouillon (404 + redirection), l'adresse ne se réécrit plus ici", 1),
     # panier : un format épuisé ou absent de la boutique ne s'ajoute pas
-    ("  function addToCart(handle, fmtId, sel) {\n",
-     "  function addToCart(handle, fmtId, sel) {\n"
+    ("  function addToCart(handle, fmtId, sel, gift) {\n",
+     "  function addToCart(handle, fmtId, sel, gift) {\n"
      "    const refus = window.LIBRERY_SHOPIFY && LIBRERY_SHOPIFY.refus(handle, fmtId);  // Shopify : stock et variantes\n"
      "    if (refus) return toast(refus);\n", 1),
     # compte client et pages légales : celles de Shopify (pages déjà présentes dans la boutique actuelle)

@@ -32,6 +32,12 @@
     p.formats = fmts.length ? fmts : (p.formats || FORMATS).map(f => ({ ...f, absent: true }));
   }
 
+  // emballage cadeau : prix et variante de la boutique ; absent ou épuisé → l'option disparaît du site
+  const emb = SHOP.produits[GIFT_WRAP.handle], embV = emb && emb.variantes[0];
+  if (actif) {
+    if (embV && embV.dispo) { GIFT_WRAP.price = embV.prix / 100; GIFT_WRAP.variant = embV.id; } else GIFT_WRAP.off = true;
+  }
+
   const formatDe = (h, fid) => { const p = PRODUCTS.find(x => x.handle === h); return p && (p.formats || FORMATS).find(f => f.id === fid); };
   window.LIBRERY_SHOPIFY = {
     actif,
@@ -71,13 +77,17 @@
     const lignes = lire(CART_KEY, []), extras = lire(EXTRA_KEY, {});
     if (!actif) return dire('La caisse ouvrira avec la boutique.');
     const items = [], manque = [];
+    let emballages = 0;
     for (const l of lignes) {
       const f = formatDe(l.h, l.f);
       if (!f || !f.variant) { manque.push(nom(l.h)); continue; }
       const properties = { _librery: '1' };
       if (l.sel) properties['Parfums'] = l.sel.map(nom).join(', ');
+      if (l.g && !GIFT_WRAP.off) { properties['Emballage cadeau'] = 'Oui'; emballages += l.q; }
       items.push({ id: f.variant, quantity: l.q, properties });
     }
+    // une unité d'emballage par flacon à emballer ; la ligne du flacon porte « Emballage cadeau : Oui »
+    if (emballages) items.push({ id: GIFT_WRAP.variant, quantity: emballages, properties: { _librery: '1' } });
     if (manque.length) return dire('Indisponible pour l’instant : ' + manque.join(', '));
     if (!items.length) return;
     const essai = [...new Set(lignes.filter(l => l.f === '100' || l.f === '30').map(l => nom(l.h)))];

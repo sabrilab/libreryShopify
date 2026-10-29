@@ -51,6 +51,11 @@ const SOON_LABEL = 'Disponible le 30 octobre';
 const SOON_SHORT = 'Le 30 octobre';   // sous « 100 ml », dans le sélecteur de format
 const SOON_NOTE = 'Le 100 ml sort le 30 octobre et les précommandes ouvrent très bientôt. En attendant, le 30 ml et l’échantillon 2 ml sont disponibles.';
 
+// Emballage cadeau (Sabri, 29/10) : papier noir et or, ruban de satin LIBRERY, pour un flacon 100 ml ou 30 ml.
+// Shopify : produit « emballage-cadeau » (prix modifiable dans l'admin, il remplace celui-ci), une unité par flacon emballé.
+const GIFT_WRAP = { handle: 'emballage-cadeau', name: 'Emballage cadeau', price: 10, formats: ['100', '30'],
+  image: '/assets/img/cadeau/librery-emballage-cadeau.jpg' };
+
 const PERFUMERS = {
   'chris-maurice': {
     name: 'Chris Maurice', role: 'Maître parfumeur', image: 'chris-maurice',

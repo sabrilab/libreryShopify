@@ -245,10 +245,12 @@
   const saveCart = () => { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) {} renderCart(); };
   const saveExtras = () => { try { localStorage.setItem(EXTRA_KEY, JSON.stringify(extras)); } catch (e) {} };
 
-  function addToCart(handle, fmtId, sel) {
-    const key = sel ? sel.join(',') : '';
-    const line = cart.find(l => l.h === handle && l.f === fmtId && (l.sel || []).join(',') === key);
-    if (line) line.q += 1; else cart.push(sel ? { h: handle, f: fmtId, q: 1, sel } : { h: handle, f: fmtId, q: 1 });
+  // emballage cadeau : proposé pour un flacon 100 ml ou 30 ml (pas un coffret, pas un 2 ml), sauf s'il manque dans la boutique
+  const giftable = (p, fid) => !GIFT_WRAP.off && p && !p.type && GIFT_WRAP.formats.includes(fid);
+  function addToCart(handle, fmtId, sel, gift) {
+    const key = sel ? sel.join(',') : '', g = gift && giftable(byHandle(handle), fmtId) ? 1 : 0;
+    const line = cart.find(l => l.h === handle && l.f === fmtId && (l.sel || []).join(',') === key && (l.g || 0) === g);
+    if (line) line.q += 1; else cart.push({ h: handle, f: fmtId, q: 1, ...(sel ? { sel } : {}), ...(g ? { g } : {}) });
     saveCart(); openCart();
   }
   function renderCartShell() {
@@ -273,7 +275,8 @@
     const items = cart.map((l, ci) => {
       const p = byHandle(l.h); if (!p) return null;
       const f = formatsOf(p).find(x => x.id === l.f) || formatsOf(p)[0];
-      return { ...l, ci, p, fmt: f, total: f.price * l.q };
+      const g = l.g && giftable(p, f.id) ? 1 : 0;   // une unité d'emballage par flacon de la ligne
+      return { ...l, ci, p, fmt: f, g, total: (f.price + g * GIFT_WRAP.price) * l.q };
     }).filter(Boolean);
     const total = items.reduce((s, i) => s + i.total, 0);
     $$('[data-cart-count]').forEach(el => el.textContent = items.reduce((s, i) => s + i.q, 0));
@@ -303,6 +306,7 @@
         <span class="line__img">${thumb(i.p, i.fmt.id)}</span>
         <div><div class="line__name">${nm(i.p.name)}</div><div class="line__var">${esc(i.fmt.label)}</div>
           ${i.sel ? `<div class="line__sel">${i.sel.map(h => esc(byHandle(h)?.name || h)).join(', ')}</div>` : ''}
+          ${giftable(i.p, i.fmt.id) ? `<label class="line__gift"><input type="checkbox" data-gift="${i.ci}"${i.g ? ' checked' : ''}><span>Emballage cadeau, +${eur(GIFT_WRAP.price)}${i.q > 1 ? ' par flacon' : ''}</span></label>` : ''}
           <div class="qty"><button data-q="-1" data-i="${i.ci}" aria-label="Retirer un">−</button><span>${i.q}</span><button data-q="1" data-i="${i.ci}" aria-label="Ajouter un">+</button></div></div>
         <div class="line__right"><span>${eur(i.total)}</span><button data-rm="${i.ci}">Retirer</button></div>
       </div>`).join('') + tryFirst.map(p => `
@@ -324,6 +328,7 @@
       <button class="btn btn--block" data-toast="Le paiement sera celui de Shopify">Commander</button>` : '';
 
     $$('#cart-items [data-q]').forEach(b => b.addEventListener('click', () => { const i = +b.dataset.i; cart[i].q += +b.dataset.q; if (cart[i].q < 1) cart.splice(i, 1); saveCart(); }));
+    $$('#cart-items [data-gift]').forEach(c => c.addEventListener('change', () => { const l = cart[+c.dataset.gift]; if (c.checked) l.g = 1; else delete l.g; saveCart(); }));
     $$('#cart-items [data-rm]').forEach(b => b.addEventListener('click', () => { cart.splice(+b.dataset.rm, 1); saveCart(); }));
     $$('#cart-items [data-sample]').forEach(el => el.addEventListener('change', () => { extras.samples[+el.dataset.sample] = el.value; saveExtras(); }));
     bindToasts($('#cart-foot'));
@@ -608,6 +613,7 @@
     const svp = PRODUCTS.filter(p => p.collection === 'summer-vibes').map(card);
     sv.innerHTML = svp.slice(0, 3).join('') + wideTile('summer-vibes', 'hero-summer') + svp.slice(3).join('') + trialTile() + quizTile();
     $$('[data-mosaic]').forEach(el => { el.innerHTML = mosaic(el.dataset.mosaic); });
+    if (GIFT_WRAP.off) $('#emballage-cadeau')?.remove(); else $$('[data-gift-price]').forEach(el => { el.textContent = eur(GIFT_WRAP.price); });
     const sh = $('#shelf');
     if (sh) sh.innerHTML = SHELF.map(m => { const p = byHandle(m.h); return `<a class="shelf__item" href="/produit?p=${m.h}"><figure>${pic(m.img, m.t, '(max-width: 800px) 62vw, 22vw')}</figure>
         <span class="fig">${esc(m.t)}</span><span class="shelf__name">${nm(p.name)}</span></a>`; }).join('');
@@ -1813,8 +1819,9 @@
     const perfumes = PRODUCTS.filter(x => !x.type);
     const related = PRODUCTS.filter(x => x.handle !== p.handle && x.collection === p.collection).concat(PRODUCTS.filter(x => x.collection !== p.collection && !x.type)).slice(0, 3);
     const acc = (t, c) => `<div class="acc"><button type="button" aria-expanded="false">${t}</button><div class="acc__panel">${c}</div></div>`;
-    const stLabel = () => isSoon(p, current) ? SOON_SHORT : `Ajouter — <span id="st-price">${eur(current.price)}</span>`;
-    const cta = () => isSoon(p, current) ? `${current.label} — ${SOON_LABEL.toLowerCase()}` : p.builder && picks.length < p.builder ? `Choisissez encore ${p.builder - picks.length} parfum${p.builder - picks.length > 1 ? 's' : ''}` : `Ajouter au panier — ${eur(current.price)}`;
+    const withGift = () => current.price + ($('#gift-cb')?.checked && giftable(p, current.id) ? GIFT_WRAP.price : 0);
+    const stLabel = () => isSoon(p, current) ? SOON_SHORT : `Ajouter — <span id="st-price">${eur(withGift())}</span>`;
+    const cta = () => isSoon(p, current) ? `${current.label} — ${SOON_LABEL.toLowerCase()}` : p.builder && picks.length < p.builder ? `Choisissez encore ${p.builder - picks.length} parfum${p.builder - picks.length > 1 ? 's' : ''}` : `Ajouter au panier — ${eur(withGift())}`;
     const story = p.description.slice(0, 2), more = p.description.slice(2);
     // une seule pyramide : si la « lecture des matières » (catalogue) existe, elle fait foi
     const notes = p.materials ? p.materials.list : p.notes;
@@ -1841,6 +1848,9 @@
           ${fmts.length > 1 ? `<div class="sizes" id="sizes">${fmts.map((f, i) => `<button type="button" data-f="${f.id}" class="${i ? '' : 'is-active'}">${f.label}<small>${isSoon(p, f) ? SOON_SHORT : eur(f.price)}</small></button>`).join('')}</div>` : ''}
           ${p.builder ? `<div class="builder"><div class="builder__head"><span>Vos parfums</span><b id="b-count">0 / ${p.builder}</b></div>
             <div class="builder__grid">${perfumes.map(x => `<button type="button" class="builder__item" data-h="${x.handle}"><span class="builder__thumb">${packPic(x.pack, '', '(max-width: 800px) 30vw, 9vw', '', true)}</span><span>${esc(x.name)}</span></button>`).join('')}</div></div>` : ''}
+          ${isPerfume && !GIFT_WRAP.off && fmts.some(f => giftable(p, f.id)) ? `<label class="pdp__gift" id="gift"${giftable(p, current.id) ? '' : ' hidden'}>
+            <input type="checkbox" id="gift-cb"><span class="pdp__gift-img"><img src="${GIFT_WRAP.image}" alt="" width="56" height="70" loading="lazy"></span>
+            <span><b>Emballage cadeau, +${eur(GIFT_WRAP.price)}</b><small>Papier noir et or, ruban de satin LIBRERY, noué à la main à Paris.</small></span></label>` : ''}
           <button class="btn btn--block" id="add" ${p.builder || isSoon(p, current) ? 'disabled' : ''}>${cta()}</button>
           ${p.soon ? `<p class="pdp__soon" id="soon"${isSoon(p, current) ? '' : ' hidden'}>${esc(SOON_NOTE)}</p>` : ''}
           ${isPerfume && sample ? `<button type="button" class="tlink pdp__try" id="try">Essayer d’abord : échantillon 2 ml, ${eur(sample.price)}</button>` : ''}
@@ -1911,12 +1921,14 @@
       $('#add').textContent = cta(); $('#st-var').textContent = current.label; $('#st-add').innerHTML = stLabel();
       if (p.soon) { const soon = isSoon(p, current); $('#add').disabled = soon; $('#st-add').disabled = soon; $('#soon').hidden = !soon; }
       showPack(p.fmtImages ? current.id : current.id === '30' ? '30' : '100');
+      if ($('#gift')) $('#gift').hidden = !giftable(p, current.id);
     };
+    $('#gift-cb')?.addEventListener('change', () => { $('#add').textContent = cta(); $('#st-add').innerHTML = stLabel(); });
     $$('#sizes button').forEach(b => b.addEventListener('click', () => setFormat(b.dataset.f)));
     const add = () => {
       if (isSoon(p, current)) return;
       if (p.builder) { if (picks.length !== p.builder) { $('.builder').scrollIntoView({ behavior: 'smooth', block: 'center' }); return toast(`Choisissez ${p.builder} parfums`); } return addToCart(p.handle, current.id, [...picks]); }
-      addToCart(p.handle, current.id);
+      addToCart(p.handle, current.id, undefined, $('#gift-cb')?.checked);
     };
     $('#add').addEventListener('click', add); $('#st-add').addEventListener('click', add);
     $('#try')?.addEventListener('click', () => { setFormat('2'); addToCart(p.handle, '2'); });
