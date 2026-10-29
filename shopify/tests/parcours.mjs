@@ -52,11 +52,16 @@ export async function essai(base, journal) {
   // ajout puis caisse
   await page.click('#add');
   await page.waitForSelector('#cart.is-open');
+  // une ligne restée dans le panier Shopify d'une autre visite (sans _librery) ne doit pas passer à la caisse (bug du 29/10)
+  await page.evaluate(() => fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items: [{ id: LIBRERY_SHOP.produits['coffret-decouverte'].variantes[0].id, quantity: 1 }] }) }));
   await page.click('[data-checkout]');
   await page.waitForURL('**/checkout', { timeout: 8000 }).catch(() => {});
   note(page.url().endsWith('/checkout'), 'Commander mène à la caisse');
-  const ajout = journal.find(j => j[0] === 'add'), attrs = journal.find(j => j[0] === 'update' && j[1].attributes);
+  const ajout = journal.filter(j => j[0] === 'add').pop(), attrs = journal.find(j => j[0] === 'update' && j[1].attributes);
   note(ajout && ajout[1].items.length === 1 && ajout[1].items[0].quantity === 1 && ajout[1].items[0].properties._librery === '1', 'panier Shopify : une ligne Hot Sand marquée _librery');
+  const reste = await page.evaluate(() => fetch('/cart.js').then(r => r.json()));
+  note(reste.items.length === 1 && reste.items[0].properties._librery === '1', `panier Shopify à la caisse : seulement les lignes du site (${reste.items.length} ligne(s))`);
   note(attrs && /,/.test(attrs[1].attributes['Échantillons offerts']) && attrs[1].attributes['2 ml pour essayer'] === 'Hot Sand', 'attributs du panier : échantillons offerts et 2 ml pour essayer');
 
   // stock : Tonka Love 30 ml épuisé dans la boutique

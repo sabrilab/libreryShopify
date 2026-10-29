@@ -99,10 +99,12 @@
     };
     bouton.disabled = true; const texte = bouton.textContent; bouton.textContent = 'Ouverture de la caisse…';
     try {
-      // on remplace les lignes envoyées la fois précédente (marquées _librery), sans toucher aux autres
+      // le panier du site fait foi : on vide le panier Shopify avant d'y mettre ses lignes. Une ligne restée d'une
+      // autre visite (sans _librery : panier gardé par le compte client, « commander à nouveau »…) passait sinon à la
+      // caisse sans être visible ni retirable sur le site (client du 29/10 : Coffret Découverte ajouté à chaque commande).
       const actuel = await json('/cart.js');
       const updates = {};
-      actuel.items.forEach(i => { if (i.properties && i.properties._librery) updates[i.key] = 0; });
+      actuel.items.forEach(i => { updates[i.key] = 0; });
       if (Object.keys(updates).length) await json('/cart/update.js', { updates });
       await json('/cart/add.js', { items });
       await json('/cart/update.js', { attributes });
