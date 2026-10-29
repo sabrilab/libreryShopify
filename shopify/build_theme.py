@@ -47,6 +47,19 @@ ROUTES_PAGES = 'bibliotheque|preface|lexique|points-de-vente|portrait-olfactif|o
 
 ERREURS = []
 
+# médias hébergés dans les fichiers Shopify (Contenu → Fichiers) plutôt que sur Vercel : la maquette n'est pas
+# toujours en ligne avec la même version, et ces vidéos doivent marcher sur libreryparfum.com quoi qu'il arrive.
+FICHIERS_SHOPIFY = {
+    '/assets/video/skin-obsession-2.mp4': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/skin-obsession-2.mp4?v=1792768202',
+    '/assets/video/skin-obsession-2-m.mp4': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/skin-obsession-2-m.mp4?v=1792768202',
+}
+
+
+def fichiers_shopify(texte):
+    for local, cdn in FICHIERS_SHOPIFY.items():
+        texte = texte.replace(local, cdn)
+    return texte
+
 
 def remplacer(texte, ancien, nouveau, fois, ou):
     """Substitution exacte, comptée : `fois` occurrences attendues (None = au moins une)."""
@@ -173,7 +186,7 @@ def construire():
         if nom == 'main.js':
             for ancien, nouveau, fois in MAIN_JS:
                 t = remplacer(t, ancien, nouveau, fois, nom)
-        t = routes(t)
+        t = fichiers_shopify(routes(t))
         t, n = medias_js(t, nom)
         bilan[nom] = n
         (OUT / 'assets' / nom).write_text(t, encoding='utf-8')
@@ -191,7 +204,7 @@ def construire():
     for nom, modele in PAGES.items():
         p = lire_page(nom)
         pages[nom] = p
-        corps = medias_html(routes(p['main']))
+        corps = medias_html(fichiers_shopify(routes(p['main'])))
         if nom == 'contact':
             corps = remplacer(corps, '<form class="form" id="contact-form">',
                               '<form class="form" id="contact-form" method="post" action="{{ routes.root_url | append: \'/contact\' | replace: \'//\', \'/\' }}#contact-form">'
