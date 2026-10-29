@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=974dc872">
+<link rel="stylesheet" href="/assets/css/style.css?v=9e485cac">
 <!-- modules chargés à la demande (cadran solaire du sillage, chevet de l'accueil) : Three.js r170, comme la visionneuse /parfum -->
 <script type="importmap">{ "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
@@ -58,16 +58,14 @@
 
 <!-- SECTION : gift-wrap — l'emballage cadeau en option sur les 100 ml et 30 ml (Sabri, 29/10) -->
 <section class="gift" id="emballage-cadeau" aria-labelledby="gift-t">
-  <div class="wrap gift__in">
-    <figure class="gift__img"><img src="/assets/img/cadeau/librery-emballage-cadeau-mains.jpg" alt="Un flacon LIBRERY emballé dans le papier cadeau noir et or, ruban de satin noué à la main" width="1800" height="2234" loading="lazy"></figure>
-    <div class="gift__txt">
-      <span class="gift__kick">À offrir</span>
-      <h2 class="h2" id="gift-t">L’emballage <em>cadeau</em></h2>
-      <p>Papier noir à motifs or, ruban de satin imprimé LIBRERY, noué à la main à Paris. Ajoutez-le à votre flacon 100&nbsp;ml ou 30&nbsp;ml, sur sa fiche ou dans le panier.</p>
-      <p class="gift__price"><span data-gift-price>10&nbsp;€</span> par flacon</p>
-      <a class="btn" href="/bibliotheque">Choisir un parfum</a>
-    </div>
-  </div>
+  <div class="gift__img"><img src="/assets/img/cadeau/librery-emballage-cadeau-accueil.jpg" alt="Deux paquets LIBRERY, papier noir et or, ruban de satin noir, sur un drap de lin" width="2400" height="1339" loading="lazy"></div>
+  <div class="wrap gift__in"><div class="gift__txt">
+    <span class="gift__kick">À offrir</span>
+    <h2 class="gift__t" id="gift-t">L’emballage <em>cadeau</em></h2>
+    <p>Papier noir à motifs or, ruban de satin imprimé LIBRERY, noué à la main à Paris. Ajoutez-le à votre flacon 100&nbsp;ml ou 30&nbsp;ml, sur sa fiche ou dans le panier.</p>
+    <p class="gift__price"><span data-gift-price>10&nbsp;€</span> par flacon</p>
+    <a class="btn" href="/bibliotheque">Choisir un parfum</a>
+  </div></div>
 </section>
 
 <!-- SECTION : book — le catalogue, présenté comme un livre ouvert (index + couverture) -->

@@ -1103,16 +1103,23 @@ html.lecteur-ouvert { overflow: hidden; scrollbar-gutter: stable; }
   .nl__form .btn { width: 100%; }
 }
 
-/* Emballage cadeau (29/10) : encart de l'accueil, case sur la fiche produit et dans le panier */
-.gift { background: #f4ede2; }
-.gift__in { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(32px, 6vw, 96px); align-items: center; padding-top: clamp(48px, 7vw, 104px); padding-bottom: clamp(48px, 7vw, 104px); }
-.gift__img { margin: 0; aspect-ratio: 4 / 5; overflow: hidden; }
-.gift__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gift__txt { max-width: 46ch; }
+/* Emballage cadeau (29/10) : encart de l'accueil (bandeau comme la lettre de la maison), case sur la fiche et dans le panier */
+.gift { position: relative; background: #f1ece4; overflow: hidden; }
+.gift__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
+.gift__in { position: relative; min-height: clamp(480px, 40vw, 640px); display: flex; align-items: center; }
+.gift__txt { width: min(440px, 38%); padding: 72px 0; }
 .gift__kick { display: block; font-family: var(--sans); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+.gift__t { font-family: var(--serif-d); font-weight: 400; font-size: clamp(38px, 3.6vw, 56px); line-height: 1.04; letter-spacing: -.01em; margin: 0; }
+.gift__t em { display: block; font-style: italic; }
 .gift__txt p { margin: 20px 0 0; font-size: 17px; line-height: 1.55; color: var(--grey); }
-.gift__txt .gift__price { margin: 18px 0 30px; font-family: var(--serif-d); font-size: 26px; color: var(--ink); }
-@media (max-width: 800px) { .gift__in { grid-template-columns: 1fr; gap: 28px; } .gift__txt .gift__price { font-size: 22px; } }
+.gift__txt .gift__price { margin: 16px 0 28px; font-family: var(--serif-d); font-size: 24px; color: var(--ink); }
+@media (max-width: 800px) {
+  .gift__img { position: relative; aspect-ratio: 16 / 10; }
+  .gift__img img { object-position: 75% 50%; }
+  .gift__in { min-height: 0; display: block; }
+  .gift__txt { width: auto; padding: 32px 0 52px; }
+  .gift__txt p { font-size: 16px; }
+}
 .pdp__gift { display: flex; gap: 14px; align-items: center; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--line, #e2d9cc); cursor: pointer; background: #fff; }
 .pdp__gift[hidden] { display: none; }
 .pdp__gift input { width: 18px; height: 18px; accent-color: var(--ink); flex: none; margin: 0; }

@@ -53,7 +53,7 @@ FICHIERS_SHOPIFY = {
     '/assets/video/skin-obsession-2.mp4': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/skin-obsession-2.mp4?v=1792768202',
     '/assets/video/skin-obsession-2-m.mp4': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/skin-obsession-2-m.mp4?v=1792768202',
     # emballage cadeau (29/10)
-    '/assets/img/cadeau/librery-emballage-cadeau-mains.jpg': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/librery-emballage-cadeau-mains.jpg',
+    '/assets/img/cadeau/librery-emballage-cadeau-accueil.jpg': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/librery-emballage-cadeau-accueil.jpg',
     '/assets/img/cadeau/librery-emballage-cadeau.jpg': 'https://cdn.shopify.com/s/files/1/0911/1594/6333/files/librery-emballage-cadeau.jpg',
 }
 
