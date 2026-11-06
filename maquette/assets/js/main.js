@@ -1962,13 +1962,15 @@
     let filter = 'all', q = '';
     const countries = ['France', ...[...new Set(STORES.map(s => s.country).filter(c => c !== 'France'))].sort((a, b) => a.localeCompare(b, 'fr'))];
     $('#stores-tabs').innerHTML = `<button data-c="all" class="is-active">Tous</button>` + countries.map(c => `<button data-c="${c}">${c}</button>`).join('');
-    let map, markers = [];
+    let map, markers = [], icon;
+    // un repère seulement pour une boutique physique dont la position est connue (null garde l'alignement avec STORES)
+    const placed = s => !s.online && isFinite(s.lat) && isFinite(s.lng);
+    const pin = s => placed(s) ? L.marker([s.lat, s.lng], { icon }).bindPopup(`<b>${esc(s.name)}</b><br>${esc(s.address)}<br>${esc(s.city)}, ${esc(s.country)}`) : null;
     if (window.L) {
       map = L.map('map', { scrollWheelZoom: false }).setView([47.5, 4.5], 5);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 19, className: 'librery-tiles' }).addTo(map);
-      const icon = L.divIcon({ className: '', html: '<div class="librery-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] });
-      // une boutique en ligne n'a pas de repère (null garde l'alignement avec STORES)
-      markers = STORES.map(s => s.online ? null : L.marker([s.lat, s.lng], { icon }).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${esc(s.address)}<br>${esc(s.city)}, ${esc(s.country)}`));
+      icon = L.divIcon({ className: '', html: '<div class="librery-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] });
+      markers = STORES.map(pin);
     }
     const render = () => {
       const items = STORES.map((s, i) => ({ s, i })).filter(({ s }) => (filter === 'all' || s.country === filter) && (!q || (s.name + ' ' + s.address + ' ' + s.city + ' ' + s.country).toLowerCase().includes(q)));
@@ -1980,16 +1982,18 @@
         </div>`).join('') : '<p class="store muted">Aucune adresse ne correspond.</p>';
       $('#stores-count').textContent = items.length + ' adresses';
       markers.forEach((m, i) => { if (map && m) items.some(x => x.i === i) ? m.addTo(map) : m.remove(); });
-      const placed = items.filter(({ s }) => !s.online);
-      if (map && placed.length) { const f = placed.filter(({ s }) => s.lng > -30 && s.lng < 60); map.fitBounds(L.latLngBounds((f.length ? f : placed).map(({ s }) => [s.lat, s.lng])), { padding: [50, 50], maxZoom: 13 }); }
+      const onMap = items.filter(({ s }) => placed(s));
+      if (map && onMap.length) { const f = onMap.filter(({ s }) => s.lng > -30 && s.lng < 60); map.fitBounds(L.latLngBounds((f.length ? f : onMap).map(({ s }) => [s.lat, s.lng])), { padding: [50, 50], maxZoom: 13 }); }
       $$('.store[data-i]', list).forEach(el => {
-        const go = () => { $$('.store', list).forEach(x => x.classList.remove('is-active')); el.classList.add('is-active'); const s = STORES[+el.dataset.i]; if (s.online) { if (s.url) window.open(s.url, '_blank', 'noopener'); return; } if (map) { map.flyTo([s.lat, s.lng], 15, { duration: .6 }); markers[+el.dataset.i].openPopup(); } };
+        const go = () => { $$('.store', list).forEach(x => x.classList.remove('is-active')); el.classList.add('is-active'); const s = STORES[+el.dataset.i]; if (s.online) { if (s.url) window.open(s.url, '_blank', 'noopener'); return; } if (map && markers[+el.dataset.i]) { map.flyTo([s.lat, s.lng], 15, { duration: .6 }); markers[+el.dataset.i].openPopup(); } };
         el.addEventListener('click', e => { if (!e.target.closest('a')) go(); }); el.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
       });
     };
     $$('#stores-tabs button').forEach(b => b.addEventListener('click', () => { filter = b.dataset.c; $$('#stores-tabs button').forEach(x => x.classList.toggle('is-active', x === b)); render(); }));
     $('#stores-q').addEventListener('input', e => { q = e.target.value.trim().toLowerCase(); render(); });
     render();
+    // boutique sans position (ajoutée dans l'admin Shopify) : placée d'après son adresse, puis la carte est redessinée
+    if (map && window.LIBRERY_GEO) window.LIBRERY_GEO().then(found => { if (!found) return; markers.forEach(m => m && m.remove()); markers = STORES.map(pin); render(); });
   }
 
   function initQuiz() {

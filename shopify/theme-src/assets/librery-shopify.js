@@ -51,6 +51,49 @@
     }
   };
 
+  /* ---------------- 1 bis. Points de vente : fiches de l'admin (Contenu → Métaobjets → Points de vente) ---------------- */
+  // Elles remplacent la liste de data.js. Position : champ « coordonnees » (« 48.8695, 2.3064 », ou un lien Google Maps
+  // qui contient « @48.8695,2.3064 ») ; vide → la carte cherche l'adresse (OpenStreetMap), une seule fois par navigateur.
+  if (Array.isArray(SHOP.pointsDeVente) && SHOP.pointsDeVente.length) {
+    const txt = v => String(v == null ? '' : v).trim();
+    const lieux = SHOP.pointsDeVente.map(f => {
+      const s = { name: txt(f.nom), address: txt(f.adresse), city: txt(f.ville), country: txt(f.pays) || 'France' };
+      if (txt(f.site)) s.url = /^https?:\/\//i.test(txt(f.site)) ? txt(f.site) : 'https://' + txt(f.site);
+      if (f.enLigne === true || f.enLigne === 'true') s.online = true;
+      if (txt(f.note)) s.note = txt(f.note);
+      const c = txt(f.coordonnees).match(/(-?\d{1,3}(?:[.,]\d+)?)\s*[,;\s]\s*(-?\d{1,3}(?:[.,]\d+)?)/) || txt(f.coordonnees).match(/!3d(-?[\d.]+)!4d(-?[\d.]+)/);
+      if (c) { const la = parseFloat(c[1].replace(',', '.')), lo = parseFloat(c[2].replace(',', '.')); if (Math.abs(la) <= 90 && Math.abs(lo) <= 180) { s.lat = la; s.lng = lo; } }
+      return s;
+    }).filter(s => s.name);
+    // France d'abord, puis les pays par ordre alphabétique ; dans un pays, l'ordre de l'admin
+    const rang = c => c === 'France' ? '' : c;
+    lieux.forEach((s, i) => { s._i = i; });
+    lieux.sort((a, b) => rang(a.country).localeCompare(rang(b.country), 'fr') || a._i - b._i);
+    lieux.forEach(s => { delete s._i; });
+    STORES.splice(0, STORES.length, ...lieux);
+  }
+  // Repères sans position : cherchés d'après l'adresse quand la page Points de vente s'ouvre (main.js, initStores)
+  window.LIBRERY_GEO = function () {
+    const manquants = STORES.filter(s => !s.online && !(isFinite(s.lat) && isFinite(s.lng)) && (s.address || s.city));
+    if (!manquants.length) return Promise.resolve(false);
+    const CLE = 'librery-geo-v1', cache = lire(CLE, {});
+    const attendre = ms => new Promise(r => setTimeout(r, ms));
+    return manquants.reduce((p, s) => p.then(async trouve => {
+      const q = [s.address, s.city, s.country].filter(Boolean).join(', ');
+      if (!cache[q]) {
+        try {
+          const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=fr&q=' + encodeURIComponent(q));
+          const j = await r.json();
+          if (j && j[0]) { cache[q] = [+j[0].lat, +j[0].lon]; try { localStorage.setItem(CLE, JSON.stringify(cache)); } catch (e) {} }
+          else console.warn('[LIBRERY] point de vente introuvable sur la carte : ' + s.name + ' (' + q + ')');
+        } catch (e) { console.warn('[LIBRERY] carte : recherche d\'adresse impossible pour ' + s.name); }
+        await attendre(1100); // règle d'usage d'OpenStreetMap : une recherche par seconde au plus
+      }
+      if (cache[q]) { s.lat = cache[q][0]; s.lng = cache[q][1]; return true; }
+      return trouve;
+    }), Promise.resolve(false));
+  };
+
   /* ---------------- 2. Produit ou collection inconnus de data.js ---------------- */
   const relais = (racine, generique) => {
     const r = document.getElementById(racine), g = document.getElementById(generique);
