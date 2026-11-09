@@ -372,17 +372,13 @@ const SHELF = [
    Au niveau de la rue seulement : Les Passionnez, La Rouge, Kyomu, Amyris Essenze. `online` : sans adresse ni repère. */
 const STORES = [
   { name: 'Maison Diaphane', address: '11 Rue des Lices', city: '49100 Angers', country: 'France', url: 'https://maison-diaphane.com/', lat: 47.4686, lng: -0.5539 },
-  { name: 'Les Passionnez', address: '43 avenue Fortuné Ferrini', city: '13080 Aix-en-Provence', country: 'France', url: 'https://lespassionnez.com/', lat: 43.4879, lng: 5.4236 },
   { name: 'NF Senteurs', address: '30 Avenue Charles de Gaulle', city: '84130 Le Pontet', country: 'France', lat: 43.9589, lng: 4.8527 },
   { name: 'Parfumerie Basic', address: '39 Rue Jeanne-d’Arc', city: '51100 Reims', country: 'France', url: 'https://www.parfumerie-basic.fr/', lat: 49.2548, lng: 4.025 },
   { name: 'Secret Garden', address: '90 Avenue Pasteur', city: '93260 Les Lilas', country: 'France', url: 'https://secretsgarden.fr', lat: 48.876, lng: 2.4153 },
   { name: 'DSB Parfums', address: '186 Boulevard de Stalingrad', city: '94500 Champigny-sur-Marne', country: 'France', url: 'https://dsb-parfums.fr/', lat: 48.8235, lng: 2.4968 },
-  { name: 'Olfactions', address: '10 Avenue Winston Churchill', city: '31100 Toulouse', country: 'France', url: 'https://olfactions.fr', lat: 43.5688, lng: 1.4013 },
   { name: 'Sillâge', address: '9 Rue aux Juifs', city: '76000 Rouen', country: 'France', url: 'https://sillage-parfums.fr/', lat: 49.4416, lng: 1.0939 },
   { name: 'Sayhar', address: '27 Rue de Marignan', city: '75008 Paris', country: 'France', url: 'https://sayhar.fr/', lat: 48.8695, lng: 2.3064 },
-  { name: 'UNI/VERE Parfumerie', address: '30 Rue d’Aboukir', city: '75002 Paris', country: 'France', lat: 48.867, lng: 2.3446 },
   { name: 'Smell Fragrance', address: '26 Rue des Cordeliers', city: '64000 Pau', country: 'France', url: 'https://smellfragrance.fr/', lat: 43.2972, lng: -0.3718 },
-  { name: 'BL Parfumerie', address: 'Avenue de Béthusy 38B', city: '1005 Lausanne', country: 'Suisse', lat: 46.5213, lng: 6.6461 },
   { name: 'Scent Split', address: '1800 Post Oak Blvd, Ste 6140', city: 'Houston, TX 77056', country: 'États-Unis', url: 'https://www.scentsplit.com', lat: 29.7472, lng: -95.4618 },
   { name: 'Absolute Fragrance', address: '2150 W First St, Ste 3B', city: 'Fort Myers, FL 33901', country: 'États-Unis', url: 'https://www.absolutefragrances.com/', lat: 26.639, lng: -81.8777 },
   { name: 'Scents Eternal', address: '9351 Warren Parkway', city: 'Frisco, TX 75035', country: 'États-Unis', url: 'https://scentseternal.com/', lat: 33.1092, lng: -96.8019 },
